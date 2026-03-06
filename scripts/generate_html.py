@@ -77,13 +77,13 @@ DASHBOARD_BODY = """
         <h2 class="text-xl font-bold text-slate-400 mb-6 flex items-center gap-2 uppercase tracking-widest">
             <i data-lucide="smile"></i> 市場情緒 (Sentiment)
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="sentimentGrid"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12" id="sentimentGrid"></div>
 
         <!-- Risk & Options Section -->
         <h2 class="text-xl font-bold text-slate-400 mb-6 flex items-center gap-2 uppercase tracking-widest">
             <i data-lucide="shield-alert"></i> 風險與期權 (Risk & Options)
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="riskGrid"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="riskGrid"></div>
 
         <!-- Internals & Breadth Section -->
         <h2 class="text-xl font-bold text-slate-400 mb-6 flex items-center gap-2 uppercase tracking-widest">
@@ -125,12 +125,12 @@ DASHBOARD_BODY = """
         const categories = {
             sentimentGrid: [
                 { label: 'CNN Fear & Greed', value: '{{ cnn_val }}', icon: 'gauge', color: 'text-sky-400' },
+                { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-400' },
                 { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-yellow-500' },
                 { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' },
                 { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
             ],
             riskGrid: [
-                { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-400' },
                 { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-400' },
                 { label: 'Equity P/C Ratio', value: latest['Equity P/C Ratio'], icon: 'trending-up', color: 'text-rose-400' },
                 { label: 'Gamma (GEX)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-500' }
