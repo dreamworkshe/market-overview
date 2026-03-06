@@ -113,8 +113,6 @@ def fetch_dix():
         print(f"Error DIX: {e}")
         return {"DIX": None, "GEX": None}
 
-def fetch_mcclellan():
-    return fetch_breadth_single("%24NYMOT")
 
 def fetch_crypto_fg():
     url = "https://api.alternative.me/fng/"
@@ -186,7 +184,6 @@ def main():
     dix_data = fetch_dix()
     results["DIX"] = dix_data["DIX"]
     results["GEX"] = dix_data["GEX"]
-    results["McClellan VSI"] = fetch_breadth_single("%24NYVSI")
 
     print(f"Fetched: {results}")
 
