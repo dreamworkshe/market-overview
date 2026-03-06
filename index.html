@@ -151,6 +151,19 @@
             <p>本網頁由 AI 自動定時抓取更新 | 免費金融數據方案</p>
         </footer>
     </div>
-    <script>lucide.createIcons();</script>
+    <script>
+        lucide.createIcons();
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                const currentFile = window.location.pathname.split('/').pop() || 'index.html';
+                if (currentFile === 'index.html') {
+                    window.location.href = 'history.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+    </script>
 </body>
 </html>
