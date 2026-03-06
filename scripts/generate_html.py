@@ -217,31 +217,37 @@ DASHBOARD_BODY = """
 
 # --- HISTORY TABLE PAGE ---
 HISTORY_BODY = """
-        <div class="glass rounded-3xl overflow-hidden mb-10">
-            <div class="p-6 border-b border-white/10">
-                <h3 class="text-xl font-semibold">歷史交易數據細節</h3>
-            </div>
+        <!-- Tabs Header -->
+        <div class="flex flex-wrap gap-2 mb-8 p-1 bg-white/5 rounded-2xl border border-white/10 max-w-fit">
+            <button onclick="switchTab('all')" id="tab-all" class="px-6 py-2 rounded-xl text-sm transition-all active-tab-history">全部紀錄</button>
+            <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">市場情緒</button>
+            <button onclick="switchTab('risk')" id="tab-risk" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">風險與期權</button>
+            <button onclick="switchTab('internals')" id="tab-internals" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">內部資金</button>
+            <button onclick="switchTab('macro')" id="tab-macro" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">宏觀趨勢</button>
+        </div>
+
+        <div class="glass rounded-3xl overflow-hidden mb-10 shadow-2xl">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-white/5 text-slate-400 text-sm uppercase">
+                <table class="w-full text-left border-collapse min-w-[1200px]">
+                    <thead class="bg-white/5 text-slate-400 text-[10px] sm:text-xs uppercase tracking-widest border-b border-white/10">
                         <tr>
-                            <th class="p-4">交易日期 (US)</th>
-                            <th class="p-4">CNN</th>
-                            <th class="p-4">VIX</th>
-                            <th class="p-4">Total P/C</th>
-                            <th class="p-4">Equity P/C</th>
-                            <th class="p-4">NAAIM</th>
-                            <th class="p-4">Crypto F&G</th>
-                            <th class="p-4">10Y-3M</th>
-                            <th class="p-4">G/S Ratio</th>
-                            <th class="p-4">AAII DIFF</th>
-                            <th class="p-4">DIX</th>
-                            <th class="p-4">GEX</th>
-                            <th class="p-4">McClellan</th>
-                            <th class="p-4">NYSE 20</th>
-                            <th class="p-4">NASD 20</th>
-                            <th class="p-4">NYSE 50</th>
-                            <th class="p-4">NASD 50</th>
+                            <th class="p-4 bg-white/5">交易日期</th>
+                            <th class="p-4 col-sentiment">CNN</th>
+                            <th class="p-4 col-sentiment">VIX</th>
+                            <th class="p-4 col-risk">Total P/C</th>
+                            <th class="p-4 col-risk">Equity P/C</th>
+                            <th class="p-4 col-sentiment">NAAIM</th>
+                            <th class="p-4 col-sentiment">Crypto</th>
+                            <th class="p-4 col-macro">10Y-3M</th>
+                            <th class="p-4 col-macro">G/S Ratio</th>
+                            <th class="p-4 col-sentiment">AAII DIFF</th>
+                            <th class="p-4 col-internals">DIX</th>
+                            <th class="p-4 col-internals">GEX</th>
+                            <th class="p-4 col-internals">McClellan</th>
+                            <th class="p-4 col-internals">NYSE 20</th>
+                            <th class="p-4 col-internals">NASD 20</th>
+                            <th class="p-4 col-internals">NYSE 50</th>
+                            <th class="p-4 col-internals">NASD 50</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-300">
@@ -250,33 +256,64 @@ HISTORY_BODY = """
             </div>
         </div>
 
+        <style>
+            .active-tab-history { background: #38bdf8 !important; color: #0f172a !important; font-weight: 700; }
+            .hide-col { display: none !important; }
+        </style>
+
     <script>
         const rawData = {{ history_json }};
         const tableBody = document.getElementById('dataTableBody');
-        [...rawData].reverse().forEach(row => {
-            const tr = document.createElement('tr');
-            tr.className = 'border-t border-white/5 hover:bg-white/5 transition-colors';
-            tr.innerHTML = `
-                <td class="p-4 text-sm font-medium text-slate-200">${row.Date}</td>
-                <td class="p-4 font-semibold text-sky-400">${row.CNN || '-'}</td>
-                <td class="p-4">${row.VIX || '-'}</td>
-                <td class="p-4">${row['Total P/C Ratio'] || '-'}</td>
-                <td class="p-4">${row['Equity P/C Ratio'] || '-'}</td>
-                <td class="p-4">${row.NAAIM || '-'}</td>
-                <td class="p-4 font-semibold text-yellow-500">${row['Crypto F&G'] || '-'}</td>
-                <td class="p-4 ${row['10Y-3M Spread'] < 0 ? 'text-red-400' : ''}">${row['10Y-3M Spread'] || '-'}</td>
-                <td class="p-4">${row['Gold/Silver Ratio'] || '-'}</td>
-                <td class="p-4">${row['AAII B-B'] || '-'}</td>
-                <td class="p-4 text-blue-400 text-xs">${row.DIX || '-'}%</td>
-                <td class="p-4 text-purple-400 text-xs">${row.GEX || '-'}B</td>
-                <td class="p-4 text-cyan-400 text-xs">${row.McClellan || '-'}</td>
-                <td class="p-4 text-emerald-400 text-xs">${row['NYSE above 20MA'] || '-'}%</td>
-                <td class="p-4 text-emerald-400 text-xs">${row['NASDAQ above 20MA'] || '-'}%</td>
-                <td class="p-4 text-indigo-400 text-xs">${row['NYSE above 50MA'] || '-'}%</td>
-                <td class="p-4 text-indigo-400 text-xs">${row['NASDAQ above 50MA'] || '-'}%</td>
-            `;
-            tableBody.appendChild(tr);
-        });
+        
+        const renderTable = () => {
+            tableBody.innerHTML = '';
+            [...rawData].reverse().forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-t border-white/5 hover:bg-white/10 transition-colors group';
+                tr.innerHTML = `
+                    <td class="p-4 text-sm font-medium text-slate-200 bg-white/5">${row.Date}</td>
+                    <td class="p-4 font-bold text-sky-400 col-sentiment">${row.CNN || '-'}</td>
+                    <td class="p-4 col-sentiment">${row.VIX || '-'}</td>
+                    <td class="p-4 col-risk">${row['Total P/C Ratio'] || '-'}</td>
+                    <td class="p-4 col-risk">${row['Equity P/C Ratio'] || '-'}</td>
+                    <td class="p-4 col-sentiment">${row.NAAIM || '-'}</td>
+                    <td class="p-4 font-semibold text-yellow-500 col-sentiment">${row['Crypto F&G'] || '-'}</td>
+                    <td class="p-4 col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-400' : ''}">${row['10Y-3M Spread'] || '-'}</td>
+                    <td class="p-4 col-macro">${row['Gold/Silver Ratio'] || '-'}</td>
+                    <td class="p-4 col-sentiment">${row['AAII B-B'] || '-'}</td>
+                    <td class="p-4 col-internals text-blue-400 text-xs">${row.DIX || '-'}%</td>
+                    <td class="p-4 col-internals text-purple-400 text-xs">${row.GEX || '-'}B</td>
+                    <td class="p-4 col-internals text-cyan-400 text-xs">${row.McClellan || '-'}</td>
+                    <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NYSE above 20MA'] || '-'}%</td>
+                    <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NASDAQ above 20MA'] || '-'}%</td>
+                    <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NYSE above 50MA'] || '-'}%</td>
+                    <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NASDAQ above 50MA'] || '-'}%</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        };
+
+        const switchTab = (cat) => {
+            // Update Tab UI
+            document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab-history'));
+            document.getElementById('tab-' + cat).classList.add('active-tab-history');
+
+            // Hide/Show columns
+            const allCols = ['col-sentiment', 'col-risk', 'col-internals', 'col-macro'];
+            allCols.forEach(cls => {
+                const elements = document.getElementsByClassName(cls);
+                for (let el of elements) {
+                    if (cat === 'all' || cls === 'col-' + cat) {
+                        el.classList.remove('hide-col');
+                    } else {
+                        el.classList.add('hide-col');
+                    }
+                }
+            });
+        };
+
+        renderTable();
+        switchTab('all');
     </script>
 """
 
