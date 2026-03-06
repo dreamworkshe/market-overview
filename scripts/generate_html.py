@@ -84,6 +84,8 @@ HTML_TEMPLATE = """
                             <th class="p-4">AAII DIFF</th>
                             <th class="p-4">NYSE 20</th>
                             <th class="p-4">NASD 20</th>
+                            <th class="p-4">NYSE 50</th>
+                            <th class="p-4">NASD 50</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-300">
@@ -199,6 +201,8 @@ HTML_TEMPLATE = """
                 <td class="p-4">${row['AAII B-B'] || '-'}</td>
                 <td class="p-4 text-emerald-400 text-xs">${row['NYSE above 20MA'] || '-'}%</td>
                 <td class="p-4 text-emerald-400 text-xs">${row['NASDAQ above 20MA'] || '-'}%</td>
+                <td class="p-4 text-indigo-400 text-xs">${row['NYSE above 50MA'] || '-'}%</td>
+                <td class="p-4 text-indigo-400 text-xs">${row['NASDAQ above 50MA'] || '-'}%</td>
             `;
             tableBody.appendChild(tr);
         });
