@@ -13,8 +13,10 @@
     "NASDAQ above 50MA": 36.5,
     "Crypto F&G": 18,
     "10Y-3M Spread": 0.558,
-    "Gold/Silver Ratio": 61.22,
+    "Gold/Silver Ratio": 60.86,
     "DIX": 46.75,
-    "GEX": 2.94
+    "GEX": 2.94,
+    "HYG/LQD Ratio": 0.7245,
+    "XLY/XLP Ratio": 1.3646
   }
 ]

@@ -55,17 +55,6 @@ BASE_FOOTER = """
     </div>
     <script>
         lucide.createIcons();
-        // Keyboard Navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                const currentFile = window.location.pathname.split('/').pop() || 'index.html';
-                if (currentFile === 'index.html') {
-                    window.location.href = 'history.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }
-        });
     </script>
 </body>
 </html>
@@ -95,7 +84,7 @@ DASHBOARD_BODY = """
         <h2 class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-[0.2em]">
             <i data-lucide="globe" class="w-4 h-4"></i> 宏觀趨勢
         </h2>
-        <div class="grid grid-cols-2 lg:grid-cols-2 gap-3 mb-8" id="macroGrid"></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 mb-8" id="macroGrid"></div>
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
@@ -137,13 +126,14 @@ DASHBOARD_BODY = """
             ],
             internalGrid: [
                 { label: 'Dark Pool (DIX)', value: latest.DIX + '%', icon: 'shield-check', color: 'text-blue-500' },
-                { label: 'McClellan Osc', value: latest.McClellan, icon: 'waves', color: 'text-cyan-400' },
                 { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' },
                 { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' }
             ],
             macroGrid: [
                 { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-400' : 'text-blue-400' },
-                { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' }
+                { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' },
+                { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-300' },
+                { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-300' }
             ]
         };
 
@@ -243,11 +233,12 @@ HISTORY_BODY = """
                             <th class="p-4 col-sentiment">AAII DIFF</th>
                             <th class="p-4 col-internals">DIX</th>
                             <th class="p-4 col-internals">GEX</th>
-                            <th class="p-4 col-internals">McClellan</th>
                             <th class="p-4 col-internals">NYSE 20</th>
                             <th class="p-4 col-internals">NASD 20</th>
                             <th class="p-4 col-internals">NYSE 50</th>
                             <th class="p-4 col-internals">NASD 50</th>
+                            <th class="p-4 col-macro">HYG/LQD</th>
+                            <th class="p-4 col-macro">XLY/XLP</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-300">
@@ -283,17 +274,19 @@ HISTORY_BODY = """
                     <td class="p-4 col-sentiment">${row['AAII B-B'] || '-'}</td>
                     <td class="p-4 col-internals text-blue-400 text-xs">${row.DIX || '-'}%</td>
                     <td class="p-4 col-internals text-purple-400 text-xs">${row.GEX || '-'}B</td>
-                    <td class="p-4 col-internals text-cyan-400 text-xs">${row.McClellan || '-'}</td>
                     <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NYSE above 20MA'] || '-'}%</td>
                     <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NASDAQ above 20MA'] || '-'}%</td>
                     <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NYSE above 50MA'] || '-'}%</td>
                     <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NASDAQ above 50MA'] || '-'}%</td>
+                    <td class="p-4 col-macro text-orange-300 text-[10px]">${row['HYG/LQD Ratio'] || '-'}</td>
+                    <td class="p-4 col-macro text-pink-300 text-[10px]">${row['XLY/XLP Ratio'] || '-'}</td>
                 `;
                 tableBody.appendChild(tr);
             });
         };
 
         const switchTab = (cat) => {
+            currentTab = cat;
             // Update Tab UI
             document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab-history'));
             document.getElementById('tab-' + cat).classList.add('active-tab-history');
@@ -311,6 +304,19 @@ HISTORY_BODY = """
                 }
             });
         };
+
+        // Keyboard Navigation for Tabs
+        const tabs = ['all', 'sentiment', 'risk', 'internals', 'macro'];
+        let currentTab = 'all';
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                let idx = tabs.indexOf(currentTab);
+                if (e.key === 'ArrowRight') idx = (idx + 1) % tabs.length;
+                else idx = (idx - 1 + tabs.length) % tabs.length;
+                switchTab(tabs[idx]);
+            }
+        });
 
         renderTable();
         switchTab('all');

@@ -89,11 +89,11 @@ def fetch_breadth_single(symbol):
         response = requests.get(url, headers=HEADERS, timeout=10)
         # Look for the price in the meta tags or script
         # Example: <meta name="description" content="$NYA50R - NYSE stocks above 50-day MA: 50.35">
-        match = re.search(r'([\$A-Z0-9]+)\s*:\s*([\d\.]+)', response.text)
+        match = re.search(r'([\$A-Z0-9]+)\s*:\s*(-?[\d\.]+)', response.text)
         if match:
             return float(match.group(2))
         # Regex search for current price in the chart data or summary
-        match = re.search(r'Last:\s*(\d+\.\d+)', response.text)
+        match = re.search(r'Last:\s*(-?\d+\.\d+)', response.text)
         if match:
             return float(match.group(1))
     except Exception as e:
@@ -128,20 +128,28 @@ def fetch_crypto_fg():
 
 def fetch_macro_data():
     try:
-        # 10Y (^TNX), 3M (^IRX), Gold (GC=F), Silver (SI=F)
-        tickers = yf.Tickers("^TNX ^IRX GC=F SI=F")
+        # Metals & Rates: 10Y (^TNX), 3M (^IRX), Gold (GC=F), Silver (SI=F)
+        # Sector Ratios: HYG (High Yield), LQD (Inv. Grade), XLY (Disc.), XLP (Staples)
+        tickers_str = "^TNX ^IRX GC=F SI=F HYG LQD XLY XLP"
+        tickers = yf.Tickers(tickers_str)
         prices = {}
-        for t in ["^TNX", "^IRX", "GC=F", "SI=F"]:
-            p = tickers.tickers[t].history(period="1d")['Close'].iloc[-1]
-            prices[t] = p
+        for t in tickers_str.split():
+            hist = tickers.tickers[t].history(period="1d")
+            if not hist.empty:
+                prices[t] = hist['Close'].iloc[-1]
+            else:
+                return None, None, None, None
         
-        # Calculate Spread and Ratio
+        # Calculate Ratios
         spread = round(prices["^TNX"] - prices["^IRX"], 3)
         gs_ratio = round(prices["GC=F"] / prices["SI=F"], 2)
-        return spread, gs_ratio
+        hyg_lqd = round(prices["HYG"] / prices["LQD"], 4)
+        xly_xlp = round(prices["XLY"] / prices["XLP"], 4)
+        
+        return spread, gs_ratio, hyg_lqd, xly_xlp
     except Exception as e:
         print(f"Error fetching Macro data: {e}")
-        return None, None
+        return None, None, None, None
 
 def main():
     # Use US/New_York time for consistency with market trading days
@@ -169,14 +177,15 @@ def main():
     results["NASDAQ above 50MA"] = fetch_breadth_single("%24NAA50R")
 
     results["Crypto F&G"] = fetch_crypto_fg()
-    spread, gs_ratio = fetch_macro_data()
+    spread, gs_ratio, hyg_lqd, xly_xlp = fetch_macro_data()
     results["10Y-3M Spread"] = spread
     results["Gold/Silver Ratio"] = gs_ratio
+    results["HYG/LQD Ratio"] = hyg_lqd
+    results["XLY/XLP Ratio"] = xly_xlp
 
     dix_data = fetch_dix()
     results["DIX"] = dix_data["DIX"]
     results["GEX"] = dix_data["GEX"]
-    results["McClellan"] = fetch_mcclellan()
 
     print(f"Fetched: {results}")
 

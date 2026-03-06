@@ -67,11 +67,12 @@
                             <th class="p-4 col-sentiment">AAII DIFF</th>
                             <th class="p-4 col-internals">DIX</th>
                             <th class="p-4 col-internals">GEX</th>
-                            <th class="p-4 col-internals">McClellan</th>
                             <th class="p-4 col-internals">NYSE 20</th>
                             <th class="p-4 col-internals">NASD 20</th>
                             <th class="p-4 col-internals">NYSE 50</th>
                             <th class="p-4 col-internals">NASD 50</th>
+                            <th class="p-4 col-macro">HYG/LQD</th>
+                            <th class="p-4 col-macro">XLY/XLP</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-300">
@@ -86,7 +87,7 @@
         </style>
 
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 61.22, "DIX": 46.75, "GEX": 2.94}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.86, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646}];
         const tableBody = document.getElementById('dataTableBody');
         
         const renderTable = () => {
@@ -107,17 +108,19 @@
                     <td class="p-4 col-sentiment">${row['AAII B-B'] || '-'}</td>
                     <td class="p-4 col-internals text-blue-400 text-xs">${row.DIX || '-'}%</td>
                     <td class="p-4 col-internals text-purple-400 text-xs">${row.GEX || '-'}B</td>
-                    <td class="p-4 col-internals text-cyan-400 text-xs">${row.McClellan || '-'}</td>
                     <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NYSE above 20MA'] || '-'}%</td>
                     <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NASDAQ above 20MA'] || '-'}%</td>
                     <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NYSE above 50MA'] || '-'}%</td>
                     <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NASDAQ above 50MA'] || '-'}%</td>
+                    <td class="p-4 col-macro text-orange-300 text-[10px]">${row['HYG/LQD Ratio'] || '-'}</td>
+                    <td class="p-4 col-macro text-pink-300 text-[10px]">${row['XLY/XLP Ratio'] || '-'}</td>
                 `;
                 tableBody.appendChild(tr);
             });
         };
 
         const switchTab = (cat) => {
+            currentTab = cat;
             // Update Tab UI
             document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab-history'));
             document.getElementById('tab-' + cat).classList.add('active-tab-history');
@@ -136,6 +139,19 @@
             });
         };
 
+        // Keyboard Navigation for Tabs
+        const tabs = ['all', 'sentiment', 'risk', 'internals', 'macro'];
+        let currentTab = 'all';
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                let idx = tabs.indexOf(currentTab);
+                if (e.key === 'ArrowRight') idx = (idx + 1) % tabs.length;
+                else idx = (idx - 1 + tabs.length) % tabs.length;
+                switchTab(tabs[idx]);
+            }
+        });
+
         renderTable();
         switchTab('all');
     </script>
@@ -145,17 +161,6 @@
     </div>
     <script>
         lucide.createIcons();
-        // Keyboard Navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                const currentFile = window.location.pathname.split('/').pop() || 'index.html';
-                if (currentFile === 'index.html') {
-                    window.location.href = 'history.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }
-        });
     </script>
 </body>
 </html>

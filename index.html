@@ -63,7 +63,7 @@
         <h2 class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-[0.2em]">
             <i data-lucide="globe" class="w-4 h-4"></i> 宏觀趨勢
         </h2>
-        <div class="grid grid-cols-2 lg:grid-cols-2 gap-3 mb-8" id="macroGrid"></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 mb-8" id="macroGrid"></div>
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
@@ -86,7 +86,7 @@
         </div>
 
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 61.22, "DIX": 46.75, "GEX": 2.94}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.86, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646}];
         const latest = rawData[rawData.length - 1];
 
         // Main Metrics UI Groups
@@ -105,13 +105,14 @@
             ],
             internalGrid: [
                 { label: 'Dark Pool (DIX)', value: latest.DIX + '%', icon: 'shield-check', color: 'text-blue-500' },
-                { label: 'McClellan Osc', value: latest.McClellan, icon: 'waves', color: 'text-cyan-400' },
                 { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' },
                 { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' }
             ],
             macroGrid: [
                 { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-400' : 'text-blue-400' },
-                { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' }
+                { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' },
+                { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-300' },
+                { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-300' }
             ]
         };
 
@@ -187,17 +188,6 @@
     </div>
     <script>
         lucide.createIcons();
-        // Keyboard Navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                const currentFile = window.location.pathname.split('/').pop() || 'index.html';
-                if (currentFile === 'index.html') {
-                    window.location.href = 'history.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }
-        });
     </script>
 </body>
 </html>
