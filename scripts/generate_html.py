@@ -28,7 +28,7 @@ HTML_TEMPLATE = """
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
             <div>
                 <h1 class="text-4xl font-bold gradient-text">市場數據儀表板</h1>
-                <p class="text-slate-400 mt-2">最後更新於: <span id="lastUpdated" class="text-slate-200">正在載入...</span> (美股數據)</p>
+                <p class="text-slate-400 mt-2">最後交易日: <span id="lastUpdated" class="text-slate-200">正在載入...</span> (美股日期 / NY Time)</p>
             </div>
             <div class="glass px-6 py-3 rounded-2xl flex items-center gap-4">
                 <div class="flex flex-col">
@@ -75,7 +75,7 @@ HTML_TEMPLATE = """
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-white/5 text-slate-400 text-sm uppercase">
                         <tr>
-                            <th class="p-4">日期</th>
+                            <th class="p-4">交易日期 (US)</th>
                             <th class="p-4">CNN</th>
                             <th class="p-4">VIX</th>
                             <th class="p-4">Total P/C</th>
