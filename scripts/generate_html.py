@@ -73,7 +73,7 @@ DASHBOARD_BODY = """
                     <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">宏觀趨勢 Macro</h2>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3" id="macroGrid"></div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="macroGrid"></div>
             </section>
 
             <!-- Sentiment Section: Full Width Row -->
@@ -113,7 +113,8 @@ DASHBOARD_BODY = """
                 { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-500' : 'text-blue-600' },
                 { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-600' },
                 { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-600' },
-                { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-600' }
+                { label: 'Copper/Gold Ratio', value: latest['Copper/Gold Ratio'], icon: 'coins', color: 'text-amber-600' },
+                { label: 'KBE/SPY Ratio', value: latest['KBE/SPY Ratio'], icon: 'building', color: 'text-indigo-600' }
             ],
             sentimentGrid: [
                 { label: 'CNN Fear & Greed', value: '{{ cnn_val }}', icon: 'gauge', color: 'text-sky-600' },
@@ -262,7 +263,8 @@ HISTORY_BODY = """
                             <th class="p-6 col-macro">10Y-3M</th>
                             <th class="p-6 col-macro">HYG/LQD</th>
                             <th class="p-6 col-macro">XLY/XLP</th>
-                            <th class="p-6 col-macro">G/S Ratio</th>
+                            <th class="p-6 col-macro text-nowrap">C/G Ratio</th>
+                            <th class="p-6 col-macro text-nowrap">KBE/SPY</th>
                             <th class="p-6 col-sentiment text-nowrap">CNN F&G</th>
                             <th class="p-6 col-sentiment">VIX</th>
                             <th class="p-6 col-sentiment">NAAIM</th>
@@ -298,7 +300,8 @@ HISTORY_BODY = """
                     <td class="p-6 text-xs col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
                     <td class="p-6 text-xs font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
                     <td class="p-6 text-xs font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
-                    <td class="p-6 text-xs col-macro text-slate-500">${row['Gold/Silver Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs col-macro font-bold text-amber-600">${row['Copper/Gold Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs col-macro font-bold text-indigo-600">${row['KBE/SPY Ratio'] || '--'}</td>
                     <td class="p-6 text-xs font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
                     <td class="p-6 text-xs col-sentiment">${row.VIX || '--'}</td>
                     <td class="p-6 text-xs col-sentiment">${row.NAAIM || '--'}</td>

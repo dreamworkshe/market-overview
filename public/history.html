@@ -1,121 +1,109 @@
 
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歷史數據 | Market Overview</title>
+    <title>歷史紀錄 | Market Overview</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .card-hover:hover { transform: translateY(-4px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .active-tab { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8 !important; color: #38bdf8; font-weight: 600; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 0, 0, 0.05); }
+        .gradient-text { background: linear-gradient(135deg, #020617, #475569); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card-hover:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); transition: all 0.2s ease; }
+        .active-tab { background: #0f172a; color: white !important; font-weight: 700; }
     </style>
 </head>
-<body class="p-2 md:p-4">
-    <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white/5 p-4 rounded-3xl border border-white/10">
-            <div class="flex flex-col md:flex-row items-center gap-6">
-                <div class="overflow-hidden">
-                    <pre class="text-[7px] leading-[1.2] md:text-[9px] font-bold gradient-text opacity-90 select-none tracking-tight">
- █▀▄▀█ ▄▀█ █▀█ █▄▀ █▀▀ ▀█▀   █▀█ █░█ █▀▀ █▀█ █░█ █ █▀▀ █░█░█
- █░▀░█ █▀█ █▀▄ █░█ ██▄ ░█░   █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █ ██▄ ▀▄▀▄▀
-                    </pre>
-                </div>
-                <div class="h-10 w-px bg-white/10 hidden md:block"></div>
-                <div class="text-center md:text-left">
-                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.2em] mb-1">Trading Date</p>
-                    <p class="text-xl font-bold text-slate-200 tracking-tight">2026/3/5</p>
+<body class="p-2 md:p-3">
+    <div class="max-w-5xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-5 gap-3 bg-white p-3 px-6 rounded-3xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-4">
+                <div class="flex flex-col md:flex-row md:items-baseline gap-2">
+                    <h1 class="text-xl md:text-2xl font-black gradient-text tracking-tighter">Market Overview</h1>
+                    <span class="text-xs md:text-sm font-bold text-slate-400 font-mono">:: 2026/3/5</span>
                 </div>
             </div>
             
-            <nav class="flex gap-1 p-1 bg-black/20 rounded-xl border border-white/5 text-xs">
-                <a href="index.html" class="px-4 py-1.5 rounded-lg transition-all ">儀表板</a>
-                <a href="history.html" class="px-4 py-1.5 rounded-lg transition-all active-tab">歷史紀錄</a>
+            <nav class="flex gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-[13px] font-bold">
+                <a href="index.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 ">儀表板</a>
+                <a href="charts.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 ">圖表區</a>
+                <a href="history.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 active-tab">歷史紀錄</a>
             </nav>
         </header>
 
-        <!-- Tabs Header -->
-        <div class="flex flex-wrap gap-2 mb-8 p-1 bg-white/5 rounded-2xl border border-white/10 max-w-fit">
-            <button onclick="switchTab('all')" id="tab-all" class="px-6 py-2 rounded-xl text-sm transition-all active-tab-history">全部紀錄</button>
-            <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">市場情緒</button>
-            <button onclick="switchTab('risk')" id="tab-risk" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">風險與期權</button>
-            <button onclick="switchTab('internals')" id="tab-internals" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">內部資金</button>
-            <button onclick="switchTab('macro')" id="tab-macro" class="px-6 py-2 rounded-xl text-sm transition-all hover:bg-white/5">宏觀趨勢</button>
+        <div class="flex flex-wrap gap-2 mb-10 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 max-w-fit mx-auto md:mx-0">
+            <button onclick="switchTab('all')" id="tab-all" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all active-tab shadow-sm">全部紀錄</button>
+            <button onclick="switchTab('macro')" id="tab-macro" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
+            <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">市場情緒</button>
+            <button onclick="switchTab('risk')" id="tab-risk" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">風險與期權</button>
+            <button onclick="switchTab('internals')" id="tab-internals" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">內部資金</button>
         </div>
 
-        <div class="glass rounded-3xl overflow-hidden mb-10 shadow-2xl">
+        <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[1200px]">
-                    <thead class="bg-white/5 text-slate-400 text-[10px] sm:text-xs uppercase tracking-widest border-b border-white/10">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-200">
                         <tr>
-                            <th class="p-4 bg-white/5">交易日期</th>
-                            <th class="p-4 col-sentiment">CNN</th>
-                            <th class="p-4 col-sentiment">VIX</th>
-                            <th class="p-4 col-risk">Total P/C</th>
-                            <th class="p-4 col-risk">Equity P/C</th>
-                            <th class="p-4 col-sentiment">NAAIM</th>
-                            <th class="p-4 col-sentiment">Crypto</th>
-                            <th class="p-4 col-macro">10Y-3M</th>
-                            <th class="p-4 col-macro">G/S Ratio</th>
-                            <th class="p-4 col-sentiment">AAII DIFF</th>
-                            <th class="p-4 col-internals text-xs">DIX</th>
-                            <th class="p-4 col-internals text-xs">GEX</th>
-                            <th class="p-4 col-internals text-xs">MVSI</th>
-                            <th class="p-4 col-internals text-xs">NYSE 20</th>
-                            <th class="p-4 col-internals text-xs">NASD 20</th>
-                            <th class="p-4 col-internals text-xs">NYSE 50</th>
-                            <th class="p-4 col-internals text-xs">NASD 50</th>
-                            <th class="p-4 col-macro text-xs">HYG/LQD</th>
-                            <th class="p-4 col-macro text-xs">XLY/XLP</th>
+                            <th class="p-6">交易日期</th>
+                            <th class="p-6 col-macro">10Y-3M</th>
+                            <th class="p-6 col-macro">HYG/LQD</th>
+                            <th class="p-6 col-macro">XLY/XLP</th>
+                            <th class="p-6 col-macro text-nowrap">C/G Ratio</th>
+                            <th class="p-6 col-macro text-nowrap">KBE/SPY</th>
+                            <th class="p-6 col-sentiment text-nowrap">CNN F&G</th>
+                            <th class="p-6 col-sentiment">VIX</th>
+                            <th class="p-6 col-sentiment">NAAIM</th>
+                            <th class="p-6 col-sentiment">AAII Spread</th>
+                            <th class="p-6 col-sentiment">Crypto</th>
+                            <th class="p-6 col-risk">Gamma (GEX)</th>
+                            <th class="p-6 col-risk">Equity P/C</th>
+                            <th class="p-6 col-risk">Total P/C</th>
+                            <th class="p-6 col-internals">Dark Pool</th>
+                            <th class="p-6 col-internals text-nowrap">NYSE 20</th>
+                            <th class="p-6 col-internals text-nowrap">NASD 20</th>
+                            <th class="p-6 col-internals text-nowrap">NYSE 50</th>
+                            <th class="p-6 col-internals text-nowrap">NASD 50</th>
                         </tr>
                     </thead>
-                    <tbody id="dataTableBody" class="text-slate-300">
+                    <tbody id="dataTableBody" class="text-slate-600">
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <style>
-            .active-tab-history { background: #38bdf8 !important; color: #0f172a !important; font-weight: 700; }
-            .hide-col { display: none !important; }
-        </style>
-
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.71, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.73, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646, "XLP/XLY Ratio": 0.7328, "Copper/Gold Ratio": 0.0011, "KBE/SPY Ratio": 0.0895}];
         const tableBody = document.getElementById('dataTableBody');
         
         const renderTable = () => {
             tableBody.innerHTML = '';
-            [...rawData].reverse().forEach(row => {
+            [...rawData].sort((a,b) => new Date(b.Date) - new Date(a.Date)).forEach(row => {
                 const tr = document.createElement('tr');
-                tr.className = 'border-t border-white/5 hover:bg-white/10 transition-colors group';
+                tr.className = 'border-t border-slate-100 hover:bg-slate-50 transition-colors';
                 tr.innerHTML = `
-                    <td class="p-4 text-sm font-medium text-slate-200 bg-white/5">${row.Date}</td>
-                    <td class="p-4 text-xs font-semibold text-sky-400 col-sentiment">${row.CNN || '-'}</td>
-                    <td class="p-4 text-xs col-sentiment">${row.VIX || '-'}</td>
-                    <td class="p-4 text-xs col-risk">${row['Total P/C Ratio'] || '-'}</td>
-                    <td class="p-4 text-xs col-risk">${row['Equity P/C Ratio'] || '-'}</td>
-                    <td class="p-4 text-xs col-sentiment">${row.NAAIM || '-'}</td>
-                    <td class="p-4 text-xs font-semibold text-yellow-500 col-sentiment">${row['Crypto F&G'] || '-'}</td>
-                    <td class="p-4 text-xs col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-400' : ''}">${row['10Y-3M Spread'] || '-'}</td>
-                    <td class="p-4 text-xs col-macro">${row['Gold/Silver Ratio'] || '-'}</td>
-                    <td class="p-4 text-xs col-sentiment">${row['AAII B-B'] || '-'}</td>
-                    <td class="p-4 col-internals text-blue-400 text-xs">${row.DIX || '-'}%</td>
-                    <td class="p-4 col-internals text-purple-400 text-xs">${row.GEX || '-'}B</td>
-                    <td class="p-4 col-internals text-cyan-400 text-xs">${row['McClellan VSI'] || '-'}</td>
-                    <td class="p-4 col-internals text-emerald-400 text-xs">${row['NYSE above 20MA'] || '-'}%</td>
-                    <td class="p-4 col-internals text-emerald-400 text-xs">${row['NASDAQ above 20MA'] || '-'}%</td>
-                    <td class="p-4 col-internals text-indigo-400 text-xs">${row['NYSE above 50MA'] || '-'}%</td>
-                    <td class="p-4 col-internals text-indigo-400 text-xs">${row['NASDAQ above 50MA'] || '-'}%</td>
-                    <td class="p-4 col-macro text-orange-300 text-xs">${row['HYG/LQD Ratio'] || '-'}</td>
-                    <td class="p-4 col-macro text-pink-300 text-xs">${row['XLY/XLP Ratio'] || '-'}</td>
+                    <td class="p-6 text-xs font-black text-slate-900 bg-slate-50/30">${row.Date}</td>
+                    <td class="p-6 text-xs col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
+                    <td class="p-6 text-xs font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs col-macro font-bold text-amber-600">${row['Copper/Gold Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs col-macro font-bold text-indigo-600">${row['KBE/SPY Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
+                    <td class="p-6 text-xs col-sentiment">${row.VIX || '--'}</td>
+                    <td class="p-6 text-xs col-sentiment">${row.NAAIM || '--'}</td>
+                    <td class="p-6 text-xs col-sentiment">${row['AAII B-B'] || '--'}</td>
+                    <td class="p-6 text-xs font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
+                    <td class="p-6 text-xs text-purple-700 font-black col-risk">${row.GEX || '--'}B</td>
+                    <td class="p-6 text-xs col-risk">${row['Equity P/C Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs col-risk">${row['Total P/C Ratio'] || '--'}</td>
+                    <td class="p-6 text-xs text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
+                    <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
+                    <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
+                    <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>
+                    <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NASDAQ above 50MA'] || '--'}%</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -123,26 +111,23 @@
 
         const switchTab = (cat) => {
             currentTab = cat;
-            // Update Tab UI
-            document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab-history'));
-            document.getElementById('tab-' + cat).classList.add('active-tab-history');
+            document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab'));
+            document.getElementById('tab-' + cat).classList.add('active-tab');
 
-            // Hide/Show columns
             const allCols = ['col-sentiment', 'col-risk', 'col-internals', 'col-macro'];
             allCols.forEach(cls => {
                 const elements = document.getElementsByClassName(cls);
                 for (let el of elements) {
                     if (cat === 'all' || cls === 'col-' + cat) {
-                        el.classList.remove('hide-col');
+                        el.style.display = '';
                     } else {
-                        el.classList.add('hide-col');
+                        el.style.display = 'none';
                     }
                 }
             });
         };
 
-        // Keyboard Navigation for Tabs
-        const tabs = ['all', 'sentiment', 'risk', 'internals', 'macro'];
+        const tabs = ['all', 'macro', 'sentiment', 'risk', 'internals'];
         let currentTab = 'all';
 
         document.addEventListener('keydown', (e) => {
@@ -158,7 +143,8 @@
         switchTab('all');
     </script>
 
-        <footer class="text-center text-slate-500 text-sm py-8">
+        <footer class="text-center text-slate-400 text-sm py-12">
+            <p>© 2026 Market Overview Dashboard</p>
         </footer>
     </div>
     <script>

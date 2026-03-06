@@ -126,9 +126,9 @@ def fetch_crypto_fg():
 
 def fetch_macro_data():
     try:
-        # Metals & Rates: 10Y (^TNX), 3M (^IRX), Gold (GC=F), Silver (SI=F)
-        # Sector Ratios: HYG (High Yield), LQD (Inv. Grade), XLY (Disc.), XLP (Staples)
-        tickers_str = "^TNX ^IRX GC=F SI=F HYG LQD XLY XLP"
+        # Metals & Rates: 10Y (^TNX), 3M (^IRX), Gold (GC=F), Copper (HG=F)
+        # Sector Ratios: HYG (High Yield), LQD (Inv. Grade), XLY (Disc.), XLP (Staples), KBE (Banks), SPY (S&P 500)
+        tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY"
         tickers = yf.Tickers(tickers_str)
         prices = {}
         for t in tickers_str.split():
@@ -136,18 +136,19 @@ def fetch_macro_data():
             if not hist.empty:
                 prices[t] = hist['Close'].iloc[-1]
             else:
-                return None, None, None, None
+                return None, None, None, None, None
         
         # Calculate Ratios
         spread = round(prices["^TNX"] - prices["^IRX"], 3)
-        gs_ratio = round(prices["GC=F"] / prices["SI=F"], 2)
+        cg_ratio = round(prices["HG=F"] / prices["GC=F"], 4)
         hyg_lqd = round(prices["HYG"] / prices["LQD"], 4)
         xly_xlp = round(prices["XLY"] / prices["XLP"], 4)
+        kbe_spy = round(prices["KBE"] / prices["SPY"], 4)
         
-        return spread, gs_ratio, hyg_lqd, xly_xlp
+        return spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy
     except Exception as e:
         print(f"Error fetching Macro data: {e}")
-        return None, None, None, None
+        return None, None, None, None, None
 
 def main():
     # Use US/New_York time for consistency with market trading days
@@ -175,11 +176,16 @@ def main():
     results["NASDAQ above 50MA"] = fetch_breadth_single("%24NAA50R")
 
     results["Crypto F&G"] = fetch_crypto_fg()
-    spread, gs_ratio, hyg_lqd, xly_xlp = fetch_macro_data()
+    spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy = fetch_macro_data()
     results["10Y-3M Spread"] = spread
-    results["Gold/Silver Ratio"] = gs_ratio
+    results["Copper/Gold Ratio"] = cg_ratio
     results["HYG/LQD Ratio"] = hyg_lqd
     results["XLY/XLP Ratio"] = xly_xlp
+    results["KBE/SPY Ratio"] = kbe_spy
+    
+    if "Gold/Silver Ratio" in results:
+        del results["Gold/Silver Ratio"]
+
 
     dix_data = fetch_dix()
     results["DIX"] = dix_data["DIX"]

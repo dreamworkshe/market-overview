@@ -21,7 +21,7 @@
 - **情緒 (Sentiment)**: CNN F&G, Crypto F&G, NAAIM, AAII。
 - **風險與期權 (Risk & Options)**: CBOE Equity/Total P/C Ratios, VIX, GEX (Gamma Exposure)。
 - **內部資金與廣度 (Internals)**: DIX (Dark Pool Index), NYSE/NASD 20MA & 50MA 廣度（已精簡至核心 5 項指標）。
-- **宏觀趨勢 (Macro)**: 10Y-3M 利差、HYG/LQD、XLY/XLP 及金銀比。
+- **宏觀趨勢 (Macro)**: 10Y-3M 利差、HYG/LQD、XLY/XLP、銅金比 (Copper/Gold) 及 KBE/SPY 比值。
 
 ## 5. UI/UX 特色
 - **三頁導頁**: 獨立的「儀表板 (Dashboard)」、「圖表區 (Charts)」與「歷史紀錄 (History)」，動態橫向導覽。

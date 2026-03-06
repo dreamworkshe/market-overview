@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,111 +9,100 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .card-hover:hover { transform: translateY(-4px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .active-tab { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8 !important; color: #38bdf8; font-weight: 600; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 0, 0, 0.05); }
+        .gradient-text { background: linear-gradient(135deg, #020617, #475569); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card-hover:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); transition: all 0.2s ease; }
+        .active-tab { background: #0f172a; color: white !important; font-weight: 700; }
     </style>
 </head>
-<body class="p-2 md:p-4">
-    <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white/5 p-4 rounded-3xl border border-white/10">
-            <div class="flex flex-col md:flex-row items-center gap-6">
-                <div class="overflow-hidden">
-                    <pre class="text-[7px] leading-[1.2] md:text-[9px] font-bold gradient-text opacity-90 select-none tracking-tight">
- █▀▄▀█ ▄▀█ █▀█ █▄▀ █▀▀ ▀█▀   █▀█ █░█ █▀▀ █▀█ █░█ █ █▀▀ █░█░█
- █░▀░█ █▀█ █▀▄ █░█ ██▄ ░█░   █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █ ██▄ ▀▄▀▄▀
-                    </pre>
-                </div>
-                <div class="h-10 w-px bg-white/10 hidden md:block"></div>
-                <div class="text-center md:text-left">
-                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.2em] mb-1">Trading Date</p>
-                    <p class="text-xl font-bold text-slate-200 tracking-tight">2026/3/5</p>
+<body class="p-2 md:p-3">
+    <div class="max-w-5xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-5 gap-3 bg-white p-3 px-6 rounded-3xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-4">
+                <div class="flex flex-col md:flex-row md:items-baseline gap-2">
+                    <h1 class="text-xl md:text-2xl font-black gradient-text tracking-tighter">Market Overview</h1>
+                    <span class="text-xs md:text-sm font-bold text-slate-400 font-mono">:: 2026/3/5</span>
                 </div>
             </div>
             
-            <nav class="flex gap-1 p-1 bg-black/20 rounded-xl border border-white/5 text-xs">
-                <a href="index.html" class="px-4 py-1.5 rounded-lg transition-all active-tab">儀表板</a>
-                <a href="history.html" class="px-4 py-1.5 rounded-lg transition-all ">歷史紀錄</a>
+            <nav class="flex gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-[13px] font-bold">
+                <a href="index.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 active-tab">儀表板</a>
+                <a href="charts.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 ">圖表區</a>
+                <a href="history.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 ">歷史紀錄</a>
             </nav>
         </header>
 
-        <!-- Sentiment Section -->
-        <h2 class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-[0.2em]">
-            <i data-lucide="smile" class="w-4 h-4"></i> 市場情緒
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6" id="sentimentGrid"></div>
-
-        <!-- Risk & Options Section -->
-        <h2 class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-[0.2em]">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i> 風險與期權
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 mb-6" id="riskGrid"></div>
-
-        <!-- Internals & Breadth Section -->
-        <h2 class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-[0.2em]">
-            <i data-lucide="layers" class="w-4 h-4"></i> 內部資金與廣度
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6" id="internalGrid"></div>
-
-        <!-- Macro Section -->
-        <h2 class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-[0.2em]">
-            <i data-lucide="globe" class="w-4 h-4"></i> 宏觀趨勢
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 mb-8" id="macroGrid"></div>
-
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-            <div class="glass p-6 rounded-3xl">
-                <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-                    <i data-lucide="trending-up" class="text-sky-400"></i> 情緒指標趨勢
-                </h3>
-                <div class="h-80">
-                    <canvas id="sentimentChart"></canvas>
+        <div class="space-y-6">
+            <!-- Macro Section: Full Width Row -->
+            <section>
+                <div class="flex items-center gap-2 mb-2 px-1">
+                    <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">宏觀趨勢 Macro</h2>
                 </div>
-            </div>
-            <div class="glass p-6 rounded-3xl">
-                <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-                    <i data-lucide="bar-chart-3" class="text-purple-400"></i> 市場廣度 (Moving Averages)
-                </h3>
-                <div class="h-80">
-                    <canvas id="breadthChart"></canvas>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="macroGrid"></div>
+            </section>
+
+            <!-- Sentiment Section: Full Width Row -->
+            <section>
+                <div class="flex items-center gap-2 mb-2 px-1">
+                    <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場情緒 Sentiment</h2>
                 </div>
-            </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
+            </section>
+
+            <!-- Risk Section: Full Width Row -->
+            <section>
+                <div class="flex items-center gap-2 mb-2 px-1">
+                    <div class="w-1 h-3 bg-purple-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">風險與期權 Risk</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3" id="riskGrid"></div>
+            </section>
+
+            <!-- Internals Section: Full Width Row -->
+            <section>
+                <div class="flex items-center gap-2 mb-2 px-1">
+                    <div class="w-1 h-3 bg-emerald-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">內部資金與廣度 Internals</h2>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="internalGrid"></div>
+            </section>
         </div>
 
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.71, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.73, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646, "XLP/XLY Ratio": 0.7328, "Copper/Gold Ratio": 0.0011, "KBE/SPY Ratio": 0.0895}];
         const latest = rawData[rawData.length - 1];
 
-        // Main Metrics UI Groups
         const categories = {
+            macroGrid: [
+                { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-500' : 'text-blue-600' },
+                { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-600' },
+                { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-600' },
+                { label: 'Copper/Gold Ratio', value: latest['Copper/Gold Ratio'], icon: 'coins', color: 'text-amber-600' },
+                { label: 'KBE/SPY Ratio', value: latest['KBE/SPY Ratio'], icon: 'building', color: 'text-indigo-600' }
+            ],
             sentimentGrid: [
-                { label: 'CNN Fear & Greed', value: '33.77', icon: 'gauge', color: 'text-sky-400' },
-                { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-400' },
-                { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-yellow-500' },
-                { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' },
-                { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
+                { label: 'CNN Fear & Greed', value: '33.77', icon: 'gauge', color: 'text-sky-600' },
+                { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-500' },
+                { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-600' },
+                { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-rose-500' },
+                { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-amber-500' }
             ],
             riskGrid: [
-                { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-400' },
-                { label: 'Equity P/C Ratio', value: latest['Equity P/C Ratio'], icon: 'trending-up', color: 'text-rose-400' },
-                { label: 'Gamma (GEX)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-500' }
+                { label: 'Gamma (GEX)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-600' },
+                { label: 'Equity P/C Ratio', value: latest['Equity P/C Ratio'], icon: 'trending-up', color: 'text-rose-600' },
+                { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-600' }
             ],
             internalGrid: [
-                { label: 'Dark Pool (DIX)', value: latest.DIX + '%', icon: 'shield-check', color: 'text-blue-500' },
-                { label: 'McClellan VSI', value: latest['McClellan VSI'], icon: 'bar-chart-3', color: 'text-cyan-400' },
-                { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' },
-                { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' }
-            ],
-            macroGrid: [
-                { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-400' : 'text-blue-400' },
-                { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' },
-                { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-300' },
-                { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-300' }
+                { label: 'Dark Pool (DIX)', value: latest.DIX ? latest.DIX + '%' : '--%', icon: 'shield-check', color: 'text-blue-600' },
+                { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] ? latest['NYSE above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-600' },
+                { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] ? latest['NASDAQ above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-600' },
+                { label: 'NYSE > 50MA', value: latest['NYSE above 50MA'] ? latest['NYSE above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' },
+                { label: 'NASD > 50MA', value: latest['NASDAQ above 50MA'] ? latest['NASDAQ above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' }
             ]
         };
 
@@ -122,69 +111,24 @@
             if (!grid) return;
             items.forEach(m => {
                 grid.innerHTML += `
-                    <div class="glass p-3 rounded-2xl card-hover border-t border-transparent hover:border-sky-500/20">
+                    <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-slate-500 text-[9px] font-bold uppercase tracking-wider">${m.label}</span>
-                            <i data-lucide="${m.icon}" class="${m.color} w-3.5 h-3.5"></i>
+                            <span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>
+                            <div class="p-1 px-1.5 bg-slate-50 rounded-lg">
+                                <i data-lucide="${m.icon}" class="${m.color} w-3 h-3"></i>
+                            </div>
                         </div>
-                        <div class="text-xl font-bold tracking-tight">${m.value || 'N/A'}</div>
+                        <div class="text-2xl font-black tracking-tighter text-slate-900">${m.value || '--'}</div>
                     </div>
                 `;
             });
         };
 
         Object.keys(categories).forEach(id => renderGrid(id, categories[id]));
-
-        // Charts
-        const labels = rawData.map(d => d.Date);
-        new Chart(document.getElementById('sentimentChart'), {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [
-                    { label: 'CNN F&G', data: rawData.map(d => d.CNN), borderColor: '#38bdf8', tension: 0.3, fill: false },
-                    { label: 'NAAIM', data: rawData.map(d => d.NAAIM), borderColor: '#10b981', tension: 0.3, fill: false },
-                    { label: 'VIX (Scaled 2x)', data: rawData.map(d => d.VIX * 2), borderColor: '#f43f5e', tension: 0.3, borderDash: [5, 5] }
-                ]
-            },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: '#94a3b8' } } },
-                scales: { 
-                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
-                }
-            }
-        });
-
-        new Chart(document.getElementById('breadthChart'), {
-            type: 'bar',
-            data: {
-                labels: ['NYSE > 20MA', 'NASD > 20MA', 'NYSE > 50MA', 'NASD > 50MA'],
-                datasets: [{
-                    label: '最新比例 (%)',
-                    data: [
-                        latest['NYSE above 20MA'], 
-                        latest['NASDAQ above 20MA'], 
-                        latest['NYSE above 50MA'], 
-                        latest['NASDAQ above 50MA']
-                    ],
-                    backgroundColor: ['#60a5fa', '#a78bfa', '#34d399', '#f472b6'],
-                    borderRadius: 12
-                }]
-            },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-                }
-            }
-        });
     </script>
 
-        <footer class="text-center text-slate-500 text-sm py-8">
+        <footer class="text-center text-slate-400 text-sm py-12">
+            <p>© 2026 Market Overview Dashboard</p>
         </footer>
     </div>
     <script>
