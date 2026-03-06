@@ -100,6 +100,49 @@ def fetch_breadth_single(symbol):
         print(f"Error Breadth {symbol}: {e}")
     return None
 
+def fetch_dix():
+    url = "https://squeezemetrics.com/monitor/static/DIX.csv"
+    try:
+        df = pd.read_csv(url)
+        latest = df.iloc[-1]
+        return {
+            "DIX": round(float(latest['dix']) * 100, 2),
+            "GEX": round(float(latest['gex']) / 1e9, 2)
+        }
+    except Exception as e:
+        print(f"Error DIX: {e}")
+        return {"DIX": None, "GEX": None}
+
+def fetch_mcclellan():
+    return fetch_breadth_single("%24NYMOT")
+
+def fetch_crypto_fg():
+    url = "https://api.alternative.me/fng/"
+    try:
+        response = requests.get(url, timeout=10)
+        data = response.json()
+        return int(data['data'][0]['value'])
+    except Exception as e:
+        print(f"Error fetching Crypto F&G: {e}")
+        return None
+
+def fetch_macro_data():
+    try:
+        # 10Y (^TNX), 3M (^IRX), Gold (GC=F), Silver (SI=F)
+        tickers = yf.Tickers("^TNX ^IRX GC=F SI=F")
+        prices = {}
+        for t in ["^TNX", "^IRX", "GC=F", "SI=F"]:
+            p = tickers.tickers[t].history(period="1d")['Close'].iloc[-1]
+            prices[t] = p
+        
+        # Calculate Spread and Ratio
+        spread = round(prices["^TNX"] - prices["^IRX"], 3)
+        gs_ratio = round(prices["GC=F"] / prices["SI=F"], 2)
+        return spread, gs_ratio
+    except Exception as e:
+        print(f"Error fetching Macro data: {e}")
+        return None, None
+
 def main():
     # Use US/New_York time for consistency with market trading days
     from datetime import timezone
@@ -124,6 +167,16 @@ def main():
     results["NASDAQ above 20MA"] = fetch_breadth_single("%24NAA20R")
     results["NYSE above 50MA"] = fetch_breadth_single("%24NYA50R")
     results["NASDAQ above 50MA"] = fetch_breadth_single("%24NAA50R")
+
+    results["Crypto F&G"] = fetch_crypto_fg()
+    spread, gs_ratio = fetch_macro_data()
+    results["10Y-3M Spread"] = spread
+    results["Gold/Silver Ratio"] = gs_ratio
+
+    dix_data = fetch_dix()
+    results["DIX"] = dix_data["DIX"]
+    results["GEX"] = dix_data["GEX"]
+    results["McClellan"] = fetch_mcclellan()
 
     print(f"Fetched: {results}")
 

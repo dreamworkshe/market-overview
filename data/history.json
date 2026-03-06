@@ -10,6 +10,11 @@
     "NYSE above 20MA": 38.2,
     "NASDAQ above 20MA": 38.9,
     "NYSE above 50MA": 50.5,
-    "NASDAQ above 50MA": 36.5
+    "NASDAQ above 50MA": 36.5,
+    "Crypto F&G": 18,
+    "10Y-3M Spread": 0.558,
+    "Gold/Silver Ratio": 61.19,
+    "DIX": 46.75,
+    "GEX": 2.94
   }
 ]

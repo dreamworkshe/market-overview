@@ -55,7 +55,13 @@
                             <th class="p-4">Total P/C</th>
                             <th class="p-4">Equity P/C</th>
                             <th class="p-4">NAAIM</th>
+                            <th class="p-4">Crypto F&G</th>
+                            <th class="p-4">10Y-3M</th>
+                            <th class="p-4">G/S Ratio</th>
                             <th class="p-4">AAII DIFF</th>
+                            <th class="p-4">DIX</th>
+                            <th class="p-4">GEX</th>
+                            <th class="p-4">McClellan</th>
                             <th class="p-4">NYSE 20</th>
                             <th class="p-4">NASD 20</th>
                             <th class="p-4">NYSE 50</th>
@@ -69,7 +75,7 @@
         </div>
 
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 61.19, "DIX": 46.75, "GEX": 2.94}];
         const tableBody = document.getElementById('dataTableBody');
         [...rawData].reverse().forEach(row => {
             const tr = document.createElement('tr');
@@ -81,7 +87,13 @@
                 <td class="p-4">${row['Total P/C Ratio'] || '-'}</td>
                 <td class="p-4">${row['Equity P/C Ratio'] || '-'}</td>
                 <td class="p-4">${row.NAAIM || '-'}</td>
+                <td class="p-4 font-semibold text-yellow-500">${row['Crypto F&G'] || '-'}</td>
+                <td class="p-4 ${row['10Y-3M Spread'] < 0 ? 'text-red-400' : ''}">${row['10Y-3M Spread'] || '-'}</td>
+                <td class="p-4">${row['Gold/Silver Ratio'] || '-'}</td>
                 <td class="p-4">${row['AAII B-B'] || '-'}</td>
+                <td class="p-4 text-blue-400 text-xs">${row.DIX || '-'}%</td>
+                <td class="p-4 text-purple-400 text-xs">${row.GEX || '-'}B</td>
+                <td class="p-4 text-cyan-400 text-xs">${row.McClellan || '-'}</td>
                 <td class="p-4 text-emerald-400 text-xs">${row['NYSE above 20MA'] || '-'}%</td>
                 <td class="p-4 text-emerald-400 text-xs">${row['NASDAQ above 20MA'] || '-'}%</td>
                 <td class="p-4 text-indigo-400 text-xs">${row['NYSE above 50MA'] || '-'}%</td>
@@ -92,7 +104,6 @@
     </script>
 
         <footer class="text-center text-slate-500 text-sm py-8">
-            <p>本網頁由 AI 自動定時抓取更新 | 免費金融數據方案</p>
         </footer>
     </div>
     <script>

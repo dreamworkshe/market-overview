@@ -51,7 +51,6 @@ BASE_HEAD = """
 
 BASE_FOOTER = """
         <footer class="text-center text-slate-500 text-sm py-8">
-            <p>本網頁由 AI 自動定時抓取更新 | 免費金融數據方案</p>
         </footer>
     </div>
     <script>
@@ -75,15 +74,13 @@ BASE_FOOTER = """
 # --- DASHBOARD PAGE ---
 DASHBOARD_BODY = """
         <!-- Metrics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10" id="metricsGrid">
-            <!-- CNN Card Included Here -->
-            <div class="glass p-6 rounded-3xl card-hover">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">CNN Fear & Greed</span>
-                    <i data-lucide="gauge" class="text-sky-400 w-5 h-5"></i>
-                </div>
-                <div class="text-3xl font-bold">{{ cnn_val }}</div>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="metricsGrid">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="macroGrid">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" id="internalGrid">
         </div>
 
         <!-- Charts Section -->
@@ -112,15 +109,54 @@ DASHBOARD_BODY = """
 
         // Main Metrics UI
         const metrics = [
+            { label: 'CNN Fear & Greed', value: '{{ cnn_val }}', icon: 'gauge', color: 'text-sky-400' },
             { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-400' },
             { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-400' },
-            { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' },
-            { label: 'AAII B-B Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
+            { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' }
+        ];
+
+        const macroMetrics = [
+            { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-yellow-500' },
+            { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-400' : 'text-blue-400' },
+            { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' },
+            { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
+        ];
+
+        const internalMetrics = [
+            { label: 'DIX (Dark Pool)', value: latest.DIX, icon: 'shield-check', color: 'text-blue-500' },
+            { label: 'GEX (Gamma)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-500' },
+            { label: 'McClellan Osc', value: latest.McClellan, icon: 'waves', color: 'text-cyan-400' }
         ];
 
         const grid = document.getElementById('metricsGrid');
         metrics.forEach(m => {
             grid.innerHTML += `
+                <div class="glass p-6 rounded-3xl card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
+                        <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
+                    </div>
+                    <div class="text-3xl font-bold">${m.value || 'N/A'}</div>
+                </div>
+            `;
+        });
+
+        const mgrid = document.getElementById('macroGrid');
+        macroMetrics.forEach(m => {
+            mgrid.innerHTML += `
+                <div class="glass p-6 rounded-3xl card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
+                        <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
+                    </div>
+                    <div class="text-3xl font-bold">${m.value || 'N/A'}</div>
+                </div>
+            `;
+        });
+
+        const igrid = document.getElementById('internalGrid');
+        internalMetrics.forEach(m => {
+            igrid.innerHTML += `
                 <div class="glass p-6 rounded-3xl card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
@@ -197,7 +233,13 @@ HISTORY_BODY = """
                             <th class="p-4">Total P/C</th>
                             <th class="p-4">Equity P/C</th>
                             <th class="p-4">NAAIM</th>
+                            <th class="p-4">Crypto F&G</th>
+                            <th class="p-4">10Y-3M</th>
+                            <th class="p-4">G/S Ratio</th>
                             <th class="p-4">AAII DIFF</th>
+                            <th class="p-4">DIX</th>
+                            <th class="p-4">GEX</th>
+                            <th class="p-4">McClellan</th>
                             <th class="p-4">NYSE 20</th>
                             <th class="p-4">NASD 20</th>
                             <th class="p-4">NYSE 50</th>
@@ -223,7 +265,13 @@ HISTORY_BODY = """
                 <td class="p-4">${row['Total P/C Ratio'] || '-'}</td>
                 <td class="p-4">${row['Equity P/C Ratio'] || '-'}</td>
                 <td class="p-4">${row.NAAIM || '-'}</td>
+                <td class="p-4 font-semibold text-yellow-500">${row['Crypto F&G'] || '-'}</td>
+                <td class="p-4 ${row['10Y-3M Spread'] < 0 ? 'text-red-400' : ''}">${row['10Y-3M Spread'] || '-'}</td>
+                <td class="p-4">${row['Gold/Silver Ratio'] || '-'}</td>
                 <td class="p-4">${row['AAII B-B'] || '-'}</td>
+                <td class="p-4 text-blue-400 text-xs">${row.DIX || '-'}%</td>
+                <td class="p-4 text-purple-400 text-xs">${row.GEX || '-'}B</td>
+                <td class="p-4 text-cyan-400 text-xs">${row.McClellan || '-'}</td>
                 <td class="p-4 text-emerald-400 text-xs">${row['NYSE above 20MA'] || '-'}%</td>
                 <td class="p-4 text-emerald-400 text-xs">${row['NASDAQ above 20MA'] || '-'}%</td>
                 <td class="p-4 text-indigo-400 text-xs">${row['NYSE above 50MA'] || '-'}%</td>

@@ -42,15 +42,13 @@
         </header>
 
         <!-- Metrics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10" id="metricsGrid">
-            <!-- CNN Card Included Here -->
-            <div class="glass p-6 rounded-3xl card-hover">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">CNN Fear & Greed</span>
-                    <i data-lucide="gauge" class="text-sky-400 w-5 h-5"></i>
-                </div>
-                <div class="text-3xl font-bold">33.77</div>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="metricsGrid">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="macroGrid">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" id="internalGrid">
         </div>
 
         <!-- Charts Section -->
@@ -74,20 +72,59 @@
         </div>
 
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 61.19, "DIX": 46.75, "GEX": 2.94}];
         const latest = rawData[rawData.length - 1];
 
         // Main Metrics UI
         const metrics = [
+            { label: 'CNN Fear & Greed', value: '33.77', icon: 'gauge', color: 'text-sky-400' },
             { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-400' },
             { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-400' },
-            { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' },
-            { label: 'AAII B-B Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
+            { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' }
+        ];
+
+        const macroMetrics = [
+            { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-yellow-500' },
+            { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-400' : 'text-blue-400' },
+            { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' },
+            { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
+        ];
+
+        const internalMetrics = [
+            { label: 'DIX (Dark Pool)', value: latest.DIX, icon: 'shield-check', color: 'text-blue-500' },
+            { label: 'GEX (Gamma)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-500' },
+            { label: 'McClellan Osc', value: latest.McClellan, icon: 'waves', color: 'text-cyan-400' }
         ];
 
         const grid = document.getElementById('metricsGrid');
         metrics.forEach(m => {
             grid.innerHTML += `
+                <div class="glass p-6 rounded-3xl card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
+                        <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
+                    </div>
+                    <div class="text-3xl font-bold">${m.value || 'N/A'}</div>
+                </div>
+            `;
+        });
+
+        const mgrid = document.getElementById('macroGrid');
+        macroMetrics.forEach(m => {
+            mgrid.innerHTML += `
+                <div class="glass p-6 rounded-3xl card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
+                        <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
+                    </div>
+                    <div class="text-3xl font-bold">${m.value || 'N/A'}</div>
+                </div>
+            `;
+        });
+
+        const igrid = document.getElementById('internalGrid');
+        internalMetrics.forEach(m => {
+            igrid.innerHTML += `
                 <div class="glass p-6 rounded-3xl card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
@@ -148,7 +185,6 @@
     </script>
 
         <footer class="text-center text-slate-500 text-sm py-8">
-            <p>本網頁由 AI 自動定時抓取更新 | 免費金融數據方案</p>
         </footer>
     </div>
     <script>
