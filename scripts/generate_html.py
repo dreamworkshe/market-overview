@@ -4,14 +4,6 @@ from jinja2 import Template
 
 DATA_FILE = "data/history.json"
 
-# Common Header/Nav Component
-NAV_TEMPLATE = """
-<nav class="flex gap-4 mb-8">
-    <a href="index.html" class="px-6 py-2 rounded-xl border border-white/10 hover:bg-white/5 transition-all {{ active_dash }}">儀表板</a>
-    <a href="history.html" class="px-6 py-2 rounded-xl border border-white/10 hover:bg-white/5 transition-all {{ active_hist }}">歷史紀錄</a>
-</nav>
-"""
-
 # Base Template (to avoid repetition)
 BASE_HEAD = """
 <!DOCTYPE html>
@@ -23,6 +15,7 @@ BASE_HEAD = """
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
@@ -34,21 +27,26 @@ BASE_HEAD = """
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <div class="overflow-hidden">
-                <pre class="text-[7px] leading-[1.2] md:text-[9px] font-bold gradient-text opacity-90 select-none tracking-tight">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white/5 p-6 rounded-3xl border border-white/10">
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="overflow-hidden">
+                    <pre class="text-[7px] leading-[1.2] md:text-[9px] font-bold gradient-text opacity-90 select-none tracking-tight">
  █▀▄▀█ ▄▀█ █▀█ █▄▀ █▀▀ ▀█▀   █▀█ █░█ █▀▀ █▀█ █░█ █▀█ █▀▀ █░█░█
  █░▀░█ █▀█ █▀▄ █░█ ██▄ ░█░   █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █▄█ ██▄ ▀▄▀▄▀
-                </pre>
+                    </pre>
+                </div>
+                <div class="h-10 w-px bg-white/10 hidden md:block"></div>
+                <div class="text-center md:text-left">
+                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.2em] mb-1">Trading Date</p>
+                    <p class="text-xl font-bold text-slate-200 tracking-tight">{{ last_date }}</p>
+                </div>
             </div>
-            <div class="glass px-6 py-3 rounded-2xl text-right">
-                <p class="text-slate-400 text-sm">最後交易日</p>
-                <p class="text-xl font-bold text-slate-200">{{ last_date }}</p>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">US Market Date / NY Time</p>
-            </div>
+            
+            <nav class="flex gap-2 p-1 bg-black/20 rounded-xl border border-white/5">
+                <a href="index.html" class="px-5 py-2 rounded-lg text-sm transition-all {{ active_dash }}">儀表板</a>
+                <a href="history.html" class="px-5 py-2 rounded-lg text-sm transition-all {{ active_hist }}">歷史紀錄</a>
+            </nav>
         </header>
-        
-        {{ nav_html }}
 """
 
 BASE_FOOTER = """
@@ -255,12 +253,14 @@ def main():
 
     # Generate index.html (Dashboard)
     ctx["title"] = "儀表板"
-    ctx["nav_html"] = Template(NAV_TEMPLATE).render(active_dash="active-tab", active_hist="")
+    ctx["active_dash"] = "active-tab"
+    ctx["active_hist"] = ""
     index_html = Template(BASE_HEAD + DASHBOARD_BODY + BASE_FOOTER).render(**ctx)
     
     # Generate history.html
     ctx["title"] = "歷史數據"
-    ctx["nav_html"] = Template(NAV_TEMPLATE).render(active_dash="", active_hist="active-tab")
+    ctx["active_dash"] = ""
+    ctx["active_hist"] = "active-tab"
     history_html = Template(BASE_HEAD + HISTORY_BODY + BASE_FOOTER).render(**ctx)
 
     # Save files
