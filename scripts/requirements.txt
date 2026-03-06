@@ -1,0 +1,9 @@
+requests
+pandas
+beautifulsoup4
+yfinance
+openpyxl
+lxml
+jinja2
+PyYAML
+python-dateutil

@@ -1,0 +1,40 @@
+name: Daily Market Data Update
+
+on:
+  schedule:
+    # 7:00 AM Taiwan Time (UTC+8) is 23:00 UTC (Previous Day)
+    - cron: '0 23 * * *'
+  workflow_dispatch: # Enable manual trigger
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r scripts/requirements.txt
+
+      - name: Run Data Fetcher
+        run: python scripts/fetch_data.py
+
+      - name: Generate HTML Dashboard
+        run: python scripts/generate_html.py
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "Market Bot"
+          git config --global user.email "bot@marketdash.com"
+          git add data/history.json index.html public/index.html
+          git commit -m "Auto Update: $(date +'%Y-%m-%d')" || exit 0
+          git push origin main

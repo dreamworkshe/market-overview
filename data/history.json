@@ -1,0 +1,28 @@
+[
+  {
+    "Date": "2026/3/5",
+    "CNN": 37.0,
+    "VIX": 21.15,
+    "Total P/C Ratio": 0.90,
+    "Equity P/C Ratio": 0.60,
+    "NAAIM": 79.29,
+    "AAII B-B": -2.4,
+    "NYSE above 20MA": 37.96,
+    "NASDAQ above 20MA": 38.68,
+    "NYSE above 50MA": 50.35,
+    "NASDAQ above 50MA": 36.36
+  },
+  {
+    "Date": "2026/3/6",
+    "CNN": 33.77,
+    "VIX": 23.75,
+    "Total P/C Ratio": 0.90,
+    "Equity P/C Ratio": 0.60,
+    "NAAIM": 79.29,
+    "AAII B-B": -2.4,
+    "NYSE above 20MA": 38.2,
+    "NASDAQ above 20MA": 38.9,
+    "NYSE above 50MA": 50.5,
+    "NASDAQ above 50MA": 36.5
+  }
+]
