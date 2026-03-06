@@ -36,10 +36,9 @@ BASE_HEAD = """
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
             <div class="overflow-hidden">
-                <pre class="text-[8px] leading-[1.1] md:text-[10px] font-bold gradient-text opacity-90 select-none">
-  MARKET OVERVIEW  ___  __  __
-  /  /  /  /_  /_/ /_  /__ / /
- /  /  /  /__ / \ /__ /   /_/ 
+                <pre class="text-[7px] leading-[1.2] md:text-[9px] font-bold gradient-text opacity-90 select-none tracking-tight">
+ █▀▄▀█ ▄▀█ █▀█ █▄▀ █▀▀ ▀█▀   █▀█ █░█ █▀▀ █▀█ █░█ █▀█ █▀▀ █░█░█
+ █░▀░█ █▀█ █▀▄ █░█ ██▄ ░█░   █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █▄█ ██▄ ▀▄▀▄▀
                 </pre>
             </div>
             <div class="glass px-6 py-3 rounded-2xl text-right">
