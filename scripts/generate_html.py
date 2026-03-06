@@ -73,15 +73,29 @@ BASE_FOOTER = """
 
 # --- DASHBOARD PAGE ---
 DASHBOARD_BODY = """
-        <!-- Metrics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="metricsGrid">
-        </div>
+        <!-- Sentiment Section -->
+        <h2 class="text-xl font-bold text-slate-400 mb-6 flex items-center gap-2 uppercase tracking-widest">
+            <i data-lucide="smile"></i> 市場情緒 (Sentiment)
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="sentimentGrid"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="macroGrid">
-        </div>
+        <!-- Risk & Options Section -->
+        <h2 class="text-xl font-bold text-slate-400 mb-6 flex items-center gap-2 uppercase tracking-widest">
+            <i data-lucide="shield-alert"></i> 風險與期權 (Risk & Options)
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="riskGrid"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" id="internalGrid">
-        </div>
+        <!-- Internals & Breadth Section -->
+        <h2 class="text-xl font-bold text-slate-400 mb-6 flex items-center gap-2 uppercase tracking-widest">
+            <i data-lucide="layers"></i> 內部資金與廣度 (Internals)
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="internalGrid"></div>
+
+        <!-- Macro Section -->
+        <h2 class="text-xl font-bold text-slate-400 mb-6 flex items-center gap-2 uppercase tracking-widest">
+            <i data-lucide="globe"></i> 宏觀趨勢 (Macro)
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12" id="macroGrid"></div>
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
@@ -107,65 +121,49 @@ DASHBOARD_BODY = """
         const rawData = {{ history_json }};
         const latest = rawData[rawData.length - 1];
 
-        // Main Metrics UI
-        const metrics = [
-            { label: 'CNN Fear & Greed', value: '{{ cnn_val }}', icon: 'gauge', color: 'text-sky-400' },
-            { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-400' },
-            { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-400' },
-            { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' }
-        ];
+        // Main Metrics UI Groups
+        const categories = {
+            sentimentGrid: [
+                { label: 'CNN Fear & Greed', value: '{{ cnn_val }}', icon: 'gauge', color: 'text-sky-400' },
+                { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-yellow-500' },
+                { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-400' },
+                { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
+            ],
+            riskGrid: [
+                { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-400' },
+                { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-400' },
+                { label: 'Equity P/C Ratio', value: latest['Equity P/C Ratio'], icon: 'trending-up', color: 'text-rose-400' },
+                { label: 'Gamma (GEX)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-500' }
+            ],
+            internalGrid: [
+                { label: 'Dark Pool (DIX)', value: latest.DIX + '%', icon: 'shield-check', color: 'text-blue-500' },
+                { label: 'McClellan Osc', value: latest.McClellan, icon: 'waves', color: 'text-cyan-400' },
+                { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' },
+                { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' }
+            ],
+            macroGrid: [
+                { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-400' : 'text-blue-400' },
+                { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' }
+            ]
+        };
 
-        const macroMetrics = [
-            { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-yellow-500' },
-            { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-400' : 'text-blue-400' },
-            { label: 'Gold/Silver Ratio', value: latest['Gold/Silver Ratio'], icon: 'coins', color: 'text-amber-300' },
-            { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-pink-400' }
-        ];
-
-        const internalMetrics = [
-            { label: 'DIX (Dark Pool)', value: latest.DIX, icon: 'shield-check', color: 'text-blue-500' },
-            { label: 'GEX (Gamma)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-500' },
-            { label: 'McClellan Osc', value: latest.McClellan, icon: 'waves', color: 'text-cyan-400' }
-        ];
-
-        const grid = document.getElementById('metricsGrid');
-        metrics.forEach(m => {
-            grid.innerHTML += `
-                <div class="glass p-6 rounded-3xl card-hover">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
-                        <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
+        const renderGrid = (id, items) => {
+            const grid = document.getElementById(id);
+            if (!grid) return;
+            items.forEach(m => {
+                grid.innerHTML += `
+                    <div class="glass p-6 rounded-3xl card-hover border-t-2 border-transparent hover:border-sky-500/30">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">${m.label}</span>
+                            <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
+                        </div>
+                        <div class="text-3xl font-bold tracking-tight">${m.value || 'N/A'}</div>
                     </div>
-                    <div class="text-3xl font-bold">${m.value || 'N/A'}</div>
-                </div>
-            `;
-        });
+                `;
+            });
+        };
 
-        const mgrid = document.getElementById('macroGrid');
-        macroMetrics.forEach(m => {
-            mgrid.innerHTML += `
-                <div class="glass p-6 rounded-3xl card-hover">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
-                        <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
-                    </div>
-                    <div class="text-3xl font-bold">${m.value || 'N/A'}</div>
-                </div>
-            `;
-        });
-
-        const igrid = document.getElementById('internalGrid');
-        internalMetrics.forEach(m => {
-            igrid.innerHTML += `
-                <div class="glass p-6 rounded-3xl card-hover">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-slate-400 text-sm font-medium uppercase tracking-tight">${m.label}</span>
-                        <i data-lucide="${m.icon}" class="${m.color} w-5 h-5"></i>
-                    </div>
-                    <div class="text-3xl font-bold">${m.value || 'N/A'}</div>
-                </div>
-            `;
-        });
+        Object.keys(categories).forEach(id => renderGrid(id, categories[id]));
 
         // Charts
         const labels = rawData.map(d => d.Date);
