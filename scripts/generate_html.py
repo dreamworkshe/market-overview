@@ -126,6 +126,7 @@ DASHBOARD_BODY = """
             ],
             internalGrid: [
                 { label: 'Dark Pool (DIX)', value: latest.DIX + '%', icon: 'shield-check', color: 'text-blue-500' },
+                { label: 'McClellan VSI', value: latest['McClellan VSI'], icon: 'bar-chart-3', color: 'text-cyan-400' },
                 { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' },
                 { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] + '%', icon: 'bar-chart', color: 'text-emerald-500' }
             ],
@@ -231,14 +232,15 @@ HISTORY_BODY = """
                             <th class="p-4 col-macro">10Y-3M</th>
                             <th class="p-4 col-macro">G/S Ratio</th>
                             <th class="p-4 col-sentiment">AAII DIFF</th>
-                            <th class="p-4 col-internals">DIX</th>
-                            <th class="p-4 col-internals">GEX</th>
-                            <th class="p-4 col-internals">NYSE 20</th>
-                            <th class="p-4 col-internals">NASD 20</th>
-                            <th class="p-4 col-internals">NYSE 50</th>
-                            <th class="p-4 col-internals">NASD 50</th>
-                            <th class="p-4 col-macro">HYG/LQD</th>
-                            <th class="p-4 col-macro">XLY/XLP</th>
+                            <th class="p-4 col-internals text-xs">DIX</th>
+                            <th class="p-4 col-internals text-xs">GEX</th>
+                            <th class="p-4 col-internals text-xs">MVSI</th>
+                            <th class="p-4 col-internals text-xs">NYSE 20</th>
+                            <th class="p-4 col-internals text-xs">NASD 20</th>
+                            <th class="p-4 col-internals text-xs">NYSE 50</th>
+                            <th class="p-4 col-internals text-xs">NASD 50</th>
+                            <th class="p-4 col-macro text-xs">HYG/LQD</th>
+                            <th class="p-4 col-macro text-xs">XLY/XLP</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-300">
@@ -263,23 +265,24 @@ HISTORY_BODY = """
                 tr.className = 'border-t border-white/5 hover:bg-white/10 transition-colors group';
                 tr.innerHTML = `
                     <td class="p-4 text-sm font-medium text-slate-200 bg-white/5">${row.Date}</td>
-                    <td class="p-4 font-bold text-sky-400 col-sentiment">${row.CNN || '-'}</td>
-                    <td class="p-4 col-sentiment">${row.VIX || '-'}</td>
-                    <td class="p-4 col-risk">${row['Total P/C Ratio'] || '-'}</td>
-                    <td class="p-4 col-risk">${row['Equity P/C Ratio'] || '-'}</td>
-                    <td class="p-4 col-sentiment">${row.NAAIM || '-'}</td>
-                    <td class="p-4 font-semibold text-yellow-500 col-sentiment">${row['Crypto F&G'] || '-'}</td>
-                    <td class="p-4 col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-400' : ''}">${row['10Y-3M Spread'] || '-'}</td>
-                    <td class="p-4 col-macro">${row['Gold/Silver Ratio'] || '-'}</td>
-                    <td class="p-4 col-sentiment">${row['AAII B-B'] || '-'}</td>
+                    <td class="p-4 text-xs font-semibold text-sky-400 col-sentiment">${row.CNN || '-'}</td>
+                    <td class="p-4 text-xs col-sentiment">${row.VIX || '-'}</td>
+                    <td class="p-4 text-xs col-risk">${row['Total P/C Ratio'] || '-'}</td>
+                    <td class="p-4 text-xs col-risk">${row['Equity P/C Ratio'] || '-'}</td>
+                    <td class="p-4 text-xs col-sentiment">${row.NAAIM || '-'}</td>
+                    <td class="p-4 text-xs font-semibold text-yellow-500 col-sentiment">${row['Crypto F&G'] || '-'}</td>
+                    <td class="p-4 text-xs col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-400' : ''}">${row['10Y-3M Spread'] || '-'}</td>
+                    <td class="p-4 text-xs col-macro">${row['Gold/Silver Ratio'] || '-'}</td>
+                    <td class="p-4 text-xs col-sentiment">${row['AAII B-B'] || '-'}</td>
                     <td class="p-4 col-internals text-blue-400 text-xs">${row.DIX || '-'}%</td>
                     <td class="p-4 col-internals text-purple-400 text-xs">${row.GEX || '-'}B</td>
-                    <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NYSE above 20MA'] || '-'}%</td>
-                    <td class="p-4 col-internals text-emerald-400 text-[10px]">${row['NASDAQ above 20MA'] || '-'}%</td>
-                    <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NYSE above 50MA'] || '-'}%</td>
-                    <td class="p-4 col-internals text-indigo-400 text-[10px]">${row['NASDAQ above 50MA'] || '-'}%</td>
-                    <td class="p-4 col-macro text-orange-300 text-[10px]">${row['HYG/LQD Ratio'] || '-'}</td>
-                    <td class="p-4 col-macro text-pink-300 text-[10px]">${row['XLY/XLP Ratio'] || '-'}</td>
+                    <td class="p-4 col-internals text-cyan-400 text-xs">${row['McClellan VSI'] || '-'}</td>
+                    <td class="p-4 col-internals text-emerald-400 text-xs">${row['NYSE above 20MA'] || '-'}%</td>
+                    <td class="p-4 col-internals text-emerald-400 text-xs">${row['NASDAQ above 20MA'] || '-'}%</td>
+                    <td class="p-4 col-internals text-indigo-400 text-xs">${row['NYSE above 50MA'] || '-'}%</td>
+                    <td class="p-4 col-internals text-indigo-400 text-xs">${row['NASDAQ above 50MA'] || '-'}%</td>
+                    <td class="p-4 col-macro text-orange-300 text-xs">${row['HYG/LQD Ratio'] || '-'}</td>
+                    <td class="p-4 col-macro text-pink-300 text-xs">${row['XLY/XLP Ratio'] || '-'}</td>
                 `;
                 tableBody.appendChild(tr);
             });

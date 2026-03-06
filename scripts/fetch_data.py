@@ -186,6 +186,7 @@ def main():
     dix_data = fetch_dix()
     results["DIX"] = dix_data["DIX"]
     results["GEX"] = dix_data["GEX"]
+    results["McClellan VSI"] = fetch_breadth_single("%24NYVSI")
 
     print(f"Fetched: {results}")
 
