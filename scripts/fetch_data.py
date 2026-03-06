@@ -101,7 +101,12 @@ def fetch_breadth_single(symbol):
     return None
 
 def main():
-    date_str = datetime.now().strftime("%Y/%-m/%-d")
+    # Use US/New_York time for consistency with market trading days
+    from datetime import timezone
+    # US Eastern Time is UTC-5 (Standard) or UTC-4 (Daylight)
+    # Simple manual offset for now, or use pytz
+    ny_now = datetime.now(timezone.utc) - timedelta(hours=5) 
+    date_str = ny_now.strftime("%Y/%-m/%-d")
     
     results = {
         "Date": date_str,
