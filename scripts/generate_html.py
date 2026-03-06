@@ -34,10 +34,14 @@ BASE_HEAD = """
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
             <div>
                 <h1 class="text-4xl font-bold gradient-text">市場數據監控</h1>
-                <p class="text-slate-400 mt-2">最後交易日: <span class="text-slate-200">{{ last_date }}</span> (美股日期 / NY Time)</p>
+            </div>
+            <div class="glass px-6 py-3 rounded-2xl text-right">
+                <p class="text-slate-400 text-sm">最後交易日</p>
+                <p class="text-xl font-bold text-slate-200">{{ last_date }}</p>
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">US Market Date / NY Time</p>
             </div>
         </header>
         
