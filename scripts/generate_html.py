@@ -66,13 +66,22 @@ BASE_FOOTER = """
 # --- DASHBOARD_BODY ---
 DASHBOARD_BODY = """
         <div class="space-y-6">
-            <!-- Macro Section: Full Width Row -->
+            <!-- Overview Section: Crucial Market Signals -->
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">宏觀趨勢 Macro</h2>
+                    <div class="w-1 h-3 bg-red-600 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">盤勢總覽 Overview</h2>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="macroGrid"></div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="overviewGrid"></div>
+            </section>
+
+            <!-- Breadth Section -->
+            <section>
+                <div class="flex items-center gap-2 mb-2 px-1">
+                    <div class="w-1 h-3 bg-emerald-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場廣度 Market Breadth</h2>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="breadthGrid"></div>
             </section>
 
             <!-- Sentiment Section: Full Width Row -->
@@ -84,22 +93,13 @@ DASHBOARD_BODY = """
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
             </section>
 
-            <!-- Risk Section: Full Width Row -->
+            <!-- Macro Section: Full Width Row -->
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-purple-500 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">風險與期權 Risk</h2>
+                    <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">宏觀趨勢 Macro</h2>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3" id="riskGrid"></div>
-            </section>
-
-            <!-- Internals Section: Full Width Row -->
-            <section>
-                <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-emerald-500 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">內部資金與廣度 Internals</h2>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="internalGrid"></div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="macroGrid"></div>
             </section>
         </div>
 
@@ -108,12 +108,17 @@ DASHBOARD_BODY = """
         const latest = rawData[rawData.length - 1];
 
         const categories = {
-            macroGrid: [
-                { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-500' : 'text-blue-600' },
-                { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-600' },
-                { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-600' },
-                { label: 'Copper/Gold Ratio', value: latest['Copper/Gold Ratio'], icon: 'coins', color: 'text-amber-600' },
-                { label: 'KBE/SPY Ratio', value: latest['KBE/SPY Ratio'], icon: 'building', color: 'text-indigo-600' }
+            overviewGrid: [
+                { label: 'Dark Pool (DIX)', value: latest.DIX ? latest.DIX + '%' : '--%', icon: 'shield-check', color: 'text-blue-600' },
+                { label: 'Gamma (GEX)', value: latest.GEX ? latest.GEX + 'B' : '--B', icon: 'zap', color: 'text-purple-600' },
+                { label: 'Equity P/C Ratio', value: latest['Equity P/C Ratio'], icon: 'trending-up', color: 'text-rose-600' },
+                { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-600' }
+            ],
+            breadthGrid: [
+                { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] ? latest['NYSE above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-500' },
+                { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] ? latest['NASDAQ above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-500' },
+                { label: 'NYSE > 50MA', value: latest['NYSE above 50MA'] ? latest['NYSE above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' },
+                { label: 'NASD > 50MA', value: latest['NASDAQ above 50MA'] ? latest['NASDAQ above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' }
             ],
             sentimentGrid: [
                 { label: 'CNN Fear & Greed', value: '{{ cnn_val }}', icon: 'gauge', color: 'text-sky-600' },
@@ -122,15 +127,12 @@ DASHBOARD_BODY = """
                 { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-rose-500' },
                 { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-amber-500' }
             ],
-            riskGrid: [
-                { label: 'Gamma (GEX)', value: latest.GEX + 'B', icon: 'zap', color: 'text-purple-600' },
-                { label: 'Equity P/C Ratio', value: latest['Equity P/C Ratio'], icon: 'trending-up', color: 'text-rose-600' },
-                { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-600' }
-            ],
-            internalGrid: [
-                { label: 'Dark Pool (DIX)', value: latest.DIX ? latest.DIX + '%' : '--%', icon: 'shield-check', color: 'text-blue-600' },
-                { label: 'NYSE > 50MA', value: latest['NYSE above 50MA'] ? latest['NYSE above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' },
-                { label: 'NASD > 50MA', value: latest['NASDAQ above 50MA'] ? latest['NASDAQ above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' }
+            macroGrid: [
+                { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-500' : 'text-blue-600' },
+                { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-600' },
+                { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-600' },
+                { label: 'Copper/Gold Ratio', value: latest['Copper/Gold Ratio'], icon: 'coins', color: 'text-amber-600' },
+                { label: 'KBE/SPY Ratio', value: latest['KBE/SPY Ratio'], icon: 'building', color: 'text-indigo-600' }
             ]
         };
 
@@ -161,10 +163,10 @@ HISTORY_BODY = """
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
                 <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">全部紀錄</button>
-                <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
+                <button onclick="switchTab('overview')" id="tab-overview" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">總覽 Overview</button>
+                <button onclick="switchTab('breadth')" id="tab-breadth" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場廣度 Breadth</button>
                 <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場情緒</button>
-                <button onclick="switchTab('risk')" id="tab-risk" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">風險與期權</button>
-                <button onclick="switchTab('internals')" id="tab-internals" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">內部資金</button>
+                <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
             </div>
             <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-2xl shadow-sm">
                 <i data-lucide="keyboard" class="w-4 h-4 text-slate-400"></i>
@@ -178,24 +180,24 @@ HISTORY_BODY = """
                     <thead class="bg-slate-50 text-slate-400 text-[9px] font-black uppercase tracking-[0.15em] border-b border-slate-200">
                         <tr>
                             <th class="p-4 px-5">日期</th>
-                            <th class="p-4 col-macro">10Y-3M</th>
-                            <th class="p-4 col-macro">HYG/LQD</th>
-                            <th class="p-4 col-macro">XLY/XLP</th>
-                            <th class="p-4 col-macro text-nowrap">C/G Ratio</th>
-                            <th class="p-4 col-macro text-nowrap">KBE/SPY</th>
+                            <th class="p-4 col-overview">DIX</th>
+                            <th class="p-4 col-overview">GEX</th>
+                            <th class="p-4 col-overview">Eq P/C</th>
+                            <th class="p-4 col-overview">Tot P/C</th>
+                            <th class="p-4 col-breadth text-nowrap">NY 20</th>
+                            <th class="p-4 col-breadth text-nowrap">NQ 20</th>
+                            <th class="p-4 col-breadth text-nowrap">NY 50</th>
+                            <th class="p-4 col-breadth text-nowrap">NQ 50</th>
                             <th class="p-4 col-sentiment text-nowrap">CNN</th>
                             <th class="p-4 col-sentiment">VIX</th>
                             <th class="p-4 col-sentiment">NAAIM</th>
                             <th class="p-4 col-sentiment">AAII</th>
                             <th class="p-4 col-sentiment">Crypto</th>
-                            <th class="p-4 col-risk">GEX</th>
-                            <th class="p-4 col-risk">Eq P/C</th>
-                            <th class="p-4 col-risk">Tot P/C</th>
-                            <th class="p-4 col-internals text-nowrap">DIX</th>
-                            <th class="p-4 col-internals text-nowrap">NY 20</th>
-                            <th class="p-4 col-internals text-nowrap">NQ 20</th>
-                            <th class="p-4 col-internals text-nowrap">NY 50</th>
-                            <th class="p-4 col-internals text-nowrap">NQ 50</th>
+                            <th class="p-4 col-macro">10Y-3M</th>
+                            <th class="p-4 col-macro">HYG/LQD</th>
+                            <th class="p-4 col-macro">XLY/XLP</th>
+                            <th class="p-4 col-macro text-nowrap">C/G Ratio</th>
+                            <th class="p-4 col-macro text-nowrap">KBE/SPY</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-600">
@@ -215,24 +217,24 @@ HISTORY_BODY = """
                 tr.className = 'border-t border-slate-100 hover:bg-slate-50/50 transition-colors';
                 tr.innerHTML = `
                     <td class="p-4 px-5 text-[11px] font-black text-slate-800 bg-slate-50/20">${row.Date}</td>
-                    <td class="p-4 text-[11px] col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
-                    <td class="p-4 text-[11px] font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
-                    <td class="p-4 text-[11px] font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
-                    <td class="p-4 text-[11px] col-macro font-bold text-amber-600">${row['Copper/Gold Ratio'] || '--'}</td>
-                    <td class="p-4 text-[11px] col-macro font-bold text-indigo-600">${row['KBE/SPY Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] text-blue-700 font-bold col-overview">${row.DIX || '--'}%</td>
+                    <td class="p-4 text-[11px] text-purple-700 font-black col-overview">${row.GEX || '--'}B</td>
+                    <td class="p-4 text-[11px] col-overview">${row['Equity P/C Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-overview">${row['Total P/C Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] text-emerald-600 font-black col-breadth">${row['NYSE above 20MA'] || '--'}%</td>
+                    <td class="p-4 text-[11px] text-emerald-600 font-black col-breadth">${row['NASDAQ above 20MA'] || '--'}%</td>
+                    <td class="p-4 text-[11px] text-indigo-500 font-bold col-breadth">${row['NYSE above 50MA'] || '--'}%</td>
+                    <td class="p-4 text-[11px] text-indigo-500 font-bold col-breadth">${row['NASDAQ above 50MA'] || '--'}%</td>
                     <td class="p-4 text-[11px] font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
                     <td class="p-4 text-[11px] col-sentiment">${row.VIX || '--'}</td>
                     <td class="p-4 text-[11px] col-sentiment">${row.NAAIM || '--'}</td>
                     <td class="p-4 text-[11px] col-sentiment">${row['AAII B-B'] || '--'}</td>
                     <td class="p-4 text-[11px] font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
-                    <td class="p-4 text-[11px] text-purple-700 font-black col-risk">${row.GEX || '--'}B</td>
-                    <td class="p-4 text-[11px] col-risk">${row['Equity P/C Ratio'] || '--'}</td>
-                    <td class="p-4 text-[11px] col-risk">${row['Total P/C Ratio'] || '--'}</td>
-                    <td class="p-4 text-[11px] text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
-                    <td class="p-4 text-[11px] text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
-                    <td class="p-4 text-[11px] text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
-                    <td class="p-4 text-[11px] text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>
-                    <td class="p-4 text-[11px] text-indigo-500 font-bold col-internals">${row['NASDAQ above 50MA'] || '--'}%</td>
+                    <td class="p-4 text-[11px] col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-macro font-bold text-amber-600">${row['Copper/Gold Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-macro font-bold text-indigo-600">${row['KBE/SPY Ratio'] || '--'}</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -243,7 +245,7 @@ HISTORY_BODY = """
             document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab'));
             document.getElementById('tab-' + cat).classList.add('active-tab');
 
-            const allCols = ['col-sentiment', 'col-risk', 'col-internals', 'col-macro'];
+            const allCols = ['col-overview', 'col-breadth', 'col-sentiment', 'col-macro'];
             allCols.forEach(cls => {
                 const elements = document.getElementsByClassName(cls);
                 for (let el of elements) {
@@ -256,7 +258,7 @@ HISTORY_BODY = """
             });
         };
 
-        const tabs = ['all', 'macro', 'sentiment', 'risk', 'internals'];
+        const tabs = ['all', 'overview', 'breadth', 'sentiment', 'macro'];
         let currentTab = 'all';
 
         document.addEventListener('keydown', (e) => {
