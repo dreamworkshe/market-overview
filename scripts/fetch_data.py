@@ -33,63 +33,69 @@ def fetch_vix():
         print(f"Error VIX: {e}")
     return None
 
+def fetch_naaim():
+    """Fetch NAAIM using requests to find the text value on the page."""
+    url = "https://www.naaim.org/programs/naaim-exposure-index/"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+        response = requests.get(url, headers=headers, timeout=20)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        text = soup.get_text()
+        match = re.search(r'Exposure Index Number is[\*\s:]+([\d\.]+)', text, re.IGNORECASE)
+        if match:
+            return float(match.group(1))
+        # Fallback to search any number near "Exposure Index"
+        match = re.search(r'Index Number[\s:]+([\d\.]+)', text, re.IGNORECASE)
+        if match:
+            return float(match.group(1))
+    except Exception as e:
+        print(f"Error NAAIM (Requests): {e}")
+    return None
+
 def fetch_playwright_data():
-    """Fetch NAAIM, AAII, CBOE, and StockCharts using reinforced Playwright."""
+    """Fetch AAII, CBOE, Barchart, and WSJ using reinforced Playwright."""
     results = {
-        "NAAIM": None,
         "AAII B-B": None,
         "Total P/C Ratio": None,
         "Equity P/C Ratio": None,
         "NYSE above 20MA": None,
         "NASDAQ above 20MA": None,
         "NYSE above 50MA": None,
-        "NASDAQ above 50MA": None
+        "NASDAQ above 50MA": None,
+        "NYSE Advancing": None,
+        "NASDAQ Advancing": None,
+        "NYSE Declining": None,
+        "NASDAQ Declining": None,
+        "NYSE AD Ratio": None,
+        "NASDAQ AD Ratio": None
     }
     
     with sync_playwright() as p:
-        # Added sandbox flags for better GitHub Actions stability
         browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
-        
-        # Emulate a more realistic desktop browser
         context = browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
             viewport={"width": 1280, "height": 800},
-            device_scale_factor=1,
         )
         page = context.new_page()
 
-        # 1. NAAIM
-        try:
-            page.goto("https://www.naaim.org/programs/naaim-exposure-index/", wait_until="domcontentloaded", timeout=40000)
-            time.sleep(5) # Direct wait for JS data to settle
-            content = page.content()
-            # Try finding the large number directly in text if selector fails
-            match = re.search(r'color:\s*#11317d;">\s*([\d\.]+)', content)
-            if match:
-                results["NAAIM"] = float(match.group(1))
-            else:
-                # Fallback search for any exposure number
-                match = re.search(r'Exposure Index Number is[\*\s:]+([\d\.]+)', page.inner_text("body"), re.IGNORECASE)
-                if match: results["NAAIM"] = float(match.group(1))
-        except Exception as e:
-            print(f"Error NAAIM: {e}")
-
-        # 2. AAII
+        # 1. AAII
         try:
             page.goto("https://www.aaii.com/sentimentsurvey", wait_until="domcontentloaded", timeout=40000)
             time.sleep(5)
             content = page.content()
-            # Robust table parsing
+            # Parse table percentages
             match = re.search(r'([\d\.]+)%</td>\s*<td[^>]*>[\d\.]+%</td>\s*<td[^>]*>([\d\.]+)%', content)
             if match:
                 results["AAII B-B"] = round(float(match.group(1)) - float(match.group(2)), 2)
         except Exception as e:
             print(f"Error AAII: {e}")
 
-        # 3. CBOE Put/Call
+        # 2. CBOE Put/Call
         try:
             page.goto("https://www.cboe.com/us/options/market_statistics/daily/", wait_until="domcontentloaded", timeout=40000)
-            time.sleep(8) # CBOE is heavy
+            time.sleep(8)
             content = page.content()
             total_match = re.search(r'TOTAL PUT/CALL RATIO[^\d]*([\d\.]+)', content, re.IGNORECASE)
             equity_match = re.search(r'EQUITY PUT/CALL RATIO[^\d]*([\d\.]+)', content, re.IGNORECASE)
@@ -98,23 +104,20 @@ def fetch_playwright_data():
         except Exception as e:
             print(f"Error CBOE: {e}")
 
-        # 4. Barchart Breadth (High Stability)
+        # 2. Barchart Breadth
         def close_barchart_modal(p):
             try:
-                # Try to click the X on any popup modal that might appear
                 close_btn = p.query_selector("i.bc-glyph-close")
                 if close_btn: 
                     close_btn.click()
                     time.sleep(1)
             except: pass
 
-        # NYSE indicators from Momentum page (very stable table)
         try:
             page.goto("https://www.barchart.com/stocks/momentum", wait_until="domcontentloaded", timeout=40000)
             close_barchart_modal(page)
             time.sleep(5)
             content = page.content()
-            # Search for $MMTW and $MMFI values in the Momentum table
             mmtw_match = re.search(r'\$MMTW.*?class="last-price">([\d\.]+)', content, re.DOTALL)
             mmfi_match = re.search(r'\$MMFI.*?class="last-price">([\d\.]+)', content, re.DOTALL)
             if mmtw_match: results["NYSE above 20MA"] = float(mmtw_match.group(1))
@@ -122,7 +125,6 @@ def fetch_playwright_data():
         except Exception as e:
             print(f"Error Barchart Momentum (NYSE): {e}")
 
-        # NASDAQ indicators from individual pages
         for label, sym in [("NASDAQ above 20MA", "$NCTW"), ("NASDAQ above 50MA", "$NCFI")]:
             try:
                 page.goto(f"https://www.barchart.com/stocks/quotes/{sym}/overview", wait_until="domcontentloaded", timeout=40000)
@@ -130,37 +132,28 @@ def fetch_playwright_data():
                 time.sleep(5)
                 content = page.content()
                 match = re.search(r'class="last-price">([\d\.]+)', content)
-                if match:
-                    results[label] = float(match.group(1))
-                else:
-                    # Fallback
-                    match = re.search(r'data-last="([\d\.]+)"', content)
-                    if match: results[label] = float(match.group(1))
+                if match: results[label] = float(match.group(1))
             except Exception as e:
                 print(f"Error Barchart {label}: {e}")
 
-        # 5. WSJ Markets Diary (AD Issues)
+        # 3. WSJ Markets Diary (AD Issues)
         try:
             page.goto("https://www.wsj.com/market-data/stocks", wait_until="domcontentloaded", timeout=40000)
             time.sleep(5)
             inner_text = page.inner_text("body")
-            
             adv_match = re.search(r'Advancing\s+([\d,]+)\s+([\d,]+)', inner_text)
             dec_match = re.search(r'Declining\s+([\d,]+)\s+([\d,]+)', inner_text)
-            
             if adv_match and dec_match:
                 ny_adv = int(adv_match.group(1).replace(",", ""))
                 nas_adv = int(adv_match.group(2).replace(",", ""))
                 ny_dec = int(dec_match.group(1).replace(",", ""))
                 nas_dec = int(dec_match.group(2).replace(",", ""))
-                
-                results["NYSE Advancing"] = ny_adv
-                results["NASDAQ Advancing"] = nas_adv
-                results["NYSE Declining"] = ny_dec
-                results["NASDAQ Declining"] = nas_dec
-                
-                results["NYSE AD Ratio"] = round(float(ny_adv) / float(max(ny_dec, 1)), 2)
-                results["NASDAQ AD Ratio"] = round(float(nas_adv) / float(max(nas_dec, 1)), 2)
+                results.update({
+                    "NYSE Advancing": ny_adv, "NASDAQ Advancing": nas_adv,
+                    "NYSE Declining": ny_dec, "NASDAQ Declining": nas_dec,
+                    "NYSE AD Ratio": round(float(ny_adv) / float(max(ny_dec, 1)), 2),
+                    "NASDAQ AD Ratio": round(float(nas_adv) / float(max(nas_dec, 1)), 2)
+                })
         except Exception as e:
             print(f"Error WSJ AD Issues: {e}")
 
@@ -235,6 +228,7 @@ def main():
         "Date": date_str,
         "CNN": fetch_cnn_fg(),
         "VIX": fetch_vix(),
+        "NAAIM": fetch_naaim()
     }
     
     # 2. Fetch Selenium/Playwright-based data (Heavy)

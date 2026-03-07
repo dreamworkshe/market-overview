@@ -7,3 +7,5 @@ lxml
 jinja2
 PyYAML
 python-dateutil
+python-dotenv
+xlrd
