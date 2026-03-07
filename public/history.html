@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歷史紀錄 | Market Overview</title>
+    <title>歷史紀錄 | Trendsetter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -23,7 +23,7 @@
         <header class="flex flex-col md:flex-row justify-between items-center mb-5 gap-3 bg-white p-3 px-6 rounded-3xl shadow-sm border border-slate-200">
             <div class="flex items-center gap-4">
                 <div class="flex flex-col md:flex-row md:items-baseline gap-2">
-                    <h1 class="text-xl md:text-2xl font-black gradient-text tracking-tighter">Market Overview</h1>
+                    <h1 class="text-xl md:text-2xl font-black gradient-text tracking-tighter">Trendsetter</h1>
                     <span class="text-xs md:text-sm font-bold text-slate-400 font-mono">:: 2026/3/6</span>
                 </div>
             </div>
@@ -63,8 +63,6 @@
                             <th class="p-6 col-risk">Equity P/C</th>
                             <th class="p-6 col-risk">Total P/C</th>
                             <th class="p-6 col-internals text-nowrap">Dark Pool</th>
-                            <th class="p-6 col-internals text-nowrap">NYSE AD</th>
-                            <th class="p-6 col-internals text-nowrap">NASD AD</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 20</th>
                             <th class="p-6 col-internals text-nowrap">NASD 20</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 50</th>
@@ -78,7 +76,7 @@
         </div>
 
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.73, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646, "XLP/XLY Ratio": 0.7328, "Copper/Gold Ratio": 0.0011, "KBE/SPY Ratio": 0.0895}, {"Date": "2026/3/6", "CNN": 26.71, "VIX": 29.49, "NAAIM": 79.29, "AAII B-B": -2.4, "Total P/C Ratio": 100.0, "Equity P/C Ratio": 100.0, "NYSE above 20MA": 29.88, "NASDAQ above 20MA": 35.73, "NYSE above 50MA": 42.97, "NASDAQ above 50MA": 33.12, "Crypto F&G": 12, "10Y-3M Spread": 0.563, "Copper/Gold Ratio": 0.0011, "HYG/LQD Ratio": 0.7234, "XLY/XLP Ratio": 1.3341, "KBE/SPY Ratio": 0.0886, "DIX": 46.99, "GEX": -0.26, "NYSE Advancing": 608, "NASDAQ Advancing": 1406, "NYSE Declining": 2175, "NASDAQ Declining": 3383, "NYSE AD Ratio": 0.28, "NASDAQ AD Ratio": 0.42}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.73, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646, "XLP/XLY Ratio": 0.7328, "Copper/Gold Ratio": 0.0011, "KBE/SPY Ratio": 0.0895}, {"Date": "2026/3/6", "CNN": 26.71, "VIX": 29.49, "NAAIM": 79.29, "AAII B-B": -2.4, "Total P/C Ratio": 0.96, "Equity P/C Ratio": 0.67, "NYSE above 20MA": 29.88, "NASDAQ above 20MA": 35.73, "NYSE above 50MA": 42.97, "NASDAQ above 50MA": 33.12, "Crypto F&G": 12, "10Y-3M Spread": 0.563, "Copper/Gold Ratio": 0.0011, "HYG/LQD Ratio": 0.7234, "XLY/XLP Ratio": 1.3341, "KBE/SPY Ratio": 0.0886, "DIX": 46.99, "GEX": -0.26, "NYSE Advancing": 608, "NASDAQ Advancing": 1406, "NYSE Declining": 2175, "NASDAQ Declining": 3383, "NYSE AD Ratio": 0.28, "NASDAQ AD Ratio": 0.42}];
         const tableBody = document.getElementById('dataTableBody');
         
         const renderTable = () => {
@@ -102,8 +100,6 @@
                     <td class="p-6 text-xs col-risk">${row['Equity P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs col-risk">${row['Total P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
-                    <td class="p-6 text-xs col-internals font-bold ${row['NYSE AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NYSE Advancing'] || '--'}/${row['NYSE Declining'] || '--'}</td>
-                    <td class="p-6 text-xs col-internals font-bold ${row['NASDAQ AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NASDAQ Advancing'] || '--'}/${row['NASDAQ Declining'] || '--'}</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>
@@ -148,7 +144,7 @@
     </script>
 
         <footer class="text-center text-slate-400 text-sm py-12">
-            <p>© 2026 Market Overview Dashboard</p>
+            <p>© 2026 Trendsetter Dashboard</p>
         </footer>
     </div>
     <script>

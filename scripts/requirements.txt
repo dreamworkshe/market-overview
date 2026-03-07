@@ -9,3 +9,5 @@ PyYAML
 python-dateutil
 python-dotenv
 xlrd
+gspread
+google-auth

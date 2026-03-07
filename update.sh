@@ -1,5 +1,5 @@
 #!/bin/bash
-# Market Overview Local Update Script
+# Trendsetter Local Update Script
 
 # Get the script's directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -23,5 +23,5 @@ python3 scripts/fetch_data.py
 echo "正在生成儀表板..."
 python3 scripts/generate_html.py
 
-echo "完成！您可以打開 index.html 查看結果。"
+echo "完成！您可以打開 public/index.html 查看結果。"
 deactivate

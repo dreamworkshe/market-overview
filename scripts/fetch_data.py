@@ -5,9 +5,11 @@ import time
 from datetime import datetime, timedelta
 import yfinance as yf
 import pandas as pd
-from playwright.sync_api import sync_playwright
+import gspread
+from google.oauth2.service_account import Credentials
 
 DATA_FILE = "data/history.json"
+GSHEET_ID = "18NLQo5n6Ni_NrMWuhIr9dUZFc57AKbxGVzK6M7V-FBg"
 
 def fetch_cnn_fg():
     url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
@@ -33,132 +35,58 @@ def fetch_vix():
         print(f"Error VIX: {e}")
     return None
 
-def fetch_naaim():
-    """Fetch NAAIM using requests to find the text value on the page."""
-    url = "https://www.naaim.org/programs/naaim-exposure-index/"
-    headers = {"User-Agent": "Mozilla/5.0"}
+def fetch_gsheet_data(target_date_str):
+    """Fetch expert data from private Google Sheet using header-based mapping."""
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    creds_path = os.path.join(os.path.dirname(__file__), "..", "credentials.json")
+    if not os.path.exists(creds_path):
+        creds_path = "credentials.json" # Fallback
+        
     try:
-        import requests
-        from bs4 import BeautifulSoup
-        response = requests.get(url, headers=headers, timeout=20)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        text = soup.get_text()
-        match = re.search(r'Exposure Index Number is[\*\s:]+([\d\.]+)', text, re.IGNORECASE)
-        if match:
-            return float(match.group(1))
-        # Fallback to search any number near "Exposure Index"
-        match = re.search(r'Index Number[\s:]+([\d\.]+)', text, re.IGNORECASE)
-        if match:
-            return float(match.group(1))
+        creds = Credentials.from_service_account_file(creds_path, scopes=scopes)
+        client = gspread.authorize(creds)
+        sh = client.open_by_key(GSHEET_ID)
+        worksheet = sh.worksheet("Log")
+        
+        # Get all records
+        all_data = worksheet.get_all_values()
+        header = [h.strip() for h in all_data[0]] # Clean headers
+        rows = all_data[1:]
+        
+        # Mapping: Column Name -> Index
+        col_map = {name: i for i, name in enumerate(header)}
+        
+        # Find target row
+        target_row = rows[-1] # Fallback to latest
+        found = False
+        for row in reversed(rows):
+            if row[0].strip() == target_date_str:
+                target_row = row
+                found = True
+                break
+        
+        if not found:
+            print(f"Warning: Date {target_date_str} not found in Sheet, using latest row ({target_row[0]})")
+
+        def get_val(col_name):
+            if col_name not in col_map: return None
+            val = target_row[col_map[col_name]]
+            try: return float(val.replace('%', '').replace(',', '').strip())
+            except: return None
+
+        return {
+            "Total P/C Ratio": get_val("Total P/C Ratio"),
+            "Equity P/C Ratio": get_val("Equity P/C Ratio"),
+            "NAAIM": get_val("NAAIM"),
+            "AAII B-B": get_val("AAII B-B"),
+            "NYSE above 20MA": get_val("NYSE above 20MA"),
+            "NASDAQ above 20MA": get_val("NASDAQ above 20MA"),
+            "NYSE above 50MA": get_val("NYSE above 50MA"),
+            "NASDAQ above 50MA": get_val("NASDAQ above 50MA")
+        }
     except Exception as e:
-        print(f"Error NAAIM (Requests): {e}")
-    return None
-
-def fetch_playwright_data():
-    """Fetch AAII, CBOE, Barchart, and WSJ using reinforced Playwright."""
-    results = {
-        "AAII B-B": None,
-        "Total P/C Ratio": None,
-        "Equity P/C Ratio": None,
-        "NYSE above 20MA": None,
-        "NASDAQ above 20MA": None,
-        "NYSE above 50MA": None,
-        "NASDAQ above 50MA": None,
-        "NYSE Advancing": None,
-        "NASDAQ Advancing": None,
-        "NYSE Declining": None,
-        "NASDAQ Declining": None,
-        "NYSE AD Ratio": None,
-        "NASDAQ AD Ratio": None
-    }
-    
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
-        context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            viewport={"width": 1280, "height": 800},
-        )
-        page = context.new_page()
-
-        # 1. AAII
-        try:
-            page.goto("https://www.aaii.com/sentimentsurvey", wait_until="domcontentloaded", timeout=40000)
-            time.sleep(5)
-            content = page.content()
-            # Parse table percentages
-            match = re.search(r'([\d\.]+)%</td>\s*<td[^>]*>[\d\.]+%</td>\s*<td[^>]*>([\d\.]+)%', content)
-            if match:
-                results["AAII B-B"] = round(float(match.group(1)) - float(match.group(2)), 2)
-        except Exception as e:
-            print(f"Error AAII: {e}")
-
-        # 2. CBOE Put/Call
-        try:
-            page.goto("https://www.cboe.com/us/options/market_statistics/daily/", wait_until="domcontentloaded", timeout=40000)
-            time.sleep(8)
-            content = page.content()
-            total_match = re.search(r'TOTAL PUT/CALL RATIO[^\d]*([\d\.]+)', content, re.IGNORECASE)
-            equity_match = re.search(r'EQUITY PUT/CALL RATIO[^\d]*([\d\.]+)', content, re.IGNORECASE)
-            if total_match: results["Total P/C Ratio"] = float(total_match.group(1))
-            if equity_match: results["Equity P/C Ratio"] = float(equity_match.group(1))
-        except Exception as e:
-            print(f"Error CBOE: {e}")
-
-        # 2. Barchart Breadth
-        def close_barchart_modal(p):
-            try:
-                close_btn = p.query_selector("i.bc-glyph-close")
-                if close_btn: 
-                    close_btn.click()
-                    time.sleep(1)
-            except: pass
-
-        try:
-            page.goto("https://www.barchart.com/stocks/momentum", wait_until="domcontentloaded", timeout=40000)
-            close_barchart_modal(page)
-            time.sleep(5)
-            content = page.content()
-            mmtw_match = re.search(r'\$MMTW.*?class="last-price">([\d\.]+)', content, re.DOTALL)
-            mmfi_match = re.search(r'\$MMFI.*?class="last-price">([\d\.]+)', content, re.DOTALL)
-            if mmtw_match: results["NYSE above 20MA"] = float(mmtw_match.group(1))
-            if mmfi_match: results["NYSE above 50MA"] = float(mmfi_match.group(1))
-        except Exception as e:
-            print(f"Error Barchart Momentum (NYSE): {e}")
-
-        for label, sym in [("NASDAQ above 20MA", "$NCTW"), ("NASDAQ above 50MA", "$NCFI")]:
-            try:
-                page.goto(f"https://www.barchart.com/stocks/quotes/{sym}/overview", wait_until="domcontentloaded", timeout=40000)
-                close_barchart_modal(page)
-                time.sleep(5)
-                content = page.content()
-                match = re.search(r'class="last-price">([\d\.]+)', content)
-                if match: results[label] = float(match.group(1))
-            except Exception as e:
-                print(f"Error Barchart {label}: {e}")
-
-        # 3. WSJ Markets Diary (AD Issues)
-        try:
-            page.goto("https://www.wsj.com/market-data/stocks", wait_until="domcontentloaded", timeout=40000)
-            time.sleep(5)
-            inner_text = page.inner_text("body")
-            adv_match = re.search(r'Advancing\s+([\d,]+)\s+([\d,]+)', inner_text)
-            dec_match = re.search(r'Declining\s+([\d,]+)\s+([\d,]+)', inner_text)
-            if adv_match and dec_match:
-                ny_adv = int(adv_match.group(1).replace(",", ""))
-                nas_adv = int(adv_match.group(2).replace(",", ""))
-                ny_dec = int(dec_match.group(1).replace(",", ""))
-                nas_dec = int(dec_match.group(2).replace(",", ""))
-                results.update({
-                    "NYSE Advancing": ny_adv, "NASDAQ Advancing": nas_adv,
-                    "NYSE Declining": ny_dec, "NASDAQ Declining": nas_dec,
-                    "NYSE AD Ratio": round(float(ny_adv) / float(max(ny_dec, 1)), 2),
-                    "NASDAQ AD Ratio": round(float(nas_adv) / float(max(nas_dec, 1)), 2)
-                })
-        except Exception as e:
-            print(f"Error WSJ AD Issues: {e}")
-
-        browser.close()
-    return results
+        print(f"Error fetching from Google Sheet: {e}")
+        return {}
 
 def fetch_dix():
     url = "https://squeezemetrics.com/monitor/static/DIX.csv"
@@ -223,17 +151,17 @@ def main():
         
     date_str = target_date.strftime("%Y/%-m/%-d")
     
-    # 1. Fetch Basic / Request-based data
+    # 1. Fetch Basic / API data
     results = {
         "Date": date_str,
         "CNN": fetch_cnn_fg(),
-        "VIX": fetch_vix(),
-        "NAAIM": fetch_naaim()
+        "VIX": fetch_vix()
     }
     
-    # 2. Fetch Selenium/Playwright-based data (Heavy)
-    pw_results = fetch_playwright_data()
-    results.update(pw_results)
+    # 2. Fetch Expert Data from Google Sheet (P/C Ratio, NAAIM, AAII, Breadth)
+    print(f"Fetching expert data from Google Sheet for {date_str}...")
+    gsheet_results = fetch_gsheet_data(date_str)
+    results.update(gsheet_results)
     
     # 3. Fetch DIX/GEX
     dix_data = fetch_dix()
@@ -257,12 +185,11 @@ def main():
         try:
             with open(DATA_FILE, 'r') as f:
                 history = json.load(f)
-            print(f"Loaded existing history: {len(history)} entries")
         except Exception as e:
             print(f"Error loading {DATA_FILE}: {e}")
             history = []
 
-    # Update or Append (Ensuring matched date format)
+    # Update or Append
     updated = False
     for i, r in enumerate(history):
         if r['Date'] == date_str:
@@ -277,7 +204,12 @@ def main():
         print(f"Adding new record for {date_str}")
         history.append(results)
     
-    # Explicit Sync and Write
+    # Sort history by date before writing
+    try:
+        history.sort(key=lambda x: datetime.strptime(x['Date'], "%Y/%-m/%-d"))
+    except: pass
+
+    # Write History
     try:
         with open(DATA_FILE, 'w') as f:
             json.dump(history, f, indent=2)

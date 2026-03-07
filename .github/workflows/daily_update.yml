@@ -2,8 +2,10 @@ name: Daily Market Data Update
 
 on:
   schedule:
-    # 7:00 AM Taiwan Time (UTC+8) is 23:00 UTC (Previous Day)
+    # 7:00 AM Taiwan Time (UTC+8) is 23:00 UTC
     - cron: '0 23 * * *'
+    # 12:00 PM Taiwan Time (UTC+8) is 04:00 UTC
+    - cron: '0 4 * * *'
   workflow_dispatch: # Enable manual trigger
 
 jobs:
@@ -28,7 +30,12 @@ jobs:
           playwright install --with-deps chromium
 
       - name: Run Data Fetcher
-        run: python scripts/fetch_data.py
+        env:
+          GSHEET_CREDENTIALS: ${{ secrets.GSHEET_CREDENTIALS }}
+        run: |
+          echo "$GSHEET_CREDENTIALS" > credentials.json
+          python scripts/fetch_data.py
+          rm credentials.json
 
       - name: Generate HTML Dashboard
         run: python scripts/generate_html.py
@@ -37,6 +44,6 @@ jobs:
         run: |
           git config --global user.name "Market Bot"
           git config --global user.email "bot@marketdash.com"
-          git add data/history.json *.html public/*.html
+          git add data/history.json public/*.html
           git commit -m "Auto Update: $(date +'%Y-%m-%d')" || exit 0
           git push origin main

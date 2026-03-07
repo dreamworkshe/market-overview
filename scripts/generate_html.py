@@ -20,7 +20,7 @@ BASE_HEAD = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} | Market Overview</title>
+    <title>{{ title }} | Trendsetter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -39,7 +39,7 @@ BASE_HEAD = """
         <header class="flex flex-col md:flex-row justify-between items-center mb-5 gap-3 bg-white p-3 px-6 rounded-3xl shadow-sm border border-slate-200">
             <div class="flex items-center gap-4">
                 <div class="flex flex-col md:flex-row md:items-baseline gap-2">
-                    <h1 class="text-xl md:text-2xl font-black gradient-text tracking-tighter">Market Overview</h1>
+                    <h1 class="text-xl md:text-2xl font-black gradient-text tracking-tighter">Trendsetter</h1>
                     <span class="text-xs md:text-sm font-bold text-slate-400 font-mono">:: {{ last_date }}</span>
                 </div>
             </div>
@@ -54,7 +54,7 @@ BASE_HEAD = """
 
 BASE_FOOTER = """
         <footer class="text-center text-slate-400 text-sm py-12">
-            <p>© 2026 Market Overview Dashboard</p>
+            <p>© 2026 Trendsetter Dashboard</p>
         </footer>
     </div>
     <script>
@@ -130,8 +130,6 @@ DASHBOARD_BODY = """
             ],
             internalGrid: [
                 { label: 'Dark Pool (DIX)', value: latest.DIX ? latest.DIX + '%' : '--%', icon: 'shield-check', color: 'text-blue-600' },
-                { label: 'NYSE AD Ratio', value: latest['NYSE AD Ratio'] || '--', icon: 'zap', color: 'text-orange-500' },
-                { label: 'NASD AD Ratio', value: latest['NASDAQ AD Ratio'] || '--', icon: 'zap', color: 'text-orange-500' },
                 { label: 'NYSE > 50MA', value: latest['NYSE above 50MA'] ? latest['NYSE above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' },
                 { label: 'NASD > 50MA', value: latest['NASDAQ above 50MA'] ? latest['NASDAQ above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' }
             ]
@@ -274,8 +272,6 @@ HISTORY_BODY = """
                             <th class="p-6 col-risk">Equity P/C</th>
                             <th class="p-6 col-risk">Total P/C</th>
                             <th class="p-6 col-internals text-nowrap">Dark Pool</th>
-                            <th class="p-6 col-internals text-nowrap">NYSE AD</th>
-                            <th class="p-6 col-internals text-nowrap">NASD AD</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 20</th>
                             <th class="p-6 col-internals text-nowrap">NASD 20</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 50</th>
@@ -313,8 +309,6 @@ HISTORY_BODY = """
                     <td class="p-6 text-xs col-risk">${row['Equity P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs col-risk">${row['Total P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
-                    <td class="p-6 text-xs col-internals font-bold ${row['NYSE AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NYSE Advancing'] || '--'}/${row['NYSE Declining'] || '--'}</td>
-                    <td class="p-6 text-xs col-internals font-bold ${row['NASDAQ AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NASDAQ Advancing'] || '--'}/${row['NASDAQ Declining'] || '--'}</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>
@@ -404,7 +398,6 @@ def main():
     }
     
     for name, content in pages.items():
-        with open(name, "w") as f: f.write(content)
         with open(f"public/{name}", "w") as f: f.write(content)
 
     print("Three pages generated successfully.")
