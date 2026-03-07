@@ -7,6 +7,7 @@ import yfinance as yf
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
+from calculate_ma import calculate_all_ma # Import MA calculation
 
 DATA_FILE = "data/history.json"
 GSHEET_ID = "18NLQo5n6Ni_NrMWuhIr9dUZFc57AKbxGVzK6M7V-FBg"
@@ -216,6 +217,9 @@ def main():
             f.flush()
             os.fsync(f.fileno())
         print(f"Successfully wrote {len(history)} records to {DATA_FILE}")
+        
+        # Trigger MA calculation
+        calculate_all_ma()
     except Exception as e:
         print(f"CRITICAL ERROR writing to {DATA_FILE}: {e}")
 

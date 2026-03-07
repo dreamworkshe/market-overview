@@ -3,6 +3,7 @@ import os
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
+from calculate_ma import calculate_all_ma
 
 DATA_FILE = "data/history.json"
 
@@ -77,13 +78,15 @@ def backfill_macro():
         except Exception as e:
             print(f"Error calculating for {date_str}: {e}")
 
-    # 3. Sort and Save
     history.sort(key=lambda x: parse_date(x['Date']))
 
     with open(DATA_FILE, 'w') as f:
         json.dump(history, f, indent=2)
     
     print(f"Macro Backfill Complete: Updated {updated_count} days.")
+    
+    # Recalculate MA
+    calculate_all_ma()
 
 if __name__ == "__main__":
     backfill_macro()

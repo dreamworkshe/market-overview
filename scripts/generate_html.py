@@ -4,6 +4,7 @@ from datetime import datetime
 from jinja2 import Template
 
 DATA_FILE = "data/history.json"
+MA_FILE = "data/history_ma.json"
 
 def get_cnn_color(val):
     if not val: return "text-slate-400"
@@ -72,7 +73,7 @@ DASHBOARD_BODY = """
                     <div class="w-1 h-3 bg-red-600 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">盤勢總覽 Overview</h2>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="overviewGrid"></div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" id="overviewGrid"></div>
             </section>
 
             <!-- Breadth Section -->
@@ -81,7 +82,7 @@ DASHBOARD_BODY = """
                     <div class="w-1 h-3 bg-emerald-500 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場廣度 Market Breadth</h2>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="breadthGrid"></div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" id="breadthGrid"></div>
             </section>
 
             <!-- Sentiment Section: Full Width Row -->
@@ -105,34 +106,46 @@ DASHBOARD_BODY = """
 
     <script>
         const rawData = {{ history_json }};
+        const maData = {{ ma_json }};
         const latest = rawData[rawData.length - 1];
+        const latestMA = maData.find(m => m.Date === latest.Date) || {};
+
+        const getTrend = (col) => {
+            const m5 = latestMA[col + '_5MA'];
+            const m10 = latestMA[col + '_10MA'];
+            const m20 = latestMA[col + '_20MA'];
+            if (!m5 || !m10 || !m20) return { icon: 'minus', color: 'text-slate-300' };
+            if (m5 > m10 && m10 > m20) return { icon: 'trending-up', color: 'text-emerald-500' };
+            if (m5 < m10 && m10 < m20) return { icon: 'trending-down', color: 'text-red-500' };
+            return { icon: 'minus', color: 'text-slate-300' };
+        };
 
         const categories = {
             overviewGrid: [
-                { label: 'Dark Pool (DIX)', value: latest.DIX ? latest.DIX + '%' : '--%', icon: 'shield-check', color: 'text-blue-600' },
-                { label: 'Gamma (GEX)', value: latest.GEX ? latest.GEX + 'B' : '--B', icon: 'zap', color: 'text-purple-600' },
-                { label: 'Equity P/C Ratio', value: latest['Equity P/C Ratio'], icon: 'trending-up', color: 'text-rose-600' },
-                { label: 'Total P/C Ratio', value: latest['Total P/C Ratio'], icon: 'activity', color: 'text-indigo-600' }
+                { label: 'Dark Pool (DIX)', col: 'DIX', suffix: '%' },
+                { label: 'Gamma (GEX)', col: 'GEX', suffix: 'B' },
+                { label: 'Equity P/C', col: 'Equity P/C Ratio' },
+                { label: 'Total P/C', col: 'Total P/C Ratio' }
             ],
             breadthGrid: [
-                { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] ? latest['NYSE above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-500' },
-                { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] ? latest['NASDAQ above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-500' },
-                { label: 'NYSE > 50MA', value: latest['NYSE above 50MA'] ? latest['NYSE above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' },
-                { label: 'NASD > 50MA', value: latest['NASDAQ above 50MA'] ? latest['NASDAQ above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' }
+                { label: 'NYSE > 20MA', col: 'NYSE above 20MA', suffix: '%' },
+                { label: 'NASD > 20MA', col: 'NASDAQ above 20MA', suffix: '%' },
+                { label: 'NYSE > 50MA', col: 'NYSE above 50MA', suffix: '%' },
+                { label: 'NASD > 50MA', col: 'NASDAQ above 50MA', suffix: '%' }
             ],
             sentimentGrid: [
-                { label: 'CNN Fear & Greed', value: '{{ cnn_val }}', icon: 'gauge', color: 'text-sky-600' },
-                { label: 'VIX 指數', value: latest.VIX, icon: 'alert-triangle', color: 'text-orange-500' },
-                { label: 'NAAIM 曝險', value: latest.NAAIM, icon: 'user-check', color: 'text-emerald-600' },
-                { label: 'AAII Spread', value: latest['AAII B-B'], icon: 'users', color: 'text-rose-500' },
-                { label: 'Crypto F&G', value: latest['Crypto F&G'], icon: 'bitcoin', color: 'text-amber-500' }
+                { label: 'CNN F&G', col: 'CNN' },
+                { label: 'VIX 指數', col: 'VIX' },
+                { label: 'NAAIM 曝險', col: 'NAAIM' },
+                { label: 'AAII Spread', col: 'AAII B-B' },
+                { label: 'Crypto F&G', col: 'Crypto F&G' }
             ],
             macroGrid: [
-                { label: '10Y-3M Spread', value: latest['10Y-3M Spread'], icon: 'trending-down', color: latest['10Y-3M Spread'] < 0 ? 'text-red-500' : 'text-blue-600' },
-                { label: 'HYG/LQD Ratio', value: latest['HYG/LQD Ratio'], icon: 'landmark', color: 'text-orange-600' },
-                { label: 'XLY/XLP Ratio', value: latest['XLY/XLP Ratio'], icon: 'shopping-bag', color: 'text-pink-600' },
-                { label: 'Copper/Gold Ratio', value: latest['Copper/Gold Ratio'], icon: 'coins', color: 'text-amber-600' },
-                { label: 'KBE/SPY Ratio', value: latest['KBE/SPY Ratio'], icon: 'building', color: 'text-indigo-600' }
+                { label: '10Y-3M Spread', col: '10Y-3M Spread' },
+                { label: 'HYG/LQD', col: 'HYG/LQD Ratio' },
+                { label: 'XLY/XLP', col: 'XLY/XLP Ratio' },
+                { label: 'Copper/Gold', col: 'Copper/Gold Ratio' },
+                { label: 'KBE/SPY', col: 'KBE/SPY Ratio' }
             ]
         };
 
@@ -140,15 +153,36 @@ DASHBOARD_BODY = """
             const grid = document.getElementById(id);
             if (!grid) return;
             items.forEach(m => {
+                const trend = getTrend(m.col);
+                const val = latest[m.col];
+                const m5 = latestMA[m.col + '_5MA'] || '--';
+                const m10 = latestMA[m.col + '_10MA'] || '--';
+                const m20 = latestMA[m.col + '_20MA'] || '--';
+                const sfx = m.suffix || '';
+
                 grid.innerHTML += `
                     <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300">
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center justify-between mb-1">
                             <span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>
-                            <div class="p-1 px-1.5 bg-slate-50 rounded-lg">
-                                <i data-lucide="${m.icon}" class="${m.color} w-3 h-3"></i>
+                            <i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <div class="text-2xl font-black tracking-tighter text-slate-900">${val !== undefined ? val + sfx : '--'}</div>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-slate-50 flex justify-between items-center text-[10px] font-bold text-slate-400">
+                            <div class="flex flex-col">
+                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">5MA</span>
+                                <span class="text-slate-500 font-mono">${m5}${sfx}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">10MA</span>
+                                <span class="text-slate-500 font-mono">${m10}${sfx}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">20MA</span>
+                                <span class="text-slate-500 font-mono">${m20}${sfx}</span>
                             </div>
                         </div>
-                        <div class="text-2xl font-black tracking-tighter text-slate-900">${m.value || '--'}</div>
                     </div>
                 `;
             });
@@ -283,6 +317,11 @@ def main():
     with open(DATA_FILE, 'r') as f:
         history = json.load(f)
 
+    ma_history = []
+    if os.path.exists(MA_FILE):
+        with open(MA_FILE, 'r') as f:
+            ma_history = json.load(f)
+
     latest = history[-1]
     last_date = latest['Date']
     cnn_val = latest.get('CNN', '-')
@@ -294,6 +333,7 @@ def main():
         "cnn_val": cnn_val,
         "cnn_color": cnn_color,
         "history_json": json.dumps(history),
+        "ma_json": json.dumps(ma_history),
         "active_dash": "",
         "active_hist": ""
     }

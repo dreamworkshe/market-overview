@@ -2,6 +2,7 @@ import json
 import os
 import pandas as pd
 from datetime import datetime
+from calculate_ma import calculate_all_ma
 
 DATA_FILE = "data/history.json"
 DIX_URL = "https://squeezemetrics.com/monitor/static/DIX.csv"
@@ -69,6 +70,9 @@ def backfill():
         json.dump(history, f, indent=2)
     
     print(f"Backfill complete: Updated {updates_count} records, added {new_count} new records.")
+    
+    # Recalculate MA
+    calculate_all_ma()
 
 if __name__ == "__main__":
     if not os.path.exists("data"):

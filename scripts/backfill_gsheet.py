@@ -1,8 +1,10 @@
 import json
 import os
 import gspread
+import pandas as pd
 from google.oauth2.service_account import Credentials
 from datetime import datetime
+from calculate_ma import calculate_all_ma
 
 DATA_FILE = "data/history.json"
 GSHEET_ID = "18NLQo5n6Ni_NrMWuhIr9dUZFc57AKbxGVzK6M7V-FBg"
@@ -108,11 +110,14 @@ def backfill_from_gsheet():
     # 4. Sort history by date
     history.sort(key=lambda x: parse_date(x['Date']))
 
-    # 5. Save back to file
+    # 5. Write back to file
     with open(DATA_FILE, 'w') as f:
         json.dump(history, f, indent=2)
     
     print(f"GSheet Backfill Complete: Added {added_count} new dates, updated {updated_count} existing dates.")
+    
+    # Recalculate MA
+    calculate_all_ma()
 
 if __name__ == "__main__":
     backfill_from_gsheet()
