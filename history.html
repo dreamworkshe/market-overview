@@ -62,7 +62,9 @@
                             <th class="p-6 col-risk">Gamma (GEX)</th>
                             <th class="p-6 col-risk">Equity P/C</th>
                             <th class="p-6 col-risk">Total P/C</th>
-                            <th class="p-6 col-internals">Dark Pool</th>
+                            <th class="p-6 col-internals text-nowrap">Dark Pool</th>
+                            <th class="p-6 col-internals text-nowrap">NYSE AD</th>
+                            <th class="p-6 col-internals text-nowrap">NASD AD</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 20</th>
                             <th class="p-6 col-internals text-nowrap">NASD 20</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 50</th>
@@ -76,7 +78,7 @@
         </div>
 
     <script>
-        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.73, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646, "XLP/XLY Ratio": 0.7328, "Copper/Gold Ratio": 0.0011, "KBE/SPY Ratio": 0.0895}, {"Date": "2026/3/6", "CNN": 26.71, "VIX": 29.49, "NAAIM": 79.29, "AAII B-B": -2.4, "Total P/C Ratio": 0.96, "Equity P/C Ratio": 0.67, "NYSE above 20MA": 29.88, "NASDAQ above 20MA": 35.73, "NYSE above 50MA": 42.97, "NASDAQ above 50MA": 33.12, "Crypto F&G": 12, "10Y-3M Spread": 0.563, "Copper/Gold Ratio": 0.0011, "HYG/LQD Ratio": 0.7234, "XLY/XLP Ratio": 1.3341, "KBE/SPY Ratio": 0.0886, "DIX": 46.99, "GEX": -0.26}];
+        const rawData = [{"Date": "2026/3/5", "CNN": 33.77, "VIX": 23.75, "Total P/C Ratio": 0.9, "Equity P/C Ratio": 0.6, "NAAIM": 79.29, "AAII B-B": -2.4, "NYSE above 20MA": 38.2, "NASDAQ above 20MA": 38.9, "NYSE above 50MA": 50.5, "NASDAQ above 50MA": 36.5, "Crypto F&G": 18, "10Y-3M Spread": 0.558, "Gold/Silver Ratio": 60.73, "DIX": 46.75, "GEX": 2.94, "HYG/LQD Ratio": 0.7245, "XLY/XLP Ratio": 1.3646, "XLP/XLY Ratio": 0.7328, "Copper/Gold Ratio": 0.0011, "KBE/SPY Ratio": 0.0895}, {"Date": "2026/3/6", "CNN": 26.71, "VIX": 29.49, "NAAIM": 79.29, "AAII B-B": -2.4, "Total P/C Ratio": 100.0, "Equity P/C Ratio": 100.0, "NYSE above 20MA": 29.88, "NASDAQ above 20MA": 35.73, "NYSE above 50MA": 42.97, "NASDAQ above 50MA": 33.12, "Crypto F&G": 12, "10Y-3M Spread": 0.563, "Copper/Gold Ratio": 0.0011, "HYG/LQD Ratio": 0.7234, "XLY/XLP Ratio": 1.3341, "KBE/SPY Ratio": 0.0886, "DIX": 46.99, "GEX": -0.26, "NYSE Advancing": 608, "NASDAQ Advancing": 1406, "NYSE Declining": 2175, "NASDAQ Declining": 3383, "NYSE AD Ratio": 0.28, "NASDAQ AD Ratio": 0.42}];
         const tableBody = document.getElementById('dataTableBody');
         
         const renderTable = () => {
@@ -100,6 +102,8 @@
                     <td class="p-6 text-xs col-risk">${row['Equity P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs col-risk">${row['Total P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
+                    <td class="p-6 text-xs col-internals font-bold ${row['NYSE AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NYSE Advancing'] || '--'}/${row['NYSE Declining'] || '--'}</td>
+                    <td class="p-6 text-xs col-internals font-bold ${row['NASDAQ AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NASDAQ Advancing'] || '--'}/${row['NASDAQ Declining'] || '--'}</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>
