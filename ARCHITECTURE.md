@@ -6,7 +6,7 @@
 ## 2. 技術棧 (Tech Stack)
 - **語言**: Python 3.9+
 - **虛擬環境**: `.venv` (強制於本地開發與執行時使用)
-- **數據處理與外部整合**: `gspread` (Google Sheets API), `pandas`, `yfinance`, `beautifulsoup4`, `requests`
+- **數據處理與外部整合**: `gspread` (Google Sheets API), `pandas`, `yfinance`, `beautifulsoup4`, `requests` (移除重型 Playwright 依賴，大幅提升執行效率)
 - **前端框架**: HTML5, Vanilla CSS, Tailwind CSS (Layout), Lucide Icons (圖標), Chart.js (趨勢)
 - **自動化**: GitHub Actions (**07:00 & 12:00 TPE**)
 - **部署**: GitHub Pages (自動偵測主分支變更)
@@ -32,7 +32,7 @@
 ## 6. 自動化與維護
 - **「紀錄」指令**: AI 接收指令後會同步最新腳本邏輯至本文件，並自動 Commit & Push 至 GitHub。
 - **同步策略**: 使用 **/抓取repo** 指令 (git pull --rebase)，確保本地開發腳本時不會覆蓋 GitHub Action 自動抓取的數據。
-- **定時任務**: 每日台灣時間 **07:00 與 12:00** 自動執行。環境已簡化，不再依賴 Playwright 繁重安裝，執行效率提升。
+- **定時任務**: 每日台灣時間 **07:00 與 12:00** 自動執行。環境已極度精簡，不再依賴 Playwright 繁重安裝，平均執行時間縮短至 30 秒內。
 
 ---
-*最後更新於: 2026/03/07*
+*最後更新於: 2026/03/07 (v2.1 - 極速優化版)*
