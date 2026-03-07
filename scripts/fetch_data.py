@@ -211,13 +211,16 @@ def main():
         try:
             with open(DATA_FILE, 'r') as f:
                 history = json.load(f)
-        except:
+            print(f"Loaded existing history: {len(history)} entries")
+        except Exception as e:
+            print(f"Error loading {DATA_FILE}: {e}")
             history = []
 
-    # Update or Append
+    # Update or Append (Ensuring matched date format)
     updated = False
     for i, r in enumerate(history):
         if r['Date'] == date_str:
+            print(f"Updating existing record for {date_str}")
             for k, v in results.items():
                 if v is not None:
                     history[i][k] = v
@@ -225,10 +228,18 @@ def main():
             break
     
     if not updated:
+        print(f"Adding new record for {date_str}")
         history.append(results)
     
-    with open(DATA_FILE, 'w') as f:
-        json.dump(history, f, indent=2)
+    # Explicit Sync and Write
+    try:
+        with open(DATA_FILE, 'w') as f:
+            json.dump(history, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        print(f"Successfully wrote {len(history)} records to {DATA_FILE}")
+    except Exception as e:
+        print(f"CRITICAL ERROR writing to {DATA_FILE}: {e}")
 
 if __name__ == "__main__":
     if not os.path.exists("data"):
