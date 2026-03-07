@@ -24,6 +24,8 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r scripts/requirements.txt
+          pip install playwright
+          playwright install --with-deps chromium
 
       - name: Run Data Fetcher
         run: python scripts/fetch_data.py

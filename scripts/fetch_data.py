@@ -1,23 +1,22 @@
-import requests
 import json
 import os
 import re
+import time
 from datetime import datetime, timedelta
 import yfinance as yf
 import pandas as pd
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 DATA_FILE = "data/history.json"
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-}
-
 def fetch_cnn_fg():
     url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    }
+    import requests
     try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
+        response = requests.get(url, headers=headers, timeout=10)
         data = response.json()
         return round(data['fear_and_greed']['score'], 2)
     except Exception as e:
@@ -29,102 +28,87 @@ def fetch_vix():
         vix = yf.Ticker("^VIX")
         hist = vix.history(period="1d")
         if not hist.empty:
-            return round(hist['Close'].iloc[-1], 2)
+            return round(float(hist['Close'].iloc[-1]), 2)
     except Exception as e:
         print(f"Error VIX: {e}")
     return None
 
-def fetch_naaim():
-    url = "https://www.naaim.org/programs/naaim-exposure-index/"
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
-        # New pattern: <span style="font-size: 65px; color: #11317d;">79.29</span>
-        match = re.search(r'color:\s*#11317d;">([\d\.]+)', response.text)
-        if match:
-            return float(match.group(1))
-        # Fallback
-        match = re.search(r'Exposure Index:\s*([\d\.]+)', response.text)
-        if match:
-            return float(match.group(1))
-    except Exception as e:
-        print(f"Error NAAIM: {e}")
-    return None
-
-def fetch_aaii():
-    url = "https://www.aaii.com/sentimentsurvey"
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
-        # Look for the latest bullish and bearish numbers in the historical table
-        # Searching for the first table row containing percentages
-        match_bull = re.search(r'([\d\.]+)%</td>\s*<td[^>]*>[\d\.]+%</td>\s*<td[^>]*>([\d\.]+)%', response.text)
-        if match_bull:
-            bull = float(match_bull.group(1))
-            bear = float(match_bull.group(2))
-            return round(bull - bear, 2)
-    except Exception as e:
-        print(f"Error AAII: {e}")
-    return None
-
-def fetch_put_call():
-    # Attempt to scrape the CBOE Daily Market Statistics page directly as CSV is often blocked
-    url = "https://www.cboe.com/us/options/market_statistics/daily/"
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
-        if response.status_code == 200:
-            # TOTAL PUT/CALL RATIO 0.96
-            total_match = re.search(r'TOTAL PUT/CALL RATIO\s+([\d\.]+)', response.text, re.IGNORECASE)
-            # EQUITY PUT/CALL RATIO 0.67
-            equity_match = re.search(r'EQUITY PUT/CALL RATIO\s+([\d\.]+)', response.text, re.IGNORECASE)
-            if total_match and equity_match:
-                return float(total_match.group(1)), float(equity_match.group(1))
-    except Exception as e:
-        print(f"Error CBOE scraping: {e}")
-    
-    # Fallback to the original CSV method
-    today = datetime.now()
-    for i in range(5):
-        date_str = (today - timedelta(i)).strftime("%Y-%m-%d")
-        url = f"https://cdn.cboe.com/data/us/options/market_statistics/daily_market_statistics/Daily_Market_Statistics_{date_str}.csv"
-        try:
-            response = requests.get(url, headers=HEADERS, timeout=10)
-            if response.status_code == 200:
-                import io
-                df = pd.read_csv(io.StringIO(response.text))
-                total_pc = df[df['Description'].str.contains('Total Put/Call Ratio', na=False, case=False)]['Ratio'].iloc[0]
-                equity_pc = df[df['Description'].str.contains('Equity Put/Call Ratio', na=False, case=False)]['Ratio'].iloc[0]
-                return round(float(total_pc), 2), round(float(equity_pc), 2)
-        except:
-            continue
-    return None, None
-
-def fetch_breadth_single(symbol):
-    """Scrape StockCharts for a breadth symbol score."""
-    # Symbols: $NYA20R, $NYA50R, $NAA20R, $NAA50R
-    url = f"https://stockcharts.com/h-sc/ui?s={symbol}"
-    
-    # Modern headers to avoid bot detection
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Cache-Control": "max-age=0",
+def fetch_playwright_data():
+    """Fetch NAAIM, AAII, CBOE, and StockCharts using Playwright for JS execution and bot bypass."""
+    results = {
+        "NAAIM": None,
+        "AAII B-B": None,
+        "Total P/C Ratio": None,
+        "Equity P/C Ratio": None,
+        "NYSE above 20MA": None,
+        "NASDAQ above 20MA": None,
+        "NYSE above 50MA": None,
+        "NASDAQ above 50MA": None
     }
     
-    try:
-        response = requests.get(url, headers=headers, timeout=15)
-        # Regex search for current price which is marked as "Last: 29.88" in the chart legend data
-        match = re.search(r'Last:\s*(-?[\d\.]+)', response.text)
-        if match:
-            return float(match.group(1))
-        
-        # Alternative meta tag meta description "$NYA50R - ...: 50.35"
-        match = re.search(r'description" content="[^:]+:\s*(-?[\d\.]+)', response.text)
-        if match:
-            return float(match.group(1))
-            
-    except Exception as e:
-        print(f"Error Breadth {symbol}: {e}")
-    return None
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        )
+        page = context.new_page()
+
+        # 1. NAAIM
+        try:
+            page.goto("https://www.naaim.org/programs/naaim-exposure-index/", timeout=30000)
+            # Find the span with the large number
+            element = page.query_selector('span[style*="font-size: 65px"]')
+            if element:
+                val = element.inner_text().strip()
+                results["NAAIM"] = float(val)
+        except Exception as e:
+            print(f"Error fetching NAAIM: {e}")
+
+        # 2. AAII
+        try:
+            page.goto("https://www.aaii.com/sentimentsurvey", timeout=30000)
+            # The survey is often in a table, we'll try to find the first numeric row
+            content = page.content()
+            match = re.search(r'([\d\.]+)%</td>\s*<td[^>]*>[\d\.]+%</td>\s*<td[^>]*>([\d\.]+)%', content)
+            if match:
+                results["AAII B-B"] = round(float(match.group(1)) - float(match.group(2)), 2)
+        except Exception as e:
+            print(f"Error fetching AAII: {e}")
+
+        # 3. CBOE Put/Call
+        try:
+            page.goto("https://www.cboe.com/us/options/market_statistics/daily/", timeout=30000)
+            # Wait for content to load
+            time.sleep(3)
+            content = page.content()
+            total_match = re.search(r'TOTAL PUT/CALL RATIO\s+([\d\.]+)', content, re.IGNORECASE)
+            equity_match = re.search(r'EQUITY PUT/CALL RATIO\s+([\d\.]+)', content, re.IGNORECASE)
+            if total_match: results["Total P/C Ratio"] = float(total_match.group(1))
+            if equity_match: results["Equity P/C Ratio"] = float(equity_match.group(1))
+        except Exception as e:
+            print(f"Error fetching CBOE: {e}")
+
+        # 4. StockCharts Breadth
+        symbols = {
+            "NYSE above 20MA": "%24NYA20R",
+            "NASDAQ above 20MA": "%24NAA20R",
+            "NYSE above 50MA": "%24NYA50R",
+            "NASDAQ above 50MA": "%24NAA50R"
+        }
+        for label, sym in symbols.items():
+            try:
+                page.goto(f"https://stockcharts.com/h-sc/ui?s={sym}", timeout=30000)
+                # Wait for chart legend to appear
+                page.wait_for_selector(".chart-legend", timeout=10000)
+                content = page.content()
+                match = re.search(r'Last:\s*(-?[\d\.]+)', content)
+                if match:
+                    results[label] = float(match.group(1))
+            except Exception as e:
+                print(f"Error fetching Breadth {label}: {e}")
+
+        browser.close()
+    return results
 
 def fetch_dix():
     url = "https://squeezemetrics.com/monitor/static/DIX.csv"
@@ -139,9 +123,9 @@ def fetch_dix():
         print(f"Error DIX: {e}")
         return {"DIX": None, "GEX": None}
 
-
 def fetch_crypto_fg():
     url = "https://api.alternative.me/fng/"
+    import requests
     try:
         response = requests.get(url, timeout=10)
         data = response.json()
@@ -152,8 +136,6 @@ def fetch_crypto_fg():
 
 def fetch_macro_data():
     try:
-        # Metals & Rates: 10Y (^TNX), 3M (^IRX), Gold (GC=F), Copper (HG=F)
-        # Sector Ratios: HYG (High Yield), LQD (Inv. Grade), XLY (Disc.), XLP (Staples), KBE (Banks), SPY (S&P 500)
         tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY"
         tickers = yf.Tickers(tickers_str)
         prices = {}
@@ -164,7 +146,6 @@ def fetch_macro_data():
             else:
                 return None, None, None, None, None
         
-        # Calculate Ratios
         spread = round(prices["^TNX"] - prices["^IRX"], 3)
         cg_ratio = round(prices["HG=F"] / prices["GC=F"], 4)
         hyg_lqd = round(prices["HYG"] / prices["LQD"], 4)
@@ -177,30 +158,27 @@ def fetch_macro_data():
         return None, None, None, None, None
 
 def main():
-    # Use US/New_York time for consistency with market trading days
     from datetime import timezone
-    # US Eastern Time is UTC-5 (Standard) or UTC-4 (Daylight)
-    # Simple manual offset for now, or use pytz
     ny_now = datetime.now(timezone.utc) - timedelta(hours=5) 
     date_str = ny_now.strftime("%Y/%-m/%-d")
     
+    # 1. Fetch Basic / Request-based data
     results = {
         "Date": date_str,
         "CNN": fetch_cnn_fg(),
         "VIX": fetch_vix(),
-        "NAAIM": fetch_naaim(),
-        "AAII B-B": fetch_aaii()
     }
     
-    total_pc, equity_pc = fetch_put_call()
-    results["Total P/C Ratio"] = total_pc
-    results["Equity P/C Ratio"] = equity_pc
+    # 2. Fetch Selenium/Playwright-based data (Heavy)
+    pw_results = fetch_playwright_data()
+    results.update(pw_results)
     
-    results["NYSE above 20MA"] = fetch_breadth_single("%24NYA20R")
-    results["NASDAQ above 20MA"] = fetch_breadth_single("%24NAA20R")
-    results["NYSE above 50MA"] = fetch_breadth_single("%24NYA50R")
-    results["NASDAQ above 50MA"] = fetch_breadth_single("%24NAA50R")
+    # 3. Fetch DIX/GEX
+    dix_data = fetch_dix()
+    results["DIX"] = dix_data["DIX"]
+    results["GEX"] = dix_data["GEX"]
 
+    # 4. Crypto & Macro
     results["Crypto F&G"] = fetch_crypto_fg()
     spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy = fetch_macro_data()
     results["10Y-3M Spread"] = spread
@@ -209,14 +187,6 @@ def main():
     results["XLY/XLP Ratio"] = xly_xlp
     results["KBE/SPY Ratio"] = kbe_spy
     
-    if "Gold/Silver Ratio" in results:
-        del results["Gold/Silver Ratio"]
-
-
-    dix_data = fetch_dix()
-    results["DIX"] = dix_data["DIX"]
-    results["GEX"] = dix_data["GEX"]
-
     print(f"Fetched: {results}")
 
     # Load and Update History
@@ -232,7 +202,6 @@ def main():
     updated = False
     for i, r in enumerate(history):
         if r['Date'] == date_str:
-            # Only update non-None values
             for k, v in results.items():
                 if v is not None:
                     history[i][k] = v
