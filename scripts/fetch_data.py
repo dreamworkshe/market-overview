@@ -99,25 +99,42 @@ def fetch_playwright_data():
             print(f"Error CBOE: {e}")
 
         # 4. Barchart Breadth (High Stability)
-        # Symbols: $MMTW (NYSE 20), $MMFI (NYSE 50), $NCTW (NASD 20), $NCFI (NASD 50)
-        symbols = {
-            "NYSE above 20MA": "$MMTW",
-            "NASDAQ above 20MA": "$NCTW",
-            "NYSE above 50MA": "$MMFI",
-            "NASDAQ above 50MA": "$NCFI"
-        }
-        for label, sym in symbols.items():
+        def close_barchart_modal(p):
+            try:
+                # Try to click the X on any popup modal that might appear
+                close_btn = p.query_selector("i.bc-glyph-close")
+                if close_btn: 
+                    close_btn.click()
+                    time.sleep(1)
+            except: pass
+
+        # NYSE indicators from Momentum page (very stable table)
+        try:
+            page.goto("https://www.barchart.com/stocks/momentum", wait_until="domcontentloaded", timeout=40000)
+            close_barchart_modal(page)
+            time.sleep(5)
+            content = page.content()
+            # Search for $MMTW and $MMFI values in the Momentum table
+            mmtw_match = re.search(r'\$MMTW.*?class="last-price">([\d\.]+)', content, re.DOTALL)
+            mmfi_match = re.search(r'\$MMFI.*?class="last-price">([\d\.]+)', content, re.DOTALL)
+            if mmtw_match: results["NYSE above 20MA"] = float(mmtw_match.group(1))
+            if mmfi_match: results["NYSE above 50MA"] = float(mmfi_match.group(1))
+        except Exception as e:
+            print(f"Error Barchart Momentum (NYSE): {e}")
+
+        # NASDAQ indicators from individual pages
+        for label, sym in [("NASDAQ above 20MA", "$NCTW"), ("NASDAQ above 50MA", "$NCFI")]:
             try:
                 page.goto(f"https://www.barchart.com/stocks/quotes/{sym}/overview", wait_until="domcontentloaded", timeout=40000)
-                time.sleep(3)
+                close_barchart_modal(page)
+                time.sleep(5)
                 content = page.content()
-                # Barchart usually has the value in a 'last-price' span or similar
                 match = re.search(r'class="last-price">([\d\.]+)', content)
                 if match:
                     results[label] = float(match.group(1))
                 else:
-                    # Fallback regex
-                    match = re.search(sym + r'[^>]*>([\d\.]+)', content)
+                    # Fallback
+                    match = re.search(r'data-last="([\d\.]+)"', content)
                     if match: results[label] = float(match.group(1))
             except Exception as e:
                 print(f"Error Barchart {label}: {e}")
@@ -126,24 +143,24 @@ def fetch_playwright_data():
         try:
             page.goto("https://www.wsj.com/market-data/stocks", wait_until="domcontentloaded", timeout=40000)
             time.sleep(5)
-            # Find the Markets Diary table
-            # It has rows for Advancing and Declining
-            # Columns are Issues (NYSE, NASDAQ)
             inner_text = page.inner_text("body")
             
-            # Use regex to find "Advancing" and "Declining" values in the diary
             adv_match = re.search(r'Advancing\s+([\d,]+)\s+([\d,]+)', inner_text)
             dec_match = re.search(r'Declining\s+([\d,]+)\s+([\d,]+)', inner_text)
             
             if adv_match and dec_match:
-                results["NYSE Advancing"] = int(adv_match.group(1).replace(",", ""))
-                results["NASDAQ Advancing"] = int(adv_match.group(2).replace(",", ""))
-                results["NYSE Declining"] = int(dec_match.group(1).replace(",", ""))
-                results["NASDAQ Declining"] = int(dec_match.group(2).replace(",", ""))
+                ny_adv = int(adv_match.group(1).replace(",", ""))
+                nas_adv = int(adv_match.group(2).replace(",", ""))
+                ny_dec = int(dec_match.group(1).replace(",", ""))
+                nas_dec = int(dec_match.group(2).replace(",", ""))
                 
-                # Calculate Ratio for handy display
-                results["NYSE AD Ratio"] = round(results["NYSE Advancing"] / max(results["NYSE Declining"], 1), 2)
-                results["NASDAQ AD Ratio"] = round(results["NASDAQ Advancing"] / max(results["NASDAQ Declining"], 1), 2)
+                results["NYSE Advancing"] = ny_adv
+                results["NASDAQ Advancing"] = nas_adv
+                results["NYSE Declining"] = ny_dec
+                results["NASDAQ Declining"] = nas_dec
+                
+                results["NYSE AD Ratio"] = round(float(ny_adv) / float(max(ny_dec, 1)), 2)
+                results["NASDAQ AD Ratio"] = round(float(nas_adv) / float(max(nas_dec, 1)), 2)
         except Exception as e:
             print(f"Error WSJ AD Issues: {e}")
 
