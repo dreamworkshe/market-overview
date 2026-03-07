@@ -34,7 +34,7 @@ def fetch_vix():
     return None
 
 def fetch_playwright_data():
-    """Fetch NAAIM, AAII, CBOE, and StockCharts using Playwright for JS execution and bot bypass."""
+    """Fetch NAAIM, AAII, CBOE, and StockCharts using reinforced Playwright."""
     results = {
         "NAAIM": None,
         "AAII B-B": None,
@@ -47,46 +47,56 @@ def fetch_playwright_data():
     }
     
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # Added sandbox flags for better GitHub Actions stability
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+        
+        # Emulate a more realistic desktop browser
         context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 800},
+            device_scale_factor=1,
         )
         page = context.new_page()
 
         # 1. NAAIM
         try:
-            page.goto("https://www.naaim.org/programs/naaim-exposure-index/", timeout=30000)
-            # Find the span with the large number
-            element = page.query_selector('span[style*="font-size: 65px"]')
-            if element:
-                val = element.inner_text().strip()
-                results["NAAIM"] = float(val)
+            page.goto("https://www.naaim.org/programs/naaim-exposure-index/", wait_until="domcontentloaded", timeout=40000)
+            time.sleep(5) # Direct wait for JS data to settle
+            content = page.content()
+            # Try finding the large number directly in text if selector fails
+            match = re.search(r'color:\s*#11317d;">\s*([\d\.]+)', content)
+            if match:
+                results["NAAIM"] = float(match.group(1))
+            else:
+                # Fallback search for any exposure number
+                match = re.search(r'Exposure Index Number is[\*\s:]+([\d\.]+)', page.inner_text("body"), re.IGNORECASE)
+                if match: results["NAAIM"] = float(match.group(1))
         except Exception as e:
-            print(f"Error fetching NAAIM: {e}")
+            print(f"Error NAAIM: {e}")
 
         # 2. AAII
         try:
-            page.goto("https://www.aaii.com/sentimentsurvey", timeout=30000)
-            # The survey is often in a table, we'll try to find the first numeric row
+            page.goto("https://www.aaii.com/sentimentsurvey", wait_until="domcontentloaded", timeout=40000)
+            time.sleep(5)
             content = page.content()
+            # Robust table parsing
             match = re.search(r'([\d\.]+)%</td>\s*<td[^>]*>[\d\.]+%</td>\s*<td[^>]*>([\d\.]+)%', content)
             if match:
                 results["AAII B-B"] = round(float(match.group(1)) - float(match.group(2)), 2)
         except Exception as e:
-            print(f"Error fetching AAII: {e}")
+            print(f"Error AAII: {e}")
 
         # 3. CBOE Put/Call
         try:
-            page.goto("https://www.cboe.com/us/options/market_statistics/daily/", timeout=30000)
-            # Wait for content to load
-            time.sleep(3)
+            page.goto("https://www.cboe.com/us/options/market_statistics/daily/", wait_until="domcontentloaded", timeout=40000)
+            time.sleep(8) # CBOE is heavy
             content = page.content()
-            total_match = re.search(r'TOTAL PUT/CALL RATIO\s+([\d\.]+)', content, re.IGNORECASE)
-            equity_match = re.search(r'EQUITY PUT/CALL RATIO\s+([\d\.]+)', content, re.IGNORECASE)
+            total_match = re.search(r'TOTAL PUT/CALL RATIO[^\d]*([\d\.]+)', content, re.IGNORECASE)
+            equity_match = re.search(r'EQUITY PUT/CALL RATIO[^\d]*([\d\.]+)', content, re.IGNORECASE)
             if total_match: results["Total P/C Ratio"] = float(total_match.group(1))
             if equity_match: results["Equity P/C Ratio"] = float(equity_match.group(1))
         except Exception as e:
-            print(f"Error fetching CBOE: {e}")
+            print(f"Error CBOE: {e}")
 
         # 4. StockCharts Breadth
         symbols = {
@@ -97,15 +107,21 @@ def fetch_playwright_data():
         }
         for label, sym in symbols.items():
             try:
-                page.goto(f"https://stockcharts.com/h-sc/ui?s={sym}", timeout=30000)
-                # Wait for chart legend to appear
-                page.wait_for_selector(".chart-legend", timeout=10000)
+                # Use Sc3 UI which is sometimes more stable or fallback if Sc2 blocked
+                page.goto(f"https://stockcharts.com/h-sc/ui?s={sym}", wait_until="domcontentloaded", timeout=40000)
+                time.sleep(5) # Wait for Canvas/JS to plot
                 content = page.content()
+                # Search for "Last: 33.12" in the entire raw HTML
                 match = re.search(r'Last:\s*(-?[\d\.]+)', content)
                 if match:
                     results[label] = float(match.group(1))
+                else:
+                    # Alternative search in meta tag description
+                    match = re.search(r'content="[^"]+:\s*(-?[\d\.]+)" name="description"', content)
+                    if match: results[label] = float(match.group(1))
+                    else: print(f"Warning: {label} ({sym}) parsed partially, Title: {page.title()}")
             except Exception as e:
-                print(f"Error fetching Breadth {label}: {e}")
+                print(f"Error Breadth {label}: {e}")
 
         browser.close()
     return results
