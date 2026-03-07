@@ -215,9 +215,20 @@ def fetch_macro_data():
         return None, None, None, None, None
 
 def main():
+    # NY Time Check
     from datetime import timezone
-    ny_now = datetime.now(timezone.utc) - timedelta(hours=5) 
-    date_str = ny_now.strftime("%Y/%-m/%-d")
+    ny_now = datetime.now(timezone.utc) - timedelta(hours=5)
+    
+    # 週末調整：週六(5)減一天，週日(6)減兩天，統一算在週五
+    target_date = ny_now
+    if ny_now.weekday() == 5: # Saturday
+        target_date = ny_now - timedelta(days=1)
+        print(f"Today is Saturday, mapping data to Friday {target_date.strftime('%Y/%-m/%-d')}")
+    elif ny_now.weekday() == 6: # Sunday
+        target_date = ny_now - timedelta(days=2)
+        print(f"Today is Sunday, mapping data to Friday {target_date.strftime('%Y/%-m/%-d')}")
+        
+    date_str = target_date.strftime("%Y/%-m/%-d")
     
     # 1. Fetch Basic / Request-based data
     results = {
