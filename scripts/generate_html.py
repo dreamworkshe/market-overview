@@ -130,8 +130,8 @@ DASHBOARD_BODY = """
             ],
             internalGrid: [
                 { label: 'Dark Pool (DIX)', value: latest.DIX ? latest.DIX + '%' : '--%', icon: 'shield-check', color: 'text-blue-600' },
-                { label: 'NYSE > 20MA', value: latest['NYSE above 20MA'] ? latest['NYSE above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-600' },
-                { label: 'NASD > 20MA', value: latest['NASDAQ above 20MA'] ? latest['NASDAQ above 20MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-emerald-600' },
+                { label: 'NYSE AD Ratio', value: latest['NYSE AD Ratio'] || '--', icon: 'zap', color: 'text-orange-500' },
+                { label: 'NASD AD Ratio', value: latest['NASDAQ AD Ratio'] || '--', icon: 'zap', color: 'text-orange-500' },
                 { label: 'NYSE > 50MA', value: latest['NYSE above 50MA'] ? latest['NYSE above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' },
                 { label: 'NASD > 50MA', value: latest['NASDAQ above 50MA'] ? latest['NASDAQ above 50MA'] + '%' : '--%', icon: 'bar-chart', color: 'text-indigo-500' }
             ]
@@ -273,7 +273,9 @@ HISTORY_BODY = """
                             <th class="p-6 col-risk">Gamma (GEX)</th>
                             <th class="p-6 col-risk">Equity P/C</th>
                             <th class="p-6 col-risk">Total P/C</th>
-                            <th class="p-6 col-internals">Dark Pool</th>
+                            <th class="p-6 col-internals text-nowrap">Dark Pool</th>
+                            <th class="p-6 col-internals text-nowrap">NYSE AD</th>
+                            <th class="p-6 col-internals text-nowrap">NASD AD</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 20</th>
                             <th class="p-6 col-internals text-nowrap">NASD 20</th>
                             <th class="p-6 col-internals text-nowrap">NYSE 50</th>
@@ -311,6 +313,8 @@ HISTORY_BODY = """
                     <td class="p-6 text-xs col-risk">${row['Equity P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs col-risk">${row['Total P/C Ratio'] || '--'}</td>
                     <td class="p-6 text-xs text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
+                    <td class="p-6 text-xs col-internals font-bold ${row['NYSE AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NYSE Advancing'] || '--'}/${row['NYSE Declining'] || '--'}</td>
+                    <td class="p-6 text-xs col-internals font-bold ${row['NASDAQ AD Ratio'] > 1 ? 'text-emerald-600' : 'text-rose-600'}">${row['NASDAQ Advancing'] || '--'}/${row['NASDAQ Declining'] || '--'}</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
                     <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>

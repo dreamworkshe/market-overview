@@ -28,8 +28,8 @@
     "VIX": 29.49,
     "NAAIM": 79.29,
     "AAII B-B": -2.4,
-    "Total P/C Ratio": 0.96,
-    "Equity P/C Ratio": 0.67,
+    "Total P/C Ratio": 100.0,
+    "Equity P/C Ratio": 100.0,
     "NYSE above 20MA": 29.88,
     "NASDAQ above 20MA": 35.73,
     "NYSE above 50MA": 42.97,
@@ -41,6 +41,12 @@
     "XLY/XLP Ratio": 1.3341,
     "KBE/SPY Ratio": 0.0886,
     "DIX": 46.99,
-    "GEX": -0.26
+    "GEX": -0.26,
+    "NYSE Advancing": 608,
+    "NASDAQ Advancing": 1406,
+    "NYSE Declining": 2175,
+    "NASDAQ Declining": 3383,
+    "NYSE AD Ratio": 0.28,
+    "NASDAQ AD Ratio": 0.42
   }
 ]

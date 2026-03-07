@@ -98,30 +98,54 @@ def fetch_playwright_data():
         except Exception as e:
             print(f"Error CBOE: {e}")
 
-        # 4. StockCharts Breadth
+        # 4. Barchart Breadth (High Stability)
+        # Symbols: $MMTW (NYSE 20), $MMFI (NYSE 50), $NCTW (NASD 20), $NCFI (NASD 50)
         symbols = {
-            "NYSE above 20MA": "%24NYA20R",
-            "NASDAQ above 20MA": "%24NAA20R",
-            "NYSE above 50MA": "%24NYA50R",
-            "NASDAQ above 50MA": "%24NAA50R"
+            "NYSE above 20MA": "$MMTW",
+            "NASDAQ above 20MA": "$NCTW",
+            "NYSE above 50MA": "$MMFI",
+            "NASDAQ above 50MA": "$NCFI"
         }
         for label, sym in symbols.items():
             try:
-                # Use Sc3 UI which is sometimes more stable or fallback if Sc2 blocked
-                page.goto(f"https://stockcharts.com/h-sc/ui?s={sym}", wait_until="domcontentloaded", timeout=40000)
-                time.sleep(5) # Wait for Canvas/JS to plot
+                page.goto(f"https://www.barchart.com/stocks/quotes/{sym}/overview", wait_until="domcontentloaded", timeout=40000)
+                time.sleep(3)
                 content = page.content()
-                # Search for "Last: 33.12" in the entire raw HTML
-                match = re.search(r'Last:\s*(-?[\d\.]+)', content)
+                # Barchart usually has the value in a 'last-price' span or similar
+                match = re.search(r'class="last-price">([\d\.]+)', content)
                 if match:
                     results[label] = float(match.group(1))
                 else:
-                    # Alternative search in meta tag description
-                    match = re.search(r'content="[^"]+:\s*(-?[\d\.]+)" name="description"', content)
+                    # Fallback regex
+                    match = re.search(sym + r'[^>]*>([\d\.]+)', content)
                     if match: results[label] = float(match.group(1))
-                    else: print(f"Warning: {label} ({sym}) parsed partially, Title: {page.title()}")
             except Exception as e:
-                print(f"Error Breadth {label}: {e}")
+                print(f"Error Barchart {label}: {e}")
+
+        # 5. WSJ Markets Diary (AD Issues)
+        try:
+            page.goto("https://www.wsj.com/market-data/stocks", wait_until="domcontentloaded", timeout=40000)
+            time.sleep(5)
+            # Find the Markets Diary table
+            # It has rows for Advancing and Declining
+            # Columns are Issues (NYSE, NASDAQ)
+            inner_text = page.inner_text("body")
+            
+            # Use regex to find "Advancing" and "Declining" values in the diary
+            adv_match = re.search(r'Advancing\s+([\d,]+)\s+([\d,]+)', inner_text)
+            dec_match = re.search(r'Declining\s+([\d,]+)\s+([\d,]+)', inner_text)
+            
+            if adv_match and dec_match:
+                results["NYSE Advancing"] = int(adv_match.group(1).replace(",", ""))
+                results["NASDAQ Advancing"] = int(adv_match.group(2).replace(",", ""))
+                results["NYSE Declining"] = int(dec_match.group(1).replace(",", ""))
+                results["NASDAQ Declining"] = int(dec_match.group(2).replace(",", ""))
+                
+                # Calculate Ratio for handy display
+                results["NYSE AD Ratio"] = round(results["NYSE Advancing"] / max(results["NYSE Declining"], 1), 2)
+                results["NASDAQ AD Ratio"] = round(results["NASDAQ Advancing"] / max(results["NASDAQ Declining"], 1), 2)
+        except Exception as e:
+            print(f"Error WSJ AD Issues: {e}")
 
         browser.close()
     return results
