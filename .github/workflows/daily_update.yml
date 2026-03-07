@@ -35,6 +35,6 @@ jobs:
         run: |
           git config --global user.name "Market Bot"
           git config --global user.email "bot@marketdash.com"
-          git add data/history.json index.html public/index.html
+          git add data/history.json *.html public/*.html
           git commit -m "Auto Update: $(date +'%Y-%m-%d')" || exit 0
           git push origin main

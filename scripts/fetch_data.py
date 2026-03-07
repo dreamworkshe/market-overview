@@ -38,13 +38,12 @@ def fetch_naaim():
     url = "https://www.naaim.org/programs/naaim-exposure-index/"
     try:
         response = requests.get(url, headers=HEADERS, timeout=10)
-        # Look for the numeric value in the text
-        # Usually: "The NAAIM Exposure Index for the period ending ... is 74.93."
-        match = re.search(r'Exposure Index:\s*([\d\.]+)', response.text)
+        # New pattern: <span style="font-size: 65px; color: #11317d;">79.29</span>
+        match = re.search(r'color:\s*#11317d;">([\d\.]+)', response.text)
         if match:
             return float(match.group(1))
-        # Fallback to a broader search
-        match = re.search(r'is\s+([\d\.]+)\.', response.text)
+        # Fallback
+        match = re.search(r'Exposure Index:\s*([\d\.]+)', response.text)
         if match:
             return float(match.group(1))
     except Exception as e:
@@ -55,18 +54,35 @@ def fetch_aaii():
     url = "https://www.aaii.com/sentimentsurvey"
     try:
         response = requests.get(url, headers=HEADERS, timeout=10)
-        bull = re.search(r'Bullish:\s*([\d\.]+)%', response.text)
-        bear = re.search(r'Bearish:\s*([\d\.]+)%', response.text)
-        if bull and bear:
-            return round(float(bull.group(1)) - float(bear.group(1)), 2)
+        # Look for the latest bullish and bearish numbers in the historical table
+        # Searching for the first table row containing percentages
+        match_bull = re.search(r'([\d\.]+)%</td>\s*<td[^>]*>[\d\.]+%</td>\s*<td[^>]*>([\d\.]+)%', response.text)
+        if match_bull:
+            bull = float(match_bull.group(1))
+            bear = float(match_bull.group(2))
+            return round(bull - bear, 2)
     except Exception as e:
         print(f"Error AAII: {e}")
     return None
 
 def fetch_put_call():
-    # CBOE official daily stats
+    # Attempt to scrape the CBOE Daily Market Statistics page directly as CSV is often blocked
+    url = "https://www.cboe.com/us/options/market_statistics/daily/"
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=10)
+        if response.status_code == 200:
+            # TOTAL PUT/CALL RATIO 0.96
+            total_match = re.search(r'TOTAL PUT/CALL RATIO\s+([\d\.]+)', response.text, re.IGNORECASE)
+            # EQUITY PUT/CALL RATIO 0.67
+            equity_match = re.search(r'EQUITY PUT/CALL RATIO\s+([\d\.]+)', response.text, re.IGNORECASE)
+            if total_match and equity_match:
+                return float(total_match.group(1)), float(equity_match.group(1))
+    except Exception as e:
+        print(f"Error CBOE scraping: {e}")
+    
+    # Fallback to the original CSV method
     today = datetime.now()
-    for i in range(5): # Try last 5 days
+    for i in range(5):
         date_str = (today - timedelta(i)).strftime("%Y-%m-%d")
         url = f"https://cdn.cboe.com/data/us/options/market_statistics/daily_market_statistics/Daily_Market_Statistics_{date_str}.csv"
         try:
@@ -85,17 +101,27 @@ def fetch_breadth_single(symbol):
     """Scrape StockCharts for a breadth symbol score."""
     # Symbols: $NYA20R, $NYA50R, $NAA20R, $NAA50R
     url = f"https://stockcharts.com/h-sc/ui?s={symbol}"
+    
+    # Modern headers to avoid bot detection
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Cache-Control": "max-age=0",
+    }
+    
     try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
-        # Look for the price in the meta tags or script
-        # Example: <meta name="description" content="$NYA50R - NYSE stocks above 50-day MA: 50.35">
-        match = re.search(r'([\$A-Z0-9]+)\s*:\s*(-?[\d\.]+)', response.text)
-        if match:
-            return float(match.group(2))
-        # Regex search for current price in the chart data or summary
-        match = re.search(r'Last:\s*(-?\d+\.\d+)', response.text)
+        response = requests.get(url, headers=headers, timeout=15)
+        # Regex search for current price which is marked as "Last: 29.88" in the chart legend data
+        match = re.search(r'Last:\s*(-?[\d\.]+)', response.text)
         if match:
             return float(match.group(1))
+        
+        # Alternative meta tag meta description "$NYA50R - ...: 50.35"
+        match = re.search(r'description" content="[^:]+:\s*(-?[\d\.]+)', response.text)
+        if match:
+            return float(match.group(1))
+            
     except Exception as e:
         print(f"Error Breadth {symbol}: {e}")
     return None
