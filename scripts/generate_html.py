@@ -46,7 +46,6 @@ BASE_HEAD = """
             
             <nav class="flex gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-[13px] font-bold">
                 <a href="index.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 {{ active_dash }}">儀表板</a>
-                <a href="charts.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 {{ active_charts }}">圖表區</a>
                 <a href="history.html" class="px-5 py-2 rounded-lg transition-all text-slate-500 hover:text-slate-900 {{ active_hist }}">歷史紀錄</a>
             </nav>
         </header>
@@ -157,125 +156,46 @@ DASHBOARD_BODY = """
     </script>
 """
 
-# --- CHARTS PAGE ---
-CHARTS_BODY = """
-        <div class="grid grid-cols-1 gap-10">
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-xl font-black flex items-center gap-3 text-slate-800">
-                        <i data-lucide="trending-up" class="text-sky-500"></i> 情緒指標趨勢
-                    </h3>
-                    <div class="flex gap-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                        <span>CNN</span> • <span>NAAIM</span> • <span>VIX</span>
-                    </div>
-                </div>
-                <div class="h-[450px]">
-                    <canvas id="sentimentChart"></canvas>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-black flex items-center gap-3 text-slate-800">
-                        <i data-lucide="bar-chart-3" class="text-purple-500"></i> 市場廣度 Breadth
-                    </h3>
-                </div>
-                <div class="h-[450px]">
-                    <canvas id="breadthChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-    <script>
-        const rawData = {{ history_json }};
-        const latest = rawData[rawData.length - 1];
-        
-        Chart.defaults.color = '#64748b';
-        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-
-        const labels = rawData.map(d => d.Date);
-
-        new Chart(document.getElementById('sentimentChart'), {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [
-                    { label: 'CNN F&G', data: rawData.map(d => d.CNN), borderColor: '#0ea5e9', tension: 0.3, fill: false, borderWidth: 4, pointRadius: 0, pointHoverRadius: 6 },
-                    { label: 'NAAIM', data: rawData.map(d => d.NAAIM), borderColor: '#10b981', tension: 0.3, fill: false, borderWidth: 2, pointRadius: 0 },
-                    { label: 'VIX (x2)', data: rawData.map(d => d.VIX * 2), borderColor: '#f43f5e', tension: 0.3, borderDash: [6, 6], borderWidth: 1.5, pointRadius: 0 }
-                ]
-            },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    x: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } },
-                    y: { grid: { color: '#f1f5f9' }, border: { dash: [4, 4] }, ticks: { font: { weight: '600' } } }
-                }
-            }
-        });
-
-        new Chart(document.getElementById('breadthChart'), {
-            type: 'bar',
-            data: {
-                labels: ['NYSE > 20MA', 'NASD > 20MA', 'NYSE > 50MA', 'NASD > 50MA'],
-                datasets: [{
-                    data: [
-                        latest['NYSE above 20MA'], 
-                        latest['NASDAQ above 20MA'], 
-                        latest['NYSE above 50MA'], 
-                        latest['NASDAQ above 50MA']
-                    ],
-                    backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#6366f1'],
-                    borderRadius: 16,
-                    barThickness: 60
-                }]
-            },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { min: 0, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { weight: '600' } } },
-                    x: { grid: { display: false }, ticks: { font: { size: 12, weight: '800' } } }
-                }
-            }
-        });
-    </script>
-"""
-
 # --- HISTORY PAGE ---
 HISTORY_BODY = """
-        <div class="flex flex-wrap gap-2 mb-10 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 max-w-fit mx-auto md:mx-0">
-            <button onclick="switchTab('all')" id="tab-all" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all active-tab shadow-sm">全部紀錄</button>
-            <button onclick="switchTab('macro')" id="tab-macro" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
-            <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">市場情緒</button>
-            <button onclick="switchTab('risk')" id="tab-risk" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">風險與期權</button>
-            <button onclick="switchTab('internals')" id="tab-internals" class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all hover:bg-white text-slate-500">內部資金</button>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div class="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+                <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">全部紀錄</button>
+                <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
+                <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場情緒</button>
+                <button onclick="switchTab('risk')" id="tab-risk" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">風險與期權</button>
+                <button onclick="switchTab('internals')" id="tab-internals" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">內部資金</button>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                <i data-lucide="keyboard" class="w-4 h-4 text-slate-400"></i>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">可用方向鍵 <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600">←</kbd> <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600">→</kbd> 切換分頁</span>
+            </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-200">
+        <div class="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-200">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[1200px]">
-                    <thead class="bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-200">
+                <table class="w-full text-left border-collapse min-w-[1000px]">
+                    <thead class="bg-slate-50 text-slate-400 text-[9px] font-black uppercase tracking-[0.15em] border-b border-slate-200">
                         <tr>
-                            <th class="p-6">交易日期</th>
-                            <th class="p-6 col-macro">10Y-3M</th>
-                            <th class="p-6 col-macro">HYG/LQD</th>
-                            <th class="p-6 col-macro">XLY/XLP</th>
-                            <th class="p-6 col-macro text-nowrap">C/G Ratio</th>
-                            <th class="p-6 col-macro text-nowrap">KBE/SPY</th>
-                            <th class="p-6 col-sentiment text-nowrap">CNN F&G</th>
-                            <th class="p-6 col-sentiment">VIX</th>
-                            <th class="p-6 col-sentiment">NAAIM</th>
-                            <th class="p-6 col-sentiment">AAII Spread</th>
-                            <th class="p-6 col-sentiment">Crypto</th>
-                            <th class="p-6 col-risk">Gamma (GEX)</th>
-                            <th class="p-6 col-risk">Equity P/C</th>
-                            <th class="p-6 col-risk">Total P/C</th>
-                            <th class="p-6 col-internals text-nowrap">Dark Pool</th>
-                            <th class="p-6 col-internals text-nowrap">NYSE 20</th>
-                            <th class="p-6 col-internals text-nowrap">NASD 20</th>
-                            <th class="p-6 col-internals text-nowrap">NYSE 50</th>
-                            <th class="p-6 col-internals text-nowrap">NASD 50</th>
+                            <th class="p-4 px-5">日期</th>
+                            <th class="p-4 col-macro">10Y-3M</th>
+                            <th class="p-4 col-macro">HYG/LQD</th>
+                            <th class="p-4 col-macro">XLY/XLP</th>
+                            <th class="p-4 col-macro text-nowrap">C/G Ratio</th>
+                            <th class="p-4 col-macro text-nowrap">KBE/SPY</th>
+                            <th class="p-4 col-sentiment text-nowrap">CNN</th>
+                            <th class="p-4 col-sentiment">VIX</th>
+                            <th class="p-4 col-sentiment">NAAIM</th>
+                            <th class="p-4 col-sentiment">AAII</th>
+                            <th class="p-4 col-sentiment">Crypto</th>
+                            <th class="p-4 col-risk">GEX</th>
+                            <th class="p-4 col-risk">Eq P/C</th>
+                            <th class="p-4 col-risk">Tot P/C</th>
+                            <th class="p-4 col-internals text-nowrap">DIX</th>
+                            <th class="p-4 col-internals text-nowrap">NY 20</th>
+                            <th class="p-4 col-internals text-nowrap">NQ 20</th>
+                            <th class="p-4 col-internals text-nowrap">NY 50</th>
+                            <th class="p-4 col-internals text-nowrap">NQ 50</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-600">
@@ -292,27 +212,27 @@ HISTORY_BODY = """
             tableBody.innerHTML = '';
             [...rawData].sort((a,b) => new Date(b.Date) - new Date(a.Date)).forEach(row => {
                 const tr = document.createElement('tr');
-                tr.className = 'border-t border-slate-100 hover:bg-slate-50 transition-colors';
+                tr.className = 'border-t border-slate-100 hover:bg-slate-50/50 transition-colors';
                 tr.innerHTML = `
-                    <td class="p-6 text-xs font-black text-slate-900 bg-slate-50/30">${row.Date}</td>
-                    <td class="p-6 text-xs col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
-                    <td class="p-6 text-xs font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
-                    <td class="p-6 text-xs font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
-                    <td class="p-6 text-xs col-macro font-bold text-amber-600">${row['Copper/Gold Ratio'] || '--'}</td>
-                    <td class="p-6 text-xs col-macro font-bold text-indigo-600">${row['KBE/SPY Ratio'] || '--'}</td>
-                    <td class="p-6 text-xs font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
-                    <td class="p-6 text-xs col-sentiment">${row.VIX || '--'}</td>
-                    <td class="p-6 text-xs col-sentiment">${row.NAAIM || '--'}</td>
-                    <td class="p-6 text-xs col-sentiment">${row['AAII B-B'] || '--'}</td>
-                    <td class="p-6 text-xs font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
-                    <td class="p-6 text-xs text-purple-700 font-black col-risk">${row.GEX || '--'}B</td>
-                    <td class="p-6 text-xs col-risk">${row['Equity P/C Ratio'] || '--'}</td>
-                    <td class="p-6 text-xs col-risk">${row['Total P/C Ratio'] || '--'}</td>
-                    <td class="p-6 text-xs text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
-                    <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
-                    <td class="p-6 text-xs text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
-                    <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>
-                    <td class="p-6 text-xs text-indigo-500 font-bold col-internals">${row['NASDAQ above 50MA'] || '--'}%</td>
+                    <td class="p-4 px-5 text-[11px] font-black text-slate-800 bg-slate-50/20">${row.Date}</td>
+                    <td class="p-4 text-[11px] col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-macro font-bold text-amber-600">${row['Copper/Gold Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-macro font-bold text-indigo-600">${row['KBE/SPY Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row.VIX || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row.NAAIM || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row['AAII B-B'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
+                    <td class="p-4 text-[11px] text-purple-700 font-black col-risk">${row.GEX || '--'}B</td>
+                    <td class="p-4 text-[11px] col-risk">${row['Equity P/C Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-risk">${row['Total P/C Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] text-blue-700 font-bold col-internals">${row.DIX || '--'}%</td>
+                    <td class="p-4 text-[11px] text-emerald-600 font-black col-internals">${row['NYSE above 20MA'] || '--'}%</td>
+                    <td class="p-4 text-[11px] text-emerald-600 font-black col-internals">${row['NASDAQ above 20MA'] || '--'}%</td>
+                    <td class="p-4 text-[11px] text-indigo-500 font-bold col-internals">${row['NYSE above 50MA'] || '--'}%</td>
+                    <td class="p-4 text-[11px] text-indigo-500 font-bold col-internals">${row['NASDAQ above 50MA'] || '--'}%</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -373,34 +293,28 @@ def main():
         "cnn_color": cnn_color,
         "history_json": json.dumps(history),
         "active_dash": "",
-        "active_charts": "",
         "active_hist": ""
     }
 
     # index.html
-    ctx.update({"title": "儀表板", "active_dash": "active-tab"})
+    ctx.update({"title": "儀表板", "active_dash": "active-tab", "active_hist": ""})
     index_html = Template(BASE_HEAD + DASHBOARD_BODY + BASE_FOOTER).render(**ctx)
     
-    # charts.html
-    ctx.update({"title": "圖表區", "active_dash": "", "active_charts": "active-tab"})
-    charts_html = Template(BASE_HEAD + CHARTS_BODY + BASE_FOOTER).render(**ctx)
-
     # history.html
-    ctx.update({"title": "歷史紀錄", "active_charts": "", "active_hist": "active-tab"})
+    ctx.update({"title": "歷史紀錄", "active_dash": "", "active_hist": "active-tab"})
     history_html = Template(BASE_HEAD + HISTORY_BODY + BASE_FOOTER).render(**ctx)
 
     os.makedirs("public", exist_ok=True)
     
     pages = {
         "index.html": index_html,
-        "charts.html": charts_html,
         "history.html": history_html
     }
     
     for name, content in pages.items():
         with open(f"public/{name}", "w") as f: f.write(content)
 
-    print("Three pages generated successfully.")
+    print("Pages generated successfully.")
 
 if __name__ == "__main__":
     main()
