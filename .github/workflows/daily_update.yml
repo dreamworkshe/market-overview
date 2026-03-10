@@ -1,6 +1,8 @@
 name: Daily Market Data Update
 
 on:
+  push:
+    branches: [ main ]
   schedule:
     # 07:00 AM Taiwan Time (Tue-Sat) is 23:00 UTC (Mon-Fri)
     - cron: '0 23 * * 1-5'
