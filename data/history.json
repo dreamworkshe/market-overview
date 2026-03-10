@@ -793,5 +793,18 @@
     "NASDAQ above 20MA": 37.32,
     "NYSE above 50MA": 41.71,
     "NASDAQ above 50MA": 34.03
+  },
+  {
+    "Date": "2026/3/10",
+    "CNN": 27.25,
+    "VIX": 25.5,
+    "DIX": null,
+    "GEX": null,
+    "Crypto F&G": 13,
+    "10Y-3M Spread": 0.543,
+    "Copper/Gold Ratio": 0.0011,
+    "HYG/LQD Ratio": 0.7234,
+    "XLY/XLP Ratio": 1.3329,
+    "KBE/SPY Ratio": 0.0876
   }
 ]
