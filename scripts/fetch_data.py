@@ -58,16 +58,33 @@ def fetch_gsheet_data(target_date_str):
         col_map = {name: i for i, name in enumerate(header)}
         
         # Find target row
-        target_row = rows[-1] # Fallback to latest
+        target_row = None
         found = False
+        target_dt = datetime.strptime(target_date_str, "%Y/%m/%d") if "/" in target_date_str else None
+        
         for row in reversed(rows):
-            if row[0].strip() == target_date_str:
-                target_row = row
-                found = True
-                break
+            if not row or not row[0]: continue
+            row_date_str = row[0].strip()
+            # Try robust matching (handle leading zeros etc.)
+            try:
+                # Parse sheet date (supports YYYY/M/D or YYYY-M-D etc.)
+                parts = re.split(r'[/-]', row_date_str)
+                if len(parts) >= 3:
+                    row_dt = datetime(int(parts[0]), int(parts[1]), int(parts[2]))
+                    if target_dt and row_dt.date() == target_dt.date():
+                        target_row = row
+                        found = True
+                        break
+            except:
+                # Fallback to direct string match if parsing fails
+                if row_date_str == target_date_str:
+                    target_row = row
+                    found = True
+                    break
         
         if not found:
-            print(f"Warning: Date {target_date_str} not found in Sheet, using latest row ({target_row[0]})")
+            print(f"Warning: Date {target_date_str} not found in Sheet.")
+            return {}
 
         def get_val(col_name):
             if col_name not in col_map: return None
