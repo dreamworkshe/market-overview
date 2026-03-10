@@ -26,10 +26,16 @@ def fetch_cnn_fg():
         print(f"Error CNN F&G: {e}")
         return None
 
-def fetch_vix():
+def fetch_vix(target_dt=None):
     try:
         vix = yf.Ticker("^VIX")
-        hist = vix.history(period="1d")
+        if target_dt:
+            start = target_dt.strftime('%Y-%m-%d')
+            end = (target_dt + timedelta(days=1)).strftime('%Y-%m-%d')
+            hist = vix.history(start=start, end=end)
+        else:
+            hist = vix.history(period="1d")
+            
         if not hist.empty:
             return round(float(hist['Close'].iloc[-1]), 2)
     except Exception as e:
@@ -106,11 +112,22 @@ def fetch_gsheet_data(target_date_str):
         print(f"Error fetching from Google Sheet: {e}")
         return {}
 
-def fetch_dix():
+def fetch_dix(target_date_str=None):
     url = "https://squeezemetrics.com/monitor/static/DIX.csv"
     try:
         df = pd.read_csv(url)
-        latest = df.iloc[-1]
+        if target_date_str:
+            # Match YYYY-MM-DD or YYYY-M-D
+            target_dt = datetime.strptime(target_date_str, "%Y/%m/%d")
+            df['parsed_date'] = pd.to_datetime(df['date'])
+            match = df[df['parsed_date'].dt.date == target_dt.date()]
+            if not match.empty:
+                latest = match.iloc[-1]
+            else:
+                return {"DIX": None, "GEX": None}
+        else:
+            latest = df.iloc[-1]
+            
         return {
             "DIX": round(float(latest['dix']) * 100, 2),
             "GEX": round(float(latest['gex']) / 1e9, 2)
@@ -130,16 +147,27 @@ def fetch_crypto_fg():
         print(f"Error fetching Crypto F&G: {e}")
         return None
 
-def fetch_macro_data():
+def fetch_macro_data(target_dt=None):
     try:
         tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY"
         tickers = yf.Tickers(tickers_str)
         prices = {}
+        
+        start = end = None
+        if target_dt:
+            start = target_dt.strftime('%Y-%m-%d')
+            end = (target_dt + timedelta(days=1)).strftime('%Y-%m-%d')
+
         for t in tickers_str.split():
-            hist = tickers.tickers[t].history(period="1d")
+            if target_dt:
+                hist = tickers.tickers[t].history(start=start, end=end)
+            else:
+                hist = tickers.tickers[t].history(period="1d")
+                
             if not hist.empty:
                 prices[t] = hist['Close'].iloc[-1]
             else:
+                # If doing historical fetch and one fails, we might just skip the whole macro set
                 return None, None, None, None, None
         
         spread = round(prices["^TNX"] - prices["^IRX"], 3)
@@ -153,51 +181,41 @@ def fetch_macro_data():
         print(f"Error fetching Macro data: {e}")
         return None, None, None, None, None
 
-def main():
-    # NY Time Check
-    from datetime import timezone
-    ny_now = datetime.now(timezone.utc) - timedelta(hours=5)
-    
-    # 週末調整：週六(5)減一天，週日(6)減兩天，統一算在週五
-    target_date = ny_now
-    if ny_now.weekday() == 5: # Saturday
-        target_date = ny_now - timedelta(days=1)
-        print(f"Today is Saturday, mapping data to Friday {target_date.strftime('%Y/%-m/%-d')}")
-    elif ny_now.weekday() == 6: # Sunday
-        target_date = ny_now - timedelta(days=2)
-        print(f"Today is Sunday, mapping data to Friday {target_date.strftime('%Y/%-m/%-d')}")
-        
-    date_str = target_date.strftime("%Y/%-m/%-d")
+def run_fetch_for_date(target_dt):
+    date_str = target_dt.strftime("%Y/%-m/%-d")
+    print(f"\n>>> Processing Date: {date_str} <<<")
     
     # 1. Fetch Basic / API data
+    # CNN and Crypto F&G are mostly "now" APIs, but we'll try for current date
     results = {
         "Date": date_str,
         "CNN": fetch_cnn_fg(),
-        "VIX": fetch_vix()
+        "VIX": fetch_vix(target_dt)
     }
     
-    # 2. Fetch Expert Data from Google Sheet (P/C Ratio, NAAIM, AAII, Breadth)
+    # 2. Fetch Expert Data from Google Sheet
     print(f"Fetching expert data from Google Sheet for {date_str}...")
     gsheet_results = fetch_gsheet_data(date_str)
     results.update(gsheet_results)
     
     # 3. Fetch DIX/GEX
-    dix_data = fetch_dix()
+    dix_data = fetch_dix(date_str)
     results["DIX"] = dix_data["DIX"]
     results["GEX"] = dix_data["GEX"]
 
     # 4. Crypto & Macro
     results["Crypto F&G"] = fetch_crypto_fg()
-    spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy = fetch_macro_data()
+    spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy = fetch_macro_data(target_dt)
     results["10Y-3M Spread"] = spread
     results["Copper/Gold Ratio"] = cg_ratio
     results["HYG/LQD Ratio"] = hyg_lqd
     results["XLY/XLP Ratio"] = xly_xlp
     results["KBE/SPY Ratio"] = kbe_spy
     
-    print(f"Fetched: {results}")
+    return results
 
-    # Load and Update History
+def main():
+    # Load History early
     history = []
     if os.path.exists(DATA_FILE):
         try:
@@ -205,26 +223,67 @@ def main():
                 history = json.load(f)
         except Exception as e:
             print(f"Error loading {DATA_FILE}: {e}")
-            history = []
 
-    # Update or Append
-    updated = False
-    for i, r in enumerate(history):
-        if r['Date'] == date_str:
-            print(f"Updating existing record for {date_str}")
-            for k, v in results.items():
-                if v is not None:
-                    history[i][k] = v
-            updated = True
-            break
+    # Determine dates to process
+    from datetime import timezone
+    ny_now = datetime.now(timezone.utc) - timedelta(hours=5)
     
-    if not updated:
-        print(f"Adding new record for {date_str}")
-        history.append(results)
+    # Today's target (weekend adjustment)
+    today_dt = ny_now
+    if ny_now.weekday() == 5: # Saturday
+        today_dt = ny_now - timedelta(days=1)
+    elif ny_now.weekday() == 6: # Sunday
+        today_dt = ny_now - timedelta(days=2)
+    
+    dates_to_process = [today_dt]
+    
+    # Check last 2 records for missing data
+    # Essential keys that should not be null on business days
+    essential_keys = ["DIX", "NAAIM", "CNN", "VIX", "NYSE above 20MA"]
+    
+    if len(history) >= 1:
+        # Check the last 3 entries in history (could be last 3 days)
+        for last_record in history[-3:]:
+            missing_count = sum(1 for k in essential_keys if last_record.get(k) is None)
+            if missing_count >= 2: # If more than 2 essential keys are missing, retry this date
+                try:
+                    rdt = datetime.strptime(last_record['Date'], "%Y/%-m/%-d")
+                    # Avoid adding today twice
+                    if rdt.date() != today_dt.date() and rdt not in [d.date() for d in dates_to_process if isinstance(d, datetime)]:
+                         # Only retry if it's a weekday
+                        if rdt.weekday() < 5:
+                            print(f"Found missing data for {last_record['Date']} ({missing_count} keys), adding to retry list.")
+                            dates_to_process.append(rdt)
+                except: pass
+
+    # Sort dates to process (oldest first)
+    dates_to_process.sort()
+
+    for target_dt in dates_to_process:
+        results = run_fetch_for_date(target_dt)
+        date_str = results["Date"]
+        
+        # Update or Append
+        updated = False
+        for i, r in enumerate(history):
+            if r['Date'] == date_str:
+                print(f"Updating existing record for {date_str}")
+                for k, v in results.items():
+                    if v is not None:
+                        history[i][k] = v
+                updated = True
+                break
+        
+        if not updated:
+            print(f"Adding new record for {date_str}")
+            history.append(results)
     
     # Sort history by date before writing
     try:
-        history.sort(key=lambda x: datetime.strptime(x['Date'], "%Y/%-m/%-d"))
+        def sort_key(x):
+            try: return datetime.strptime(x['Date'], "%Y/%-m/%-d")
+            except: return datetime(1970,1,1)
+        history.sort(key=sort_key)
     except: pass
 
     # Write History
@@ -233,7 +292,7 @@ def main():
             json.dump(history, f, indent=2)
             f.flush()
             os.fsync(f.fileno())
-        print(f"Successfully wrote {len(history)} records to {DATA_FILE}")
+        print(f"\nSuccessfully updated {len(history)} records in {DATA_FILE}")
         
         # Trigger MA calculation
         calculate_all_ma()
