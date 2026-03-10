@@ -196,11 +196,11 @@ DASHBOARD_BODY = """
 HISTORY_BODY = """
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
-                <button onclick="switchTab('overview')" id="tab-overview" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">盤勢總覽</button>
+                <button onclick="switchTab('overview')" id="tab-overview" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">盤勢總覽</button>
                 <button onclick="switchTab('breadth')" id="tab-breadth" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場廣度</button>
                 <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場情緒</button>
                 <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
-                <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">全部紀錄</button>
+                <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">全部紀錄</button>
             </div>
             <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-2xl shadow-sm">
                 <i data-lucide="keyboard" class="w-4 h-4 text-slate-400"></i>
@@ -293,7 +293,7 @@ HISTORY_BODY = """
         };
 
         const tabs = ['overview', 'breadth', 'sentiment', 'macro', 'all'];
-        let currentTab = 'all';
+        let currentTab = 'overview';
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -305,7 +305,7 @@ HISTORY_BODY = """
         });
 
         renderTable();
-        switchTab('all');
+        switchTab('overview');
     </script>
 """
 

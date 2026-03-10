@@ -12,7 +12,7 @@ if [ ! -d ".venv" ]; then
     echo "未偵測到 .venv，正在建立..."
     python3 -m venv .venv
     source .venv/bin/activate
-    pip install -r scripts/requirements.txt
+    pip install -r requirements.txt
 else
     source .venv/bin/activate
 fi
