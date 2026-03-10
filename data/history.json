@@ -775,15 +775,23 @@
   },
   {
     "Date": "2026/3/9",
-    "CNN": 27.17,
+    "CNN": 27.25,
     "VIX": 25.5,
     "DIX": 44.73,
     "GEX": 2.65,
-    "Crypto F&G": 8,
+    "Crypto F&G": 13,
     "10Y-3M Spread": 0.543,
     "Copper/Gold Ratio": 0.0011,
     "HYG/LQD Ratio": 0.7234,
     "XLY/XLP Ratio": 1.3329,
-    "KBE/SPY Ratio": 0.0876
+    "KBE/SPY Ratio": 0.0876,
+    "Total P/C Ratio": 1.0,
+    "Equity P/C Ratio": 0.64,
+    "NAAIM": 79.29,
+    "AAII B-B": -2.4,
+    "NYSE above 20MA": 29.32,
+    "NASDAQ above 20MA": 37.32,
+    "NYSE above 50MA": 41.71,
+    "NASDAQ above 50MA": 34.03
   }
 ]
