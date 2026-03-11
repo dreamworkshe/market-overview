@@ -126,8 +126,9 @@ DASHBOARD_BODY = """
         const categories = {
             sentimentGrid: [
                 { label: 'CNN F&G', col: 'CNN' },
-                { label: 'VIX 指數', col: 'VIX', reverse: true },
-                { label: 'Crypto F&G', col: 'Crypto F&G' },
+                { label: 'VIX', col: 'VIX', reverse: true },
+                { label: 'VIX/VIX3M', col: 'VIX/VIX3M Ratio' },
+                { label: 'SKEW', col: 'SKEW' },
                 { label: 'Dark Pool (DIX)', col: 'DIX', suffix: '%' },
                 { label: 'Gamma (GEX)', col: 'GEX', suffix: 'B' },
                 { label: 'Total P/C', col: 'Total P/C Ratio', reverse: true },
@@ -218,7 +219,9 @@ DASHBOARD_BODY = """
             // 4. Sentiment (15%) - Contrarian Logic
             const s1 = norm(getVal('CNN'), 80, 20); // 20 = 100pts (Extrem Fear = Opportunity)
             const s2 = norm(getVal('AAII B-B'), 30, -20);
-            const sentimentScore = (s1 + s2) / 2;
+            const s3 = norm(getVal('VIX/VIX3M Ratio'), 0.7, 1.1); // > 1.0 is Capitulation (Positive for score)
+            const s4 = norm(getVal('SKEW'), 145, 115); // High SKEW = Tail Risk (Negative for score)
+            const sentimentScore = (s1 + s2 + s3 + s4) / 4;
 
             // 5. Intermarket (5%)
             const m1 = getMA('XLY/XLP Ratio', 5) > getMA('XLY/XLP Ratio', 20) ? 100 : 20;
@@ -239,60 +242,56 @@ DASHBOARD_BODY = """
             const score = calculateRegimeScore();
             let label, color, bgColor, icon, insight;
 
-            if (score.total >= 75) { label = '積極做多'; color = 'text-emerald-600'; bgColor = 'bg-emerald-500'; icon = 'rocket'; insight = '市場環境極佳，各項指標均顯示強勁動能，可考慮積極參與。'; }
-            else if (score.total >= 60) { label = '偏多看待'; color = 'text-emerald-500'; bgColor = 'bg-emerald-400'; icon = 'trending-up'; insight = '市場處於上升趨勢，風險偏好回升，可維持較高倉位。'; }
-            else if (score.total >= 40) { label = '中性盤整'; color = 'text-amber-500'; bgColor = 'bg-amber-400'; icon = 'minus'; insight = '市場多空交戰，方向不明。建議保持中性倉位，等待趨勢確認。'; }
-            else if (score.total >= 25) { label = '保守警戒'; color = 'text-orange-500'; bgColor = 'bg-orange-400'; icon = 'alert-triangle'; insight = '環境轉弱，風險指標升溫。建議縮減倉位，保護本金。'; }
-            else { label = '極度危險'; color = 'text-red-600'; bgColor = 'bg-red-500'; icon = 'shield-alert'; insight = '市場處於極端負面環境，建議觀望或採取防禦型操作。'; }
+            if (score.total >= 75) { label = '積極做多'; color = 'text-emerald-500'; bgColor = 'bg-emerald-500'; icon = 'rocket'; insight = '市場環境極佳，各項指標均顯示強勁動能。'; }
+            else if (score.total >= 60) { label = '偏多看待'; color = 'text-emerald-500'; bgColor = 'bg-emerald-500'; icon = 'trending-up'; insight = '市場處於上升趨勢，風險偏好回升。'; }
+            else if (score.total >= 40) { label = '中性盤整'; color = 'text-amber-500'; bgColor = 'bg-amber-400'; icon = 'minus'; insight = '市場多空交戰，方向不明。建議保持中性倉位。'; }
+            else if (score.total >= 25) { label = '保守警戒'; color = 'text-orange-500'; bgColor = 'bg-orange-400'; icon = 'alert-triangle'; insight = '環境轉弱，風險指標升溫。建議縮減倉位。'; }
+            else { label = '極度危險'; color = 'text-red-600'; bgColor = 'bg-red-500'; icon = 'shield-alert'; insight = '市場處於極端負面環境，建議觀望防禦。'; }
 
             // Sub-insights based on score divergence
-            if (score.flow > score.breadth + 30) insight = '🔥 偵測到「聰明錢底部吸納」模式：散戶恐慌且廣度疲軟，但暗池買盤與資金流向極其強勁。可能是波段底部。';
-            if (score.breadth > score.sentiment + 30) insight = '⚖️ 偵測到「隱性健康」模式：市場情緒低迷但內部結構 (廣度) 正悄悄改善。這通常是反彈前兆。';
-            if (score.sentiment > score.flow + 30) insight = '⚠️ 偵測到「誘多陷阱」模式：市場情緒樂觀但資金流向與暗池卻在撤退。需謹防假突破。';
+            if (score.flow > score.breadth + 30) insight = '🔥 偵測到「聰明錢底部吸納」模式：暗池買進力道極強。';
+            if (score.breadth > score.sentiment + 30) insight = '⚖️ 偵測到「隱性健康」模式：內部廣度正悄悄改善。';
+            if (score.sentiment > score.flow + 30) insight = '⚠️ 偵測到「誘多陷阱」模式：情緒過熱但資金流向撤退。';
 
             const container = document.getElementById('regimeSection');
             container.innerHTML = `
-                <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm mb-6">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl ${bgColor} flex items-center justify-center text-white shadow-lg shadow-current/20">
-                                <span class="text-2xl font-black">${score.total}</span>
+                <div class="bg-white p-3 px-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <!-- Score & Status -->
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl ${bgColor} flex items-center justify-center text-white shadow-md shadow-current/10 shrink-0">
+                                <span class="text-lg font-black">${score.total}</span>
                             </div>
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h2 class="text-xl font-black text-slate-800 tracking-tight">市場體制：${label}</h2>
-                                    <i data-lucide="${icon}" class="${color} w-5 h-5"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <h2 class="text-sm font-black text-slate-800 tracking-tight">${label}</h2>
+                                    <i data-lucide="${icon}" class="${color} w-3.5 h-3.5"></i>
                                 </div>
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Market Regime Score Index</p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Market Regime Index</p>
                             </div>
                         </div>
-                        <div class="flex-1 max-w-md">
-                            <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1 px-1">
-                                <span>Risk 0</span>
-                                <span>Bull 100</span>
+
+                        <!-- Progress Bar & Sub-scores -->
+                        <div class="flex flex-1 flex-col md:flex-row md:items-center gap-4 md:px-6">
+                            <div class="flex-1 max-w-xs">
+                                <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-100">
+                                    <div class="h-full rounded-full ${bgColor} transition-all duration-1000" style="width: ${score.total}%"></div>
+                                </div>
                             </div>
-                            <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-                                <div class="h-full rounded-full ${bgColor} transition-all duration-1000" style="width: ${score.total}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-5 pt-4 border-t border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> 廣度: <span class="text-slate-800">${score.breadth}</span>
-                            </div>
-                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-                                <div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div> 信用: <span class="text-slate-800">${score.credit}</span>
-                            </div>
-                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-                                <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div> 資金: <span class="text-slate-800">${score.flow}</span>
-                            </div>
-                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-                                <div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div> 情緒: <span class="text-slate-800">${score.sentiment}</span>
+                            <div class="flex gap-3 text-[9px] font-black uppercase tracking-widest">
+                                <span class="flex items-center gap-1 text-slate-400">廣度 <span class="text-slate-700">${score.breadth}</span></span>
+                                <span class="flex items-center gap-1 text-slate-400">信用 <span class="text-slate-700">${score.credit}</span></span>
+                                <span class="flex items-center gap-1 text-slate-400">資金 <span class="text-slate-700">${score.flow}</span></span>
+                                <span class="flex items-center gap-1 text-slate-400">情緒 <span class="text-slate-700">${score.sentiment}</span></span>
                             </div>
                         </div>
-                        <div class="flex-1 md:text-right">
-                            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-4 py-2 rounded-xl inline-block border border-slate-200"> ${insight} </span>
+
+                        <!-- Insight Banner -->
+                        <div class="md:text-right shrink-0">
+                            <span class="text-[10px] font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 inline-flex items-center gap-2">
+                                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                                ${insight}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -410,6 +409,8 @@ HISTORY_BODY = """
                             <th class="p-4 px-5">日期</th>
                             <th class="p-4 col-sentiment text-nowrap">CNN</th>
                             <th class="p-4 col-sentiment">VIX</th>
+                            <th class="p-4 col-sentiment">VIX/3M</th>
+                            <th class="p-4 col-sentiment">SKEW</th>
                             <th class="p-4 col-credit">HY OAS</th>
                             <th class="p-4 col-sentiment">Crypto</th>
                             <th class="p-4 col-sentiment">DIX</th>
@@ -451,6 +452,8 @@ HISTORY_BODY = """
                     <td class="p-4 px-5 text-[11px] font-black text-slate-800 bg-slate-50/20">${row.Date}</td>
                     <td class="p-4 text-[11px] font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
                     <td class="p-4 text-[11px] col-sentiment">${row.VIX || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment font-mono">${row['VIX/VIX3M Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment font-mono">${row.SKEW || '--'}</td>
                     <td class="p-4 text-[11px] font-bold text-red-600 col-credit">${row['HY OAS'] || '--'}</td>
                     <td class="p-4 text-[11px] font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
                     <td class="p-4 text-[11px] text-blue-700 font-bold col-sentiment">${row.DIX || '--'}%</td>

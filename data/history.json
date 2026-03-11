@@ -18,7 +18,10 @@
     "QQQ/SPY Ratio": 0.8999,
     "RSP/SPY Ratio": 0.2849,
     "HYG/IEF Ratio": 0.8398,
-    "HY OAS": 2.76
+    "HY OAS": 2.76,
+    "VIX3M": 18.39,
+    "SKEW": 147.08,
+    "VIX/VIX3M Ratio": 0.8401
   },
   {
     "Date": "2026/1/9",
@@ -39,7 +42,10 @@
     "QQQ/SPY Ratio": 0.9029,
     "RSP/SPY Ratio": 0.2847,
     "HYG/IEF Ratio": 0.8394,
-    "HY OAS": 2.74
+    "HY OAS": 2.74,
+    "VIX3M": 17.88,
+    "SKEW": 146.04,
+    "VIX/VIX3M Ratio": 0.8104
   },
   {
     "Date": "2026/1/12",
@@ -60,7 +66,10 @@
     "QQQ/SPY Ratio": 0.9022,
     "RSP/SPY Ratio": 0.2845,
     "HYG/IEF Ratio": 0.8409,
-    "HY OAS": 2.74
+    "HY OAS": 2.74,
+    "VIX3M": 18.23,
+    "SKEW": 149.75,
+    "VIX/VIX3M Ratio": 0.8294
   },
   {
     "Date": "2026/1/13",
@@ -81,7 +90,10 @@
     "QQQ/SPY Ratio": 0.9027,
     "RSP/SPY Ratio": 0.2851,
     "HYG/IEF Ratio": 0.8399,
-    "HY OAS": 2.75
+    "HY OAS": 2.75,
+    "VIX3M": 18.85,
+    "SKEW": 151.6,
+    "VIX/VIX3M Ratio": 0.8477
   },
   {
     "Date": "2026/1/14",
@@ -102,7 +114,10 @@
     "QQQ/SPY Ratio": 0.8974,
     "RSP/SPY Ratio": 0.2878,
     "HYG/IEF Ratio": 0.8381,
-    "HY OAS": 2.76
+    "HY OAS": 2.76,
+    "VIX3M": 19.37,
+    "SKEW": 152.52,
+    "VIX/VIX3M Ratio": 0.8647
   },
   {
     "Date": "2026/1/15",
@@ -123,7 +138,10 @@
     "QQQ/SPY Ratio": 0.8982,
     "RSP/SPY Ratio": 0.2883,
     "HYG/IEF Ratio": 0.8399,
-    "HY OAS": 2.71
+    "HY OAS": 2.71,
+    "VIX3M": 18.9,
+    "SKEW": 151.57,
+    "VIX/VIX3M Ratio": 0.8381
   },
   {
     "Date": "2026/1/16",
@@ -144,7 +162,10 @@
     "QQQ/SPY Ratio": 0.8982,
     "RSP/SPY Ratio": 0.2878,
     "HYG/IEF Ratio": 0.8436,
-    "HY OAS": 2.65
+    "HY OAS": 2.65,
+    "VIX3M": 18.99,
+    "SKEW": 153.59,
+    "VIX/VIX3M Ratio": 0.8352
   },
   {
     "Date": "2026/1/20",
@@ -165,7 +186,10 @@
     "QQQ/SPY Ratio": 0.8974,
     "RSP/SPY Ratio": 0.2894,
     "HYG/IEF Ratio": 0.8448,
-    "HY OAS": 2.73
+    "HY OAS": 2.73,
+    "VIX3M": 21.28,
+    "SKEW": 154.96,
+    "VIX/VIX3M Ratio": 0.9441
   },
   {
     "Date": "2026/1/21",
@@ -186,7 +210,10 @@
     "QQQ/SPY Ratio": 0.8992,
     "RSP/SPY Ratio": 0.2909,
     "HYG/IEF Ratio": 0.8451,
-    "HY OAS": 2.69
+    "HY OAS": 2.69,
+    "VIX3M": 19.36,
+    "SKEW": 144.41,
+    "VIX/VIX3M Ratio": 0.8729
   },
   {
     "Date": "2026/1/22",
@@ -207,7 +234,10 @@
     "QQQ/SPY Ratio": 0.901,
     "RSP/SPY Ratio": 0.2898,
     "HYG/IEF Ratio": 0.8458,
-    "HY OAS": 2.64
+    "HY OAS": 2.64,
+    "VIX3M": 18.75,
+    "SKEW": 141.31,
+    "VIX/VIX3M Ratio": 0.8341
   },
   {
     "Date": "2026/1/23",
@@ -230,7 +260,10 @@
     "QQQ/SPY Ratio": 0.9035,
     "RSP/SPY Ratio": 0.2884,
     "HYG/IEF Ratio": 0.844,
-    "HY OAS": 2.68
+    "HY OAS": 2.68,
+    "VIX3M": 19.15,
+    "SKEW": 144.02,
+    "VIX/VIX3M Ratio": 0.8402
   },
   {
     "Date": "2026/1/26",
@@ -253,7 +286,10 @@
     "QQQ/SPY Ratio": 0.9029,
     "RSP/SPY Ratio": 0.2876,
     "HYG/IEF Ratio": 0.8431,
-    "HY OAS": 2.69
+    "HY OAS": 2.69,
+    "VIX3M": 19.07,
+    "SKEW": 148.1,
+    "VIX/VIX3M Ratio": 0.8469
   },
   {
     "Date": "2026/1/27",
@@ -276,7 +312,10 @@
     "QQQ/SPY Ratio": 0.9075,
     "RSP/SPY Ratio": 0.286,
     "HYG/IEF Ratio": 0.844,
-    "HY OAS": 2.71
+    "HY OAS": 2.71,
+    "VIX3M": 19.22,
+    "SKEW": 147.25,
+    "VIX/VIX3M Ratio": 0.8507
   },
   {
     "Date": "2026/1/28",
@@ -299,7 +338,10 @@
     "QQQ/SPY Ratio": 0.9106,
     "RSP/SPY Ratio": 0.2851,
     "HYG/IEF Ratio": 0.8434,
-    "HY OAS": 2.72
+    "HY OAS": 2.72,
+    "VIX3M": 19.3,
+    "SKEW": 144.98,
+    "VIX/VIX3M Ratio": 0.8472
   },
   {
     "Date": "2026/1/29",
@@ -322,7 +364,10 @@
     "QQQ/SPY Ratio": 0.9069,
     "RSP/SPY Ratio": 0.286,
     "HYG/IEF Ratio": 0.8424,
-    "HY OAS": 2.77
+    "HY OAS": 2.77,
+    "VIX3M": 19.67,
+    "SKEW": 143.74,
+    "VIX/VIX3M Ratio": 0.8582
   },
   {
     "Date": "2026/1/30",
@@ -345,7 +390,10 @@
     "QQQ/SPY Ratio": 0.8987,
     "RSP/SPY Ratio": 0.2863,
     "HYG/IEF Ratio": 0.8438,
-    "HY OAS": 2.8
+    "HY OAS": 2.8,
+    "VIX3M": 20.07,
+    "SKEW": 143.65,
+    "VIX/VIX3M Ratio": 0.869
   },
   {
     "Date": "2026/2/2",
@@ -368,7 +416,10 @@
     "QQQ/SPY Ratio": 0.9004,
     "RSP/SPY Ratio": 0.2863,
     "HYG/IEF Ratio": 0.8446,
-    "HY OAS": 2.81
+    "HY OAS": 2.81,
+    "VIX3M": 19.37,
+    "SKEW": 146.56,
+    "VIX/VIX3M Ratio": 0.8436
   },
   {
     "Date": "2026/2/3",
@@ -391,7 +442,10 @@
     "QQQ/SPY Ratio": 0.8941,
     "RSP/SPY Ratio": 0.288,
     "HYG/IEF Ratio": 0.8433,
-    "HY OAS": 2.85
+    "HY OAS": 2.85,
+    "VIX3M": 20.35,
+    "SKEW": 143.85,
+    "VIX/VIX3M Ratio": 0.8845
   },
   {
     "Date": "2026/2/4",
@@ -414,7 +468,10 @@
     "QQQ/SPY Ratio": 0.8828,
     "RSP/SPY Ratio": 0.2919,
     "HYG/IEF Ratio": 0.8424,
-    "HY OAS": 2.86
+    "HY OAS": 2.86,
+    "VIX3M": 20.62,
+    "SKEW": 143.16,
+    "VIX/VIX3M Ratio": 0.904
   },
   {
     "Date": "2026/2/5",
@@ -437,7 +494,10 @@
     "QQQ/SPY Ratio": 0.8811,
     "RSP/SPY Ratio": 0.293,
     "HYG/IEF Ratio": 0.8366,
-    "HY OAS": 2.97
+    "HY OAS": 2.97,
+    "VIX3M": 22.45,
+    "SKEW": 137.16,
+    "VIX/VIX3M Ratio": 0.9697
   },
   {
     "Date": "2026/2/6",
@@ -460,7 +520,10 @@
     "QQQ/SPY Ratio": 0.8828,
     "RSP/SPY Ratio": 0.2929,
     "HYG/IEF Ratio": 0.8395,
-    "HY OAS": 2.87
+    "HY OAS": 2.87,
+    "VIX3M": 20.37,
+    "SKEW": 140.31,
+    "VIX/VIX3M Ratio": 1.0
   },
   {
     "Date": "2026/2/9",
@@ -483,7 +546,10 @@
     "QQQ/SPY Ratio": 0.8853,
     "RSP/SPY Ratio": 0.2916,
     "HYG/IEF Ratio": 0.8404,
-    "HY OAS": 2.84
+    "HY OAS": 2.84,
+    "VIX3M": 20.09,
+    "SKEW": 145.23,
+    "VIX/VIX3M Ratio": 0.8641
   },
   {
     "Date": "2026/2/10",
@@ -506,7 +572,10 @@
     "QQQ/SPY Ratio": 0.8835,
     "RSP/SPY Ratio": 0.2934,
     "HYG/IEF Ratio": 0.836,
-    "HY OAS": 2.86
+    "HY OAS": 2.86,
+    "VIX3M": 20.43,
+    "SKEW": 145.71,
+    "VIX/VIX3M Ratio": 0.8708
   },
   {
     "Date": "2026/2/11",
@@ -529,7 +598,10 @@
     "QQQ/SPY Ratio": 0.886,
     "RSP/SPY Ratio": 0.294,
     "HYG/IEF Ratio": 0.8382,
-    "HY OAS": 2.84
+    "HY OAS": 2.84,
+    "VIX3M": 20.37,
+    "SKEW": 143.78,
+    "VIX/VIX3M Ratio": 0.8665
   },
   {
     "Date": "2026/2/12",
@@ -552,7 +624,10 @@
     "QQQ/SPY Ratio": 0.8816,
     "RSP/SPY Ratio": 0.2947,
     "HYG/IEF Ratio": 0.8327,
-    "HY OAS": 2.92
+    "HY OAS": 2.92,
+    "VIX3M": 22.17,
+    "SKEW": 142.5,
+    "VIX/VIX3M Ratio": 0.9391
   },
   {
     "Date": "2026/2/13",
@@ -575,7 +650,10 @@
     "QQQ/SPY Ratio": 0.8829,
     "RSP/SPY Ratio": 0.2976,
     "HYG/IEF Ratio": 0.83,
-    "HY OAS": 2.95
+    "HY OAS": 2.95,
+    "VIX3M": 22.17,
+    "SKEW": 139.35,
+    "VIX/VIX3M Ratio": 0.9292
   },
   {
     "Date": "2026/2/17",
@@ -598,7 +676,10 @@
     "QQQ/SPY Ratio": 0.8806,
     "RSP/SPY Ratio": 0.2966,
     "HYG/IEF Ratio": 0.8297,
-    "HY OAS": 2.94
+    "HY OAS": 2.94,
+    "VIX3M": 21.6,
+    "SKEW": 140.28,
+    "VIX/VIX3M Ratio": 0.9394
   },
   {
     "Date": "2026/2/18",
@@ -623,7 +704,10 @@
     "QQQ/SPY Ratio": 0.8827,
     "RSP/SPY Ratio": 0.2966,
     "HYG/IEF Ratio": 0.8325,
-    "HY OAS": 2.86
+    "HY OAS": 2.86,
+    "VIX3M": 21.39,
+    "SKEW": 139.17,
+    "VIX/VIX3M Ratio": 0.9173
   },
   {
     "Date": "2026/2/19",
@@ -648,7 +732,10 @@
     "QQQ/SPY Ratio": 0.8816,
     "RSP/SPY Ratio": 0.2968,
     "HYG/IEF Ratio": 0.832,
-    "HY OAS": 2.88
+    "HY OAS": 2.88,
+    "VIX3M": 21.88,
+    "SKEW": 141.19,
+    "VIX/VIX3M Ratio": 0.9246
   },
   {
     "Date": "2026/2/20",
@@ -673,7 +760,10 @@
     "QQQ/SPY Ratio": 0.8831,
     "RSP/SPY Ratio": 0.296,
     "HYG/IEF Ratio": 0.8326,
-    "HY OAS": 2.86
+    "HY OAS": 2.86,
+    "VIX3M": 21.09,
+    "SKEW": 145.52,
+    "VIX/VIX3M Ratio": 0.9052
   },
   {
     "Date": "2026/2/23",
@@ -698,7 +788,10 @@
     "QQQ/SPY Ratio": 0.8813,
     "RSP/SPY Ratio": 0.2958,
     "HYG/IEF Ratio": 0.8283,
-    "HY OAS": 2.95
+    "HY OAS": 2.95,
+    "VIX3M": 22.14,
+    "SKEW": 141.43,
+    "VIX/VIX3M Ratio": 0.949
   },
   {
     "Date": "2026/2/24",
@@ -723,7 +816,10 @@
     "QQQ/SPY Ratio": 0.8844,
     "RSP/SPY Ratio": 0.296,
     "HYG/IEF Ratio": 0.8278,
-    "HY OAS": 2.97
+    "HY OAS": 2.97,
+    "VIX3M": 21.34,
+    "SKEW": 141.94,
+    "VIX/VIX3M Ratio": 0.9161
   },
   {
     "Date": "2026/2/25",
@@ -748,7 +844,10 @@
     "QQQ/SPY Ratio": 0.8897,
     "RSP/SPY Ratio": 0.2937,
     "HYG/IEF Ratio": 0.8297,
-    "HY OAS": 2.94
+    "HY OAS": 2.94,
+    "VIX3M": 20.36,
+    "SKEW": 146.05,
+    "VIX/VIX3M Ratio": 0.8806
   },
   {
     "Date": "2026/2/26",
@@ -773,7 +872,10 @@
     "QQQ/SPY Ratio": 0.8839,
     "RSP/SPY Ratio": 0.297,
     "HYG/IEF Ratio": 0.8267,
-    "HY OAS": 2.98
+    "HY OAS": 2.98,
+    "VIX3M": 20.81,
+    "SKEW": 146.57,
+    "VIX/VIX3M Ratio": 0.8952
   },
   {
     "Date": "2026/2/27",
@@ -798,7 +900,10 @@
     "QQQ/SPY Ratio": 0.8853,
     "RSP/SPY Ratio": 0.2988,
     "HYG/IEF Ratio": 0.8221,
-    "HY OAS": 3.1
+    "HY OAS": 3.1,
+    "VIX3M": 21.56,
+    "SKEW": 146.67,
+    "VIX/VIX3M Ratio": 0.9212
   },
   {
     "Date": "2026/3/2",
@@ -823,7 +928,10 @@
     "QQQ/SPY Ratio": 0.8859,
     "RSP/SPY Ratio": 0.2981,
     "HYG/IEF Ratio": 0.8266,
-    "HY OAS": 3.03
+    "HY OAS": 3.03,
+    "VIX3M": 22.44,
+    "SKEW": 151.78,
+    "VIX/VIX3M Ratio": 0.9554
   },
   {
     "Date": "2026/3/3",
@@ -848,7 +956,10 @@
     "QQQ/SPY Ratio": 0.8842,
     "RSP/SPY Ratio": 0.297,
     "HYG/IEF Ratio": 0.8259,
-    "HY OAS": 3.08
+    "HY OAS": 3.08,
+    "VIX3M": 23.54,
+    "SKEW": 152.83,
+    "VIX/VIX3M Ratio": 1.0013
   },
   {
     "Date": "2026/3/4",
@@ -873,7 +984,10 @@
     "QQQ/SPY Ratio": 0.8914,
     "RSP/SPY Ratio": 0.2961,
     "HYG/IEF Ratio": 0.8305,
-    "HY OAS": 2.97
+    "HY OAS": 2.97,
+    "VIX3M": 22.29,
+    "SKEW": 152.87,
+    "VIX/VIX3M Ratio": 0.9489
   },
   {
     "Date": "2026/3/5",
@@ -900,11 +1014,14 @@
     "QQQ/SPY Ratio": 0.8937,
     "RSP/SPY Ratio": 0.2943,
     "HYG/IEF Ratio": 0.8298,
-    "HY OAS": 3.0
+    "HY OAS": 3.0,
+    "VIX3M": 23.86,
+    "SKEW": 153.95,
+    "VIX/VIX3M Ratio": 0.9954
   },
   {
     "Date": "2026/3/6",
-    "CNN": 27,
+    "CNN": 27.91,
     "VIX": 29.49,
     "NAAIM": 79.29,
     "AAII B-B": -2.4,
@@ -914,7 +1031,7 @@
     "NASDAQ above 20MA": 35.73,
     "NYSE above 50MA": 42.97,
     "NASDAQ above 50MA": 33.12,
-    "Crypto F&G": 18,
+    "Crypto F&G": 15,
     "10Y-3M Spread": 0.563,
     "Copper/Gold Ratio": 0.0011,
     "HYG/LQD Ratio": 0.7234,
@@ -931,15 +1048,20 @@
     "QQQ/SPY Ratio": 0.892,
     "RSP/SPY Ratio": 0.2947,
     "HYG/IEF Ratio": 0.8262,
-    "HY OAS": 3.13
+    "HY OAS": 3.13,
+    "VIX3M": 27.56,
+    "SKEW": 151.8,
+    "VIX/VIX3M Ratio": 1.07,
+    "SPX": 6740.02,
+    "NASDAQ": 22387.68
   },
   {
     "Date": "2026/3/9",
-    "CNN": 27.25,
+    "CNN": 27.91,
     "VIX": 25.5,
     "DIX": 44.73,
     "GEX": 2.65,
-    "Crypto F&G": 13,
+    "Crypto F&G": 15,
     "10Y-3M Spread": 0.543,
     "Copper/Gold Ratio": 0.0011,
     "HYG/LQD Ratio": 0.7234,
@@ -956,7 +1078,12 @@
     "QQQ/SPY Ratio": 0.896,
     "RSP/SPY Ratio": 0.293,
     "HYG/IEF Ratio": 0.8286,
-    "HY OAS": 3.19
+    "HY OAS": 3.19,
+    "VIX3M": 25.34,
+    "SKEW": 157.98,
+    "VIX/VIX3M Ratio": 1.0063,
+    "SPX": 6795.99,
+    "NASDAQ": 22695.95
   },
   {
     "Date": "2026/3/10",
@@ -982,6 +1109,9 @@
     "NASDAQ": 22697.1,
     "QQQ/SPY Ratio": 0.8975,
     "RSP/SPY Ratio": 0.2912,
-    "HYG/IEF Ratio": 0.8299
+    "HYG/IEF Ratio": 0.8299,
+    "VIX3M": 25.51,
+    "SKEW": 154.46,
+    "VIX/VIX3M Ratio": 0.9773
   }
 ]

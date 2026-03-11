@@ -200,6 +200,33 @@ def fetch_indices(target_dt=None):
         print(f"Error fetching Indices: {e}")
         return {"SPX": None, "NASDAQ": None}
 
+def fetch_sentiment_indicators(target_dt=None):
+    try:
+        tickers_str = "^VIX3M ^SKEW"
+        tickers = yf.Tickers(tickers_str)
+        results = {}
+        
+        start = end = None
+        if target_dt:
+            start = target_dt.strftime('%Y-%m-%d')
+            end = (target_dt + timedelta(days=1)).strftime('%Y-%m-%d')
+
+        for t in tickers_str.split():
+            if target_dt:
+                hist = tickers.tickers[t].history(start=start, end=end)
+            else:
+                hist = tickers.tickers[t].history(period="1d")
+                
+            if not hist.empty:
+                name = "VIX3M" if t == "^VIX3M" else "SKEW"
+                results[name] = round(float(hist['Close'].iloc[-1]), 2)
+            else:
+                results["VIX3M" if t == "^VIX3M" else "SKEW"] = None
+        return results
+    except Exception as e:
+        print(f"Error fetching Sentiment Indicators: {e}")
+        return {"VIX3M": None, "SKEW": None}
+
 def fetch_macro_data(target_dt=None):
     try:
         tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY QQQ RSP IEF"
@@ -247,6 +274,14 @@ def run_fetch_for_date(target_dt):
         "VIX": fetch_vix(target_dt),
         "HY OAS": fetch_hy_oas(target_dt)
     }
+
+    # Add VIX3M and SKEW
+    sent_ind = fetch_sentiment_indicators(target_dt)
+    results.update(sent_ind)
+    if results["VIX"] is not None and results.get("VIX3M") is not None:
+        results["VIX/VIX3M Ratio"] = round(results["VIX"] / results["VIX3M"], 4)
+    else:
+        results["VIX/VIX3M Ratio"] = None
     
     # 2. Fetch Expert Data from Google Sheet
     print(f"Fetching expert data from Google Sheet for {date_str}...")
