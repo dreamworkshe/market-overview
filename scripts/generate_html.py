@@ -67,13 +67,13 @@ BASE_FOOTER = """
 # --- DASHBOARD_BODY ---
 DASHBOARD_BODY = """
         <div class="space-y-6">
-            <!-- Overview Section: Crucial Market Signals -->
+            <!-- Sentiment Section: Full Width Row -->
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-red-600 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">盤勢總覽 Overview</h2>
+                    <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場情緒 Sentiment</h2>
                 </div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" id="overviewGrid"></div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
             </section>
 
             <!-- Breadth Section -->
@@ -83,15 +83,6 @@ DASHBOARD_BODY = """
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場廣度 Market Breadth</h2>
                 </div>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" id="breadthGrid"></div>
-            </section>
-
-            <!-- Sentiment Section: Full Width Row -->
-            <section>
-                <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場情緒 Sentiment</h2>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
             </section>
 
             <!-- Macro Section: Full Width Row -->
@@ -112,31 +103,29 @@ DASHBOARD_BODY = """
 
         const getTrend = (v1, v2, v3) => {
             if (v1 === undefined || v2 === undefined || v3 === undefined || v1 === '--' || v2 === '--' || v3 === '--') 
-                return { icon: 'minus', color: 'text-slate-300' };
+                return { icon: '', color: '' };
             if (v1 > v2 && v2 > v3) return { icon: 'trending-up', color: 'text-emerald-500' };
             if (v1 < v2 && v2 < v3) return { icon: 'trending-down', color: 'text-red-500' };
-            return { icon: 'minus', color: 'text-slate-300' };
+            return { icon: '', color: '' };
         };
 
         const categories = {
-            overviewGrid: [
+            sentimentGrid: [
+                { label: 'CNN F&G', col: 'CNN' },
+                { label: 'VIX 指數', col: 'VIX' },
+                { label: 'Crypto F&G', col: 'Crypto F&G' },
                 { label: 'Dark Pool (DIX)', col: 'DIX', suffix: '%' },
                 { label: 'Gamma (GEX)', col: 'GEX', suffix: 'B' },
+                { label: 'Total P/C', col: 'Total P/C Ratio' },
                 { label: 'Equity P/C', col: 'Equity P/C Ratio' },
-                { label: 'Total P/C', col: 'Total P/C Ratio' }
+                { label: 'NAAIM 曝險', col: 'NAAIM', weekly: true },
+                { label: 'AAII Spread', col: 'AAII B-B', weekly: true }
             ],
             breadthGrid: [
                 { label: 'NYSE > 20MA', col: 'NYSE above 20MA', suffix: '%' },
                 { label: 'NASD > 20MA', col: 'NASDAQ above 20MA', suffix: '%' },
                 { label: 'NYSE > 50MA', col: 'NYSE above 50MA', suffix: '%' },
                 { label: 'NASD > 50MA', col: 'NASDAQ above 50MA', suffix: '%' }
-            ],
-            sentimentGrid: [
-                { label: 'CNN F&G', col: 'CNN' },
-                { label: 'VIX 指數', col: 'VIX' },
-                { label: 'NAAIM 曝險', col: 'NAAIM', weekly: true },
-                { label: 'AAII Spread', col: 'AAII B-B', weekly: true },
-                { label: 'Crypto F&G', col: 'Crypto F&G' }
             ],
             macroGrid: [
                 { label: '10Y-3M Spread', col: '10Y-3M Spread' },
@@ -175,7 +164,7 @@ DASHBOARD_BODY = """
                     <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300">
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>
-                            <i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i>
+                            ${trend.icon ? `<i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i>` : ''}
                         </div>
                         <div class="flex items-baseline gap-1">
                             <div class="text-2xl font-black tracking-tighter text-slate-900">${val !== undefined ? val + sfx : '--'}</div>
@@ -207,9 +196,8 @@ DASHBOARD_BODY = """
 HISTORY_BODY = """
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
-                <button onclick="switchTab('overview')" id="tab-overview" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">盤勢總覽</button>
+                <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">市場情緒</button>
                 <button onclick="switchTab('breadth')" id="tab-breadth" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場廣度</button>
-                <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場情緒</button>
                 <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
                 <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">全部紀錄</button>
             </div>
@@ -225,19 +213,19 @@ HISTORY_BODY = """
                     <thead class="bg-slate-50 text-slate-400 text-[9px] font-black uppercase tracking-[0.15em] border-b border-slate-200">
                         <tr>
                             <th class="p-4 px-5">日期</th>
-                            <th class="p-4 col-overview">DIX</th>
-                            <th class="p-4 col-overview">GEX</th>
-                            <th class="p-4 col-overview">Eq P/C</th>
-                            <th class="p-4 col-overview">Tot P/C</th>
+                            <th class="p-4 col-sentiment text-nowrap">CNN</th>
+                            <th class="p-4 col-sentiment">VIX</th>
+                            <th class="p-4 col-sentiment">Crypto</th>
+                            <th class="p-4 col-sentiment">DIX</th>
+                            <th class="p-4 col-sentiment">GEX</th>
+                            <th class="p-4 col-sentiment">Tot P/C</th>
+                            <th class="p-4 col-sentiment">Eq P/C</th>
+                            <th class="p-4 col-sentiment">NAAIM</th>
+                            <th class="p-4 col-sentiment">AAII</th>
                             <th class="p-4 col-breadth text-nowrap">NY 20</th>
                             <th class="p-4 col-breadth text-nowrap">NQ 20</th>
                             <th class="p-4 col-breadth text-nowrap">NY 50</th>
                             <th class="p-4 col-breadth text-nowrap">NQ 50</th>
-                            <th class="p-4 col-sentiment text-nowrap">CNN</th>
-                            <th class="p-4 col-sentiment">VIX</th>
-                            <th class="p-4 col-sentiment">NAAIM</th>
-                            <th class="p-4 col-sentiment">AAII</th>
-                            <th class="p-4 col-sentiment">Crypto</th>
                             <th class="p-4 col-macro">10Y-3M</th>
                             <th class="p-4 col-macro">HYG/LQD</th>
                             <th class="p-4 col-macro">XLY/XLP</th>
@@ -262,19 +250,19 @@ HISTORY_BODY = """
                 tr.className = 'border-t border-slate-100 hover:bg-slate-50/50 transition-colors';
                 tr.innerHTML = `
                     <td class="p-4 px-5 text-[11px] font-black text-slate-800 bg-slate-50/20">${row.Date}</td>
-                    <td class="p-4 text-[11px] text-blue-700 font-bold col-overview">${row.DIX || '--'}%</td>
-                    <td class="p-4 text-[11px] text-purple-700 font-black col-overview">${row.GEX || '--'}B</td>
-                    <td class="p-4 text-[11px] col-overview">${row['Equity P/C Ratio'] || '--'}</td>
-                    <td class="p-4 text-[11px] col-overview">${row['Total P/C Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row.VIX || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
+                    <td class="p-4 text-[11px] text-blue-700 font-bold col-sentiment">${row.DIX || '--'}%</td>
+                    <td class="p-4 text-[11px] text-purple-700 font-black col-sentiment">${row.GEX || '--'}B</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row['Total P/C Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row['Equity P/C Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row.NAAIM || '--'}</td>
+                    <td class="p-4 text-[11px] col-sentiment">${row['AAII B-B'] || '--'}</td>
                     <td class="p-4 text-[11px] text-emerald-600 font-black col-breadth">${row['NYSE above 20MA'] || '--'}%</td>
                     <td class="p-4 text-[11px] text-emerald-600 font-black col-breadth">${row['NASDAQ above 20MA'] || '--'}%</td>
                     <td class="p-4 text-[11px] text-indigo-500 font-bold col-breadth">${row['NYSE above 50MA'] || '--'}%</td>
                     <td class="p-4 text-[11px] text-indigo-500 font-bold col-breadth">${row['NASDAQ above 50MA'] || '--'}%</td>
-                    <td class="p-4 text-[11px] font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
-                    <td class="p-4 text-[11px] col-sentiment">${row.VIX || '--'}</td>
-                    <td class="p-4 text-[11px] col-sentiment">${row.NAAIM || '--'}</td>
-                    <td class="p-4 text-[11px] col-sentiment">${row['AAII B-B'] || '--'}</td>
-                    <td class="p-4 text-[11px] font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
                     <td class="p-4 text-[11px] col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
                     <td class="p-4 text-[11px] font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
                     <td class="p-4 text-[11px] font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
@@ -290,7 +278,7 @@ HISTORY_BODY = """
             document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab'));
             document.getElementById('tab-' + cat).classList.add('active-tab');
 
-            const allCols = ['col-overview', 'col-breadth', 'col-sentiment', 'col-macro'];
+            const allCols = ['col-breadth', 'col-sentiment', 'col-macro'];
             allCols.forEach(cls => {
                 const elements = document.getElementsByClassName(cls);
                 for (let el of elements) {
@@ -303,8 +291,8 @@ HISTORY_BODY = """
             });
         };
 
-        const tabs = ['overview', 'breadth', 'sentiment', 'macro', 'all'];
-        let currentTab = 'overview';
+        const tabs = ['sentiment', 'breadth', 'macro', 'all'];
+        let currentTab = 'sentiment';
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -316,7 +304,7 @@ HISTORY_BODY = """
         });
 
         renderTable();
-        switchTab('overview');
+        switchTab('sentiment');
     </script>
 """
 

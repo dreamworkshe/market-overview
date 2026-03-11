@@ -35,13 +35,13 @@
         </header>
 
         <div class="space-y-6">
-            <!-- Overview Section: Crucial Market Signals -->
+            <!-- Sentiment Section: Full Width Row -->
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-red-600 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">盤勢總覽 Overview</h2>
+                    <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場情緒 Sentiment</h2>
                 </div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" id="overviewGrid"></div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
             </section>
 
             <!-- Breadth Section -->
@@ -51,15 +51,6 @@
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場廣度 Market Breadth</h2>
                 </div>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" id="breadthGrid"></div>
-            </section>
-
-            <!-- Sentiment Section: Full Width Row -->
-            <section>
-                <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場情緒 Sentiment</h2>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
             </section>
 
             <!-- Macro Section: Full Width Row -->
@@ -80,31 +71,29 @@
 
         const getTrend = (v1, v2, v3) => {
             if (v1 === undefined || v2 === undefined || v3 === undefined || v1 === '--' || v2 === '--' || v3 === '--') 
-                return { icon: 'minus', color: 'text-slate-300' };
+                return { icon: '', color: '' };
             if (v1 > v2 && v2 > v3) return { icon: 'trending-up', color: 'text-emerald-500' };
             if (v1 < v2 && v2 < v3) return { icon: 'trending-down', color: 'text-red-500' };
-            return { icon: 'minus', color: 'text-slate-300' };
+            return { icon: '', color: '' };
         };
 
         const categories = {
-            overviewGrid: [
+            sentimentGrid: [
+                { label: 'CNN F&G', col: 'CNN' },
+                { label: 'VIX 指數', col: 'VIX' },
+                { label: 'Crypto F&G', col: 'Crypto F&G' },
                 { label: 'Dark Pool (DIX)', col: 'DIX', suffix: '%' },
                 { label: 'Gamma (GEX)', col: 'GEX', suffix: 'B' },
+                { label: 'Total P/C', col: 'Total P/C Ratio' },
                 { label: 'Equity P/C', col: 'Equity P/C Ratio' },
-                { label: 'Total P/C', col: 'Total P/C Ratio' }
+                { label: 'NAAIM 曝險', col: 'NAAIM', weekly: true },
+                { label: 'AAII Spread', col: 'AAII B-B', weekly: true }
             ],
             breadthGrid: [
                 { label: 'NYSE > 20MA', col: 'NYSE above 20MA', suffix: '%' },
                 { label: 'NASD > 20MA', col: 'NASDAQ above 20MA', suffix: '%' },
                 { label: 'NYSE > 50MA', col: 'NYSE above 50MA', suffix: '%' },
                 { label: 'NASD > 50MA', col: 'NASDAQ above 50MA', suffix: '%' }
-            ],
-            sentimentGrid: [
-                { label: 'CNN F&G', col: 'CNN' },
-                { label: 'VIX 指數', col: 'VIX' },
-                { label: 'NAAIM 曝險', col: 'NAAIM', weekly: true },
-                { label: 'AAII Spread', col: 'AAII B-B', weekly: true },
-                { label: 'Crypto F&G', col: 'Crypto F&G' }
             ],
             macroGrid: [
                 { label: '10Y-3M Spread', col: '10Y-3M Spread' },
@@ -143,7 +132,7 @@
                     <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300">
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>
-                            <i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i>
+                            ${trend.icon ? `<i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i>` : ''}
                         </div>
                         <div class="flex items-baseline gap-1">
                             <div class="text-2xl font-black tracking-tighter text-slate-900">${val !== undefined ? val + sfx : '--'}</div>
