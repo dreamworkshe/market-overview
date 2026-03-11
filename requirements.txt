@@ -7,3 +7,5 @@ PyYAML
 python-dateutil
 gspread
 google-auth
+fredapi
+python-dotenv

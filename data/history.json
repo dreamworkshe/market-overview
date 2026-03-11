@@ -14,7 +14,11 @@
     "HYG/LQD Ratio": 0.7331,
     "XLY/XLP Ratio": 1.5671,
     "KBE/SPY Ratio": 0.0922,
-    "Crypto F&G": 28
+    "Crypto F&G": 28,
+    "QQQ/SPY Ratio": 0.8999,
+    "RSP/SPY Ratio": 0.2849,
+    "HYG/IEF Ratio": 0.8398,
+    "HY OAS": 2.76
   },
   {
     "Date": "2026/1/9",
@@ -31,7 +35,11 @@
     "HYG/LQD Ratio": 0.731,
     "XLY/XLP Ratio": 1.5698,
     "KBE/SPY Ratio": 0.0911,
-    "Crypto F&G": 27
+    "Crypto F&G": 27,
+    "QQQ/SPY Ratio": 0.9029,
+    "RSP/SPY Ratio": 0.2847,
+    "HYG/IEF Ratio": 0.8394,
+    "HY OAS": 2.74
   },
   {
     "Date": "2026/1/12",
@@ -48,7 +56,11 @@
     "HYG/LQD Ratio": 0.7323,
     "XLY/XLP Ratio": 1.553,
     "KBE/SPY Ratio": 0.0898,
-    "Crypto F&G": 27
+    "Crypto F&G": 27,
+    "QQQ/SPY Ratio": 0.9022,
+    "RSP/SPY Ratio": 0.2845,
+    "HYG/IEF Ratio": 0.8409,
+    "HY OAS": 2.74
   },
   {
     "Date": "2026/1/13",
@@ -65,7 +77,11 @@
     "HYG/LQD Ratio": 0.7307,
     "XLY/XLP Ratio": 1.5314,
     "KBE/SPY Ratio": 0.0892,
-    "Crypto F&G": 26
+    "Crypto F&G": 26,
+    "QQQ/SPY Ratio": 0.9027,
+    "RSP/SPY Ratio": 0.2851,
+    "HYG/IEF Ratio": 0.8399,
+    "HY OAS": 2.75
   },
   {
     "Date": "2026/1/14",
@@ -82,7 +98,11 @@
     "HYG/LQD Ratio": 0.7288,
     "XLY/XLP Ratio": 1.4867,
     "KBE/SPY Ratio": 0.0905,
-    "Crypto F&G": 48
+    "Crypto F&G": 48,
+    "QQQ/SPY Ratio": 0.8974,
+    "RSP/SPY Ratio": 0.2878,
+    "HYG/IEF Ratio": 0.8381,
+    "HY OAS": 2.76
   },
   {
     "Date": "2026/1/15",
@@ -99,7 +119,11 @@
     "HYG/LQD Ratio": 0.7297,
     "XLY/XLP Ratio": 1.4896,
     "KBE/SPY Ratio": 0.0918,
-    "Crypto F&G": 61
+    "Crypto F&G": 61,
+    "QQQ/SPY Ratio": 0.8982,
+    "RSP/SPY Ratio": 0.2883,
+    "HYG/IEF Ratio": 0.8399,
+    "HY OAS": 2.71
   },
   {
     "Date": "2026/1/16",
@@ -116,7 +140,11 @@
     "HYG/LQD Ratio": 0.7323,
     "XLY/XLP Ratio": 1.4895,
     "KBE/SPY Ratio": 0.0915,
-    "Crypto F&G": 49
+    "Crypto F&G": 49,
+    "QQQ/SPY Ratio": 0.8982,
+    "RSP/SPY Ratio": 0.2878,
+    "HYG/IEF Ratio": 0.8436,
+    "HY OAS": 2.65
   },
   {
     "Date": "2026/1/20",
@@ -133,7 +161,11 @@
     "HYG/LQD Ratio": 0.7349,
     "XLY/XLP Ratio": 1.4463,
     "KBE/SPY Ratio": 0.092,
-    "Crypto F&G": 32
+    "Crypto F&G": 32,
+    "QQQ/SPY Ratio": 0.8974,
+    "RSP/SPY Ratio": 0.2894,
+    "HYG/IEF Ratio": 0.8448,
+    "HY OAS": 2.73
   },
   {
     "Date": "2026/1/21",
@@ -150,7 +182,11 @@
     "HYG/LQD Ratio": 0.7327,
     "XLY/XLP Ratio": 1.4726,
     "KBE/SPY Ratio": 0.0945,
-    "Crypto F&G": 24
+    "Crypto F&G": 24,
+    "QQQ/SPY Ratio": 0.8992,
+    "RSP/SPY Ratio": 0.2909,
+    "HYG/IEF Ratio": 0.8451,
+    "HY OAS": 2.69
   },
   {
     "Date": "2026/1/22",
@@ -167,7 +203,11 @@
     "HYG/LQD Ratio": 0.7318,
     "XLY/XLP Ratio": 1.4905,
     "KBE/SPY Ratio": 0.0941,
-    "Crypto F&G": 20
+    "Crypto F&G": 20,
+    "QQQ/SPY Ratio": 0.901,
+    "RSP/SPY Ratio": 0.2898,
+    "HYG/IEF Ratio": 0.8458,
+    "HY OAS": 2.64
   },
   {
     "Date": "2026/1/23",
@@ -186,7 +226,11 @@
     "HYG/LQD Ratio": 0.731,
     "XLY/XLP Ratio": 1.4851,
     "KBE/SPY Ratio": 0.0911,
-    "Crypto F&G": 24
+    "Crypto F&G": 24,
+    "QQQ/SPY Ratio": 0.9035,
+    "RSP/SPY Ratio": 0.2884,
+    "HYG/IEF Ratio": 0.844,
+    "HY OAS": 2.68
   },
   {
     "Date": "2026/1/26",
@@ -205,7 +249,11 @@
     "HYG/LQD Ratio": 0.7307,
     "XLY/XLP Ratio": 1.4777,
     "KBE/SPY Ratio": 0.0911,
-    "Crypto F&G": 20
+    "Crypto F&G": 20,
+    "QQQ/SPY Ratio": 0.9029,
+    "RSP/SPY Ratio": 0.2876,
+    "HYG/IEF Ratio": 0.8431,
+    "HY OAS": 2.69
   },
   {
     "Date": "2026/1/27",
@@ -224,7 +272,11 @@
     "HYG/LQD Ratio": 0.7314,
     "XLY/XLP Ratio": 1.4753,
     "KBE/SPY Ratio": 0.091,
-    "Crypto F&G": 29
+    "Crypto F&G": 29,
+    "QQQ/SPY Ratio": 0.9075,
+    "RSP/SPY Ratio": 0.286,
+    "HYG/IEF Ratio": 0.844,
+    "HY OAS": 2.71
   },
   {
     "Date": "2026/1/28",
@@ -243,7 +295,11 @@
     "HYG/LQD Ratio": 0.7313,
     "XLY/XLP Ratio": 1.4792,
     "KBE/SPY Ratio": 0.0906,
-    "Crypto F&G": 29
+    "Crypto F&G": 29,
+    "QQQ/SPY Ratio": 0.9106,
+    "RSP/SPY Ratio": 0.2851,
+    "HYG/IEF Ratio": 0.8434,
+    "HY OAS": 2.72
   },
   {
     "Date": "2026/1/29",
@@ -262,7 +318,11 @@
     "HYG/LQD Ratio": 0.731,
     "XLY/XLP Ratio": 1.4756,
     "KBE/SPY Ratio": 0.0923,
-    "Crypto F&G": 26
+    "Crypto F&G": 26,
+    "QQQ/SPY Ratio": 0.9069,
+    "RSP/SPY Ratio": 0.286,
+    "HYG/IEF Ratio": 0.8424,
+    "HY OAS": 2.77
   },
   {
     "Date": "2026/1/30",
@@ -281,7 +341,11 @@
     "HYG/LQD Ratio": 0.7326,
     "XLY/XLP Ratio": 1.451,
     "KBE/SPY Ratio": 0.0919,
-    "Crypto F&G": 16
+    "Crypto F&G": 16,
+    "QQQ/SPY Ratio": 0.8987,
+    "RSP/SPY Ratio": 0.2863,
+    "HYG/IEF Ratio": 0.8438,
+    "HY OAS": 2.8
   },
   {
     "Date": "2026/2/2",
@@ -300,7 +364,11 @@
     "HYG/LQD Ratio": 0.7328,
     "XLY/XLP Ratio": 1.4434,
     "KBE/SPY Ratio": 0.0928,
-    "Crypto F&G": 14
+    "Crypto F&G": 14,
+    "QQQ/SPY Ratio": 0.9004,
+    "RSP/SPY Ratio": 0.2863,
+    "HYG/IEF Ratio": 0.8446,
+    "HY OAS": 2.81
   },
   {
     "Date": "2026/2/3",
@@ -319,7 +387,11 @@
     "HYG/LQD Ratio": 0.732,
     "XLY/XLP Ratio": 1.409,
     "KBE/SPY Ratio": 0.0946,
-    "Crypto F&G": 17
+    "Crypto F&G": 17,
+    "QQQ/SPY Ratio": 0.8941,
+    "RSP/SPY Ratio": 0.288,
+    "HYG/IEF Ratio": 0.8433,
+    "HY OAS": 2.85
   },
   {
     "Date": "2026/2/4",
@@ -338,7 +410,11 @@
     "HYG/LQD Ratio": 0.732,
     "XLY/XLP Ratio": 1.3806,
     "KBE/SPY Ratio": 0.0966,
-    "Crypto F&G": 14
+    "Crypto F&G": 14,
+    "QQQ/SPY Ratio": 0.8828,
+    "RSP/SPY Ratio": 0.2919,
+    "HYG/IEF Ratio": 0.8424,
+    "HY OAS": 2.86
   },
   {
     "Date": "2026/2/5",
@@ -357,7 +433,11 @@
     "HYG/LQD Ratio": 0.7277,
     "XLY/XLP Ratio": 1.3519,
     "KBE/SPY Ratio": 0.0976,
-    "Crypto F&G": 12
+    "Crypto F&G": 12,
+    "QQQ/SPY Ratio": 0.8811,
+    "RSP/SPY Ratio": 0.293,
+    "HYG/IEF Ratio": 0.8366,
+    "HY OAS": 2.97
   },
   {
     "Date": "2026/2/6",
@@ -376,7 +456,11 @@
     "HYG/LQD Ratio": 0.7299,
     "XLY/XLP Ratio": 1.3417,
     "KBE/SPY Ratio": 0.0976,
-    "Crypto F&G": 9
+    "Crypto F&G": 9,
+    "QQQ/SPY Ratio": 0.8828,
+    "RSP/SPY Ratio": 0.2929,
+    "HYG/IEF Ratio": 0.8395,
+    "HY OAS": 2.87
   },
   {
     "Date": "2026/2/9",
@@ -395,7 +479,11 @@
     "HYG/LQD Ratio": 0.7308,
     "XLY/XLP Ratio": 1.3445,
     "KBE/SPY Ratio": 0.0969,
-    "Crypto F&G": 14
+    "Crypto F&G": 14,
+    "QQQ/SPY Ratio": 0.8853,
+    "RSP/SPY Ratio": 0.2916,
+    "HYG/IEF Ratio": 0.8404,
+    "HY OAS": 2.84
   },
   {
     "Date": "2026/2/10",
@@ -414,7 +502,11 @@
     "HYG/LQD Ratio": 0.7284,
     "XLY/XLP Ratio": 1.3578,
     "KBE/SPY Ratio": 0.0963,
-    "Crypto F&G": 9
+    "Crypto F&G": 9,
+    "QQQ/SPY Ratio": 0.8835,
+    "RSP/SPY Ratio": 0.2934,
+    "HYG/IEF Ratio": 0.836,
+    "HY OAS": 2.86
   },
   {
     "Date": "2026/2/11",
@@ -433,7 +525,11 @@
     "HYG/LQD Ratio": 0.7291,
     "XLY/XLP Ratio": 1.3321,
     "KBE/SPY Ratio": 0.095,
-    "Crypto F&G": 11
+    "Crypto F&G": 11,
+    "QQQ/SPY Ratio": 0.886,
+    "RSP/SPY Ratio": 0.294,
+    "HYG/IEF Ratio": 0.8382,
+    "HY OAS": 2.84
   },
   {
     "Date": "2026/2/12",
@@ -452,7 +548,11 @@
     "HYG/LQD Ratio": 0.7253,
     "XLY/XLP Ratio": 1.3018,
     "KBE/SPY Ratio": 0.095,
-    "Crypto F&G": 5
+    "Crypto F&G": 5,
+    "QQQ/SPY Ratio": 0.8816,
+    "RSP/SPY Ratio": 0.2947,
+    "HYG/IEF Ratio": 0.8327,
+    "HY OAS": 2.92
   },
   {
     "Date": "2026/2/13",
@@ -471,7 +571,11 @@
     "HYG/LQD Ratio": 0.7235,
     "XLY/XLP Ratio": 1.298,
     "KBE/SPY Ratio": 0.0955,
-    "Crypto F&G": 9
+    "Crypto F&G": 9,
+    "QQQ/SPY Ratio": 0.8829,
+    "RSP/SPY Ratio": 0.2976,
+    "HYG/IEF Ratio": 0.83,
+    "HY OAS": 2.95
   },
   {
     "Date": "2026/2/17",
@@ -490,7 +594,11 @@
     "HYG/LQD Ratio": 0.7224,
     "XLY/XLP Ratio": 1.3156,
     "KBE/SPY Ratio": 0.0957,
-    "Crypto F&G": 10
+    "Crypto F&G": 10,
+    "QQQ/SPY Ratio": 0.8806,
+    "RSP/SPY Ratio": 0.2966,
+    "HYG/IEF Ratio": 0.8297,
+    "HY OAS": 2.94
   },
   {
     "Date": "2026/2/18",
@@ -511,7 +619,11 @@
     "HYG/LQD Ratio": 0.724,
     "XLY/XLP Ratio": 1.3292,
     "KBE/SPY Ratio": 0.0952,
-    "Crypto F&G": 8
+    "Crypto F&G": 8,
+    "QQQ/SPY Ratio": 0.8827,
+    "RSP/SPY Ratio": 0.2966,
+    "HYG/IEF Ratio": 0.8325,
+    "HY OAS": 2.86
   },
   {
     "Date": "2026/2/19",
@@ -532,7 +644,11 @@
     "HYG/LQD Ratio": 0.7237,
     "XLY/XLP Ratio": 1.3259,
     "KBE/SPY Ratio": 0.0948,
-    "Crypto F&G": 9
+    "Crypto F&G": 9,
+    "QQQ/SPY Ratio": 0.8816,
+    "RSP/SPY Ratio": 0.2968,
+    "HYG/IEF Ratio": 0.832,
+    "HY OAS": 2.88
   },
   {
     "Date": "2026/2/20",
@@ -553,7 +669,11 @@
     "HYG/LQD Ratio": 0.7248,
     "XLY/XLP Ratio": 1.3363,
     "KBE/SPY Ratio": 0.095,
-    "Crypto F&G": 7
+    "Crypto F&G": 7,
+    "QQQ/SPY Ratio": 0.8831,
+    "RSP/SPY Ratio": 0.296,
+    "HYG/IEF Ratio": 0.8326,
+    "HY OAS": 2.86
   },
   {
     "Date": "2026/2/23",
@@ -574,7 +694,11 @@
     "HYG/LQD Ratio": 0.7229,
     "XLY/XLP Ratio": 1.2925,
     "KBE/SPY Ratio": 0.0918,
-    "Crypto F&G": 5
+    "Crypto F&G": 5,
+    "QQQ/SPY Ratio": 0.8813,
+    "RSP/SPY Ratio": 0.2958,
+    "HYG/IEF Ratio": 0.8283,
+    "HY OAS": 2.95
   },
   {
     "Date": "2026/2/24",
@@ -595,7 +719,11 @@
     "HYG/LQD Ratio": 0.7225,
     "XLY/XLP Ratio": 1.3009,
     "KBE/SPY Ratio": 0.0912,
-    "Crypto F&G": 8
+    "Crypto F&G": 8,
+    "QQQ/SPY Ratio": 0.8844,
+    "RSP/SPY Ratio": 0.296,
+    "HYG/IEF Ratio": 0.8278,
+    "HY OAS": 2.97
   },
   {
     "Date": "2026/2/25",
@@ -616,7 +744,11 @@
     "HYG/LQD Ratio": 0.7237,
     "XLY/XLP Ratio": 1.3155,
     "KBE/SPY Ratio": 0.092,
-    "Crypto F&G": 11
+    "Crypto F&G": 11,
+    "QQQ/SPY Ratio": 0.8897,
+    "RSP/SPY Ratio": 0.2937,
+    "HYG/IEF Ratio": 0.8297,
+    "HY OAS": 2.94
   },
   {
     "Date": "2026/2/26",
@@ -637,7 +769,11 @@
     "HYG/LQD Ratio": 0.7226,
     "XLY/XLP Ratio": 1.3172,
     "KBE/SPY Ratio": 0.0932,
-    "Crypto F&G": 11
+    "Crypto F&G": 11,
+    "QQQ/SPY Ratio": 0.8839,
+    "RSP/SPY Ratio": 0.297,
+    "HYG/IEF Ratio": 0.8267,
+    "HY OAS": 2.98
   },
   {
     "Date": "2026/2/27",
@@ -658,7 +794,11 @@
     "HYG/LQD Ratio": 0.7217,
     "XLY/XLP Ratio": 1.2983,
     "KBE/SPY Ratio": 0.089,
-    "Crypto F&G": 13
+    "Crypto F&G": 13,
+    "QQQ/SPY Ratio": 0.8853,
+    "RSP/SPY Ratio": 0.2988,
+    "HYG/IEF Ratio": 0.8221,
+    "HY OAS": 3.1
   },
   {
     "Date": "2026/3/2",
@@ -679,7 +819,11 @@
     "HYG/LQD Ratio": 0.7238,
     "XLY/XLP Ratio": 1.3011,
     "KBE/SPY Ratio": 0.0902,
-    "Crypto F&G": 10
+    "Crypto F&G": 10,
+    "QQQ/SPY Ratio": 0.8859,
+    "RSP/SPY Ratio": 0.2981,
+    "HYG/IEF Ratio": 0.8266,
+    "HY OAS": 3.03
   },
   {
     "Date": "2026/3/3",
@@ -700,7 +844,11 @@
     "HYG/LQD Ratio": 0.7226,
     "XLY/XLP Ratio": 1.3034,
     "KBE/SPY Ratio": 0.0904,
-    "Crypto F&G": 14
+    "Crypto F&G": 14,
+    "QQQ/SPY Ratio": 0.8842,
+    "RSP/SPY Ratio": 0.297,
+    "HYG/IEF Ratio": 0.8259,
+    "HY OAS": 3.08
   },
   {
     "Date": "2026/3/4",
@@ -721,7 +869,11 @@
     "HYG/LQD Ratio": 0.7245,
     "XLY/XLP Ratio": 1.3354,
     "KBE/SPY Ratio": 0.0902,
-    "Crypto F&G": 10
+    "Crypto F&G": 10,
+    "QQQ/SPY Ratio": 0.8914,
+    "RSP/SPY Ratio": 0.2961,
+    "HYG/IEF Ratio": 0.8305,
+    "HY OAS": 2.97
   },
   {
     "Date": "2026/3/5",
@@ -744,7 +896,11 @@
     "XLY/XLP Ratio": 1.3646,
     "XLP/XLY Ratio": 0.7328,
     "Copper/Gold Ratio": 0.0011,
-    "KBE/SPY Ratio": 0.0895
+    "KBE/SPY Ratio": 0.0895,
+    "QQQ/SPY Ratio": 0.8937,
+    "RSP/SPY Ratio": 0.2943,
+    "HYG/IEF Ratio": 0.8298,
+    "HY OAS": 3.0
   },
   {
     "Date": "2026/3/6",
@@ -771,7 +927,11 @@
     "NYSE Declining": 2175,
     "NASDAQ Declining": 3383,
     "NYSE AD Ratio": 0.28,
-    "NASDAQ AD Ratio": 0.42
+    "NASDAQ AD Ratio": 0.42,
+    "QQQ/SPY Ratio": 0.892,
+    "RSP/SPY Ratio": 0.2947,
+    "HYG/IEF Ratio": 0.8262,
+    "HY OAS": 3.13
   },
   {
     "Date": "2026/3/9",
@@ -792,7 +952,11 @@
     "NYSE above 20MA": 29.32,
     "NASDAQ above 20MA": 37.32,
     "NYSE above 50MA": 41.71,
-    "NASDAQ above 50MA": 34.03
+    "NASDAQ above 50MA": 34.03,
+    "QQQ/SPY Ratio": 0.896,
+    "RSP/SPY Ratio": 0.293,
+    "HYG/IEF Ratio": 0.8286,
+    "HY OAS": 3.19
   },
   {
     "Date": "2026/3/10",
@@ -813,6 +977,11 @@
     "NYSE above 20MA": 27.87,
     "NASDAQ above 20MA": 38.95,
     "NYSE above 50MA": 41.27,
-    "NASDAQ above 50MA": 34.51
+    "NASDAQ above 50MA": 34.51,
+    "SPX": 6781.48,
+    "NASDAQ": 22697.1,
+    "QQQ/SPY Ratio": 0.8975,
+    "RSP/SPY Ratio": 0.2912,
+    "HYG/IEF Ratio": 0.8299
   }
 ]

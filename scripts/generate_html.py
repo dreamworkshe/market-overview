@@ -33,6 +33,8 @@ BASE_HEAD = """
         .gradient-text { background: linear-gradient(135deg, #020617, #475569); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .card-hover:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); transition: all 0.2s ease; }
         .active-tab { background: #0f172a; color: white !important; font-weight: 700; }
+        .stale-card { opacity: 0.65; background-color: #f1f5f9 !important; filter: grayscale(0.2); }
+        .stale-tag { font-size: 8px; color: #94a3b8; border: 1px solid #e2e8f0; padding: 1px 4px; border-radius: 4px; }
     </style>
 </head>
 <body class="p-2 md:p-3">
@@ -80,16 +82,25 @@ DASHBOARD_BODY = """
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
                     <div class="w-1 h-3 bg-emerald-500 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場廣度 Market Breadth</h2>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場廣度 Breadth</h2>
                 </div>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" id="breadthGrid"></div>
+            </section>
+
+            <!-- Credit Spread Section -->
+            <section>
+                <div class="flex items-center gap-2 mb-2 px-1">
+                    <div class="w-1 h-3 bg-amber-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">信用利差 Credit Spreads</h2>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="creditGrid"></div>
             </section>
 
             <!-- Macro Section: Full Width Row -->
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
                     <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">宏觀趨勢 Macro</h2>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">跨市分析 Intermarket Analysis</h2>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="macroGrid"></div>
             </section>
@@ -112,12 +123,12 @@ DASHBOARD_BODY = """
         const categories = {
             sentimentGrid: [
                 { label: 'CNN F&G', col: 'CNN' },
-                { label: 'VIX 指數', col: 'VIX' },
+                { label: 'VIX 指數', col: 'VIX', reverse: true },
                 { label: 'Crypto F&G', col: 'Crypto F&G' },
                 { label: 'Dark Pool (DIX)', col: 'DIX', suffix: '%' },
                 { label: 'Gamma (GEX)', col: 'GEX', suffix: 'B' },
-                { label: 'Total P/C', col: 'Total P/C Ratio' },
-                { label: 'Equity P/C', col: 'Equity P/C Ratio' },
+                { label: 'Total P/C', col: 'Total P/C Ratio', reverse: true },
+                { label: 'Equity P/C', col: 'Equity P/C Ratio', reverse: true },
                 { label: 'NAAIM 曝險', col: 'NAAIM', weekly: true },
                 { label: 'AAII Spread', col: 'AAII B-B', weekly: true }
             ],
@@ -127,49 +138,112 @@ DASHBOARD_BODY = """
                 { label: 'NYSE > 50MA', col: 'NYSE above 50MA', suffix: '%' },
                 { label: 'NASD > 50MA', col: 'NASDAQ above 50MA', suffix: '%' }
             ],
-            macroGrid: [
+            creditGrid: [
                 { label: '10Y-3M Spread', col: '10Y-3M Spread' },
                 { label: 'HYG/LQD', col: 'HYG/LQD Ratio' },
+                { label: 'HYG/IEF', col: 'HYG/IEF Ratio' },
+                { label: 'HY OAS', col: 'HY OAS' }
+            ],
+            macroGrid: [
+                { label: 'QQQ/SPY', col: 'QQQ/SPY Ratio' },
+                { label: 'RSP/SPY', col: 'RSP/SPY Ratio' },
+                { label: 'KBE/SPY', col: 'KBE/SPY Ratio' },
                 { label: 'XLY/XLP', col: 'XLY/XLP Ratio' },
-                { label: 'Copper/Gold', col: 'Copper/Gold Ratio' },
-                { label: 'KBE/SPY', col: 'KBE/SPY Ratio' }
+                { label: 'Copper/Gold', col: 'Copper/Gold Ratio' }
             ]
+        };
+
+        const renderSparkline = (canvasId, data, color) => {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const sparkColor = '#94a3b8'; // Force simple gray
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map((_, i) => i),
+                    datasets: [{
+                        data: data,
+                        borderColor: sparkColor,
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 40);
+                            gradient.addColorStop(0, 'rgba(148, 163, 184, 0.1)');
+                            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                            return gradient;
+                        },
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    events: [],
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
         };
 
         const renderGrid = (id, items) => {
             const grid = document.getElementById(id);
             if (!grid) return;
-            items.forEach(m => {
-                const val = latest[m.col];
+            items.forEach((m, idx) => {
+                let targetIdx = rawData.length - 1;
+                let val = latest[m.col];
+                let isStale = false;
+                
+                // Fallback to previous data if missing
+                if (val === undefined || val === null || val === '--') {
+                    for (let i = rawData.length - 2; i >= 0; i--) {
+                        if (rawData[i][m.col] !== undefined && rawData[i][m.col] !== null && rawData[i][m.col] !== '--') {
+                            val = rawData[i][m.col];
+                            targetIdx = i;
+                            isStale = true;
+                            break;
+                        }
+                    }
+                }
+
                 const sfx = m.suffix || '';
+                const canvasId = `sparkline-${id}-${idx}`;
                 
                 let v1, v2, v3, labels;
                 if (m.weekly) {
-                    const idx = rawData.length - 1;
-                    // Stride by 5 days for weekly data
-                    v1 = rawData[idx - 5] ? rawData[idx - 5][m.col] : '--';
-                    v2 = rawData[idx - 10] ? rawData[idx - 10][m.col] : '--';
-                    v3 = rawData[idx - 15] ? rawData[idx - 15][m.col] : '--';
+                    v1 = rawData[targetIdx - 5] ? rawData[targetIdx - 5][m.col] : '--';
+                    v2 = rawData[targetIdx - 10] ? rawData[targetIdx - 10][m.col] : '--';
+                    v3 = rawData[targetIdx - 15] ? rawData[targetIdx - 15][m.col] : '--';
                     labels = ['1W', '2W', '3W'];
                 } else {
-                    v1 = latestMA[m.col + '_5MA'] || '--';
-                    v2 = latestMA[m.col + '_10MA'] || '--';
-                    v3 = latestMA[m.col + '_20MA'] || '--';
+                    const targetDate = rawData[targetIdx].Date;
+                    const lookupMA = maData.find(ma => ma.Date === targetDate) || {};
+                    v1 = lookupMA[m.col + '_5MA'] || '--';
+                    v2 = lookupMA[m.col + '_10MA'] || '--';
+                    v3 = lookupMA[m.col + '_20MA'] || '--';
                     labels = ['5MA', '10MA', '20MA'];
                 }
 
                 const trend = getTrend(v1, v2, v3);
+                
+                // Get last 20 days for sparkline
+                const sparkData = rawData.slice(-20).map(d => d[m.col]).filter(v => v !== undefined && v !== null);
 
                 grid.innerHTML += `
-                    <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300">
+                    <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300 ${isStale ? 'stale-card' : ''}">
                         <div class="flex items-center justify-between mb-1">
-                            <span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>
-                            ${trend.icon ? `<i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i>` : ''}
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>
+                                ${isStale ? '<span class="stale-tag">DELAYED</span>' : ''}
+                            </div>
+                            <i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i>
                         </div>
-                        <div class="flex items-baseline gap-1">
+                        <div class="flex items-end justify-between gap-1 mb-2">
                             <div class="text-2xl font-black tracking-tighter text-slate-900">${val !== undefined ? val + sfx : '--'}</div>
+                            <div class="w-16 h-8">
+                                <canvas id="${canvasId}"></canvas>
+                            </div>
                         </div>
-                        <div class="mt-2 pt-2 border-t border-slate-50 flex justify-between items-center text-[10px] font-bold text-slate-400">
+                        <div class="mt-1 pt-2 border-t border-slate-50 flex justify-between items-center text-[10px] font-bold text-slate-400">
                             <div class="flex flex-col">
                                 <span class="text-[8px] uppercase tracking-tighter text-slate-300">${labels[0]}</span>
                                 <span class="text-slate-500 font-mono">${v1}${sfx}</span>
@@ -185,6 +259,9 @@ DASHBOARD_BODY = """
                         </div>
                     </div>
                 `;
+                
+                // Render sparkline after a tiny delay to ensure DOM is ready
+                setTimeout(() => renderSparkline(canvasId, sparkData, m.color), 0);
             });
         };
 
@@ -198,7 +275,8 @@ HISTORY_BODY = """
             <div class="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
                 <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">市場情緒</button>
                 <button onclick="switchTab('breadth')" id="tab-breadth" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場廣度</button>
-                <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">宏觀趨勢</button>
+                <button onclick="switchTab('credit')" id="tab-credit" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">信用利差</button>
+                <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">跨市分析</button>
                 <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">全部紀錄</button>
             </div>
             <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-2xl shadow-sm">
@@ -215,6 +293,7 @@ HISTORY_BODY = """
                             <th class="p-4 px-5">日期</th>
                             <th class="p-4 col-sentiment text-nowrap">CNN</th>
                             <th class="p-4 col-sentiment">VIX</th>
+                            <th class="p-4 col-credit">HY OAS</th>
                             <th class="p-4 col-sentiment">Crypto</th>
                             <th class="p-4 col-sentiment">DIX</th>
                             <th class="p-4 col-sentiment">GEX</th>
@@ -226,11 +305,14 @@ HISTORY_BODY = """
                             <th class="p-4 col-breadth text-nowrap">NQ 20</th>
                             <th class="p-4 col-breadth text-nowrap">NY 50</th>
                             <th class="p-4 col-breadth text-nowrap">NQ 50</th>
-                            <th class="p-4 col-macro">10Y-3M</th>
-                            <th class="p-4 col-macro">HYG/LQD</th>
+                            <th class="p-4 col-credit">10Y-3M</th>
+                            <th class="p-4 col-credit">HYG/LQD</th>
                             <th class="p-4 col-macro">XLY/XLP</th>
                             <th class="p-4 col-macro text-nowrap">C/G Ratio</th>
                             <th class="p-4 col-macro text-nowrap">KBE/SPY</th>
+                            <th class="p-4 col-macro text-nowrap">QQQ/SPY</th>
+                            <th class="p-4 col-macro text-nowrap">RSP/SPY</th>
+                            <th class="p-4 col-credit">HYG/IEF</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="text-slate-600">
@@ -252,6 +334,7 @@ HISTORY_BODY = """
                     <td class="p-4 px-5 text-[11px] font-black text-slate-800 bg-slate-50/20">${row.Date}</td>
                     <td class="p-4 text-[11px] font-black text-sky-700 col-sentiment">${row.CNN || '--'}</td>
                     <td class="p-4 text-[11px] col-sentiment">${row.VIX || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-red-600 col-credit">${row['HY OAS'] || '--'}</td>
                     <td class="p-4 text-[11px] font-bold text-amber-600 col-sentiment">${row['Crypto F&G'] || '--'}</td>
                     <td class="p-4 text-[11px] text-blue-700 font-bold col-sentiment">${row.DIX || '--'}%</td>
                     <td class="p-4 text-[11px] text-purple-700 font-black col-sentiment">${row.GEX || '--'}B</td>
@@ -263,11 +346,14 @@ HISTORY_BODY = """
                     <td class="p-4 text-[11px] text-emerald-600 font-black col-breadth">${row['NASDAQ above 20MA'] || '--'}%</td>
                     <td class="p-4 text-[11px] text-indigo-500 font-bold col-breadth">${row['NYSE above 50MA'] || '--'}%</td>
                     <td class="p-4 text-[11px] text-indigo-500 font-bold col-breadth">${row['NASDAQ above 50MA'] || '--'}%</td>
-                    <td class="p-4 text-[11px] col-macro ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
-                    <td class="p-4 text-[11px] font-bold text-orange-600 col-macro">${row['HYG/LQD Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-credit ${row['10Y-3M Spread'] < 0 ? 'text-red-500 font-black' : ''}">${row['10Y-3M Spread'] || '--'}</td>
+                    <td class="p-4 text-[11px] font-bold text-orange-600 col-credit">${row['HYG/LQD Ratio'] || '--'}</td>
                     <td class="p-4 text-[11px] font-bold text-pink-600 col-macro">${row['XLY/XLP Ratio'] || '--'}</td>
                     <td class="p-4 text-[11px] col-macro font-bold text-amber-600">${row['Copper/Gold Ratio'] || '--'}</td>
                     <td class="p-4 text-[11px] col-macro font-bold text-indigo-600">${row['KBE/SPY Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-macro font-bold text-blue-600">${row['QQQ/SPY Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-macro font-bold text-slate-600">${row['RSP/SPY Ratio'] || '--'}</td>
+                    <td class="p-4 text-[11px] col-credit font-bold text-red-600">${row['HYG/IEF Ratio'] || '--'}</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -278,7 +364,7 @@ HISTORY_BODY = """
             document.querySelectorAll('button[id^="tab-"]').forEach(btn => btn.classList.remove('active-tab'));
             document.getElementById('tab-' + cat).classList.add('active-tab');
 
-            const allCols = ['col-breadth', 'col-sentiment', 'col-macro'];
+            const allCols = ['col-breadth', 'col-sentiment', 'col-macro', 'col-credit'];
             allCols.forEach(cls => {
                 const elements = document.getElementsByClassName(cls);
                 for (let el of elements) {
@@ -291,7 +377,7 @@ HISTORY_BODY = """
             });
         };
 
-        const tabs = ['sentiment', 'breadth', 'macro', 'all'];
+        const tabs = ['sentiment', 'breadth', 'credit', 'macro', 'all'];
         let currentTab = 'sentiment';
 
         document.addEventListener('keydown', (e) => {
