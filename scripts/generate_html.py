@@ -110,13 +110,11 @@ DASHBOARD_BODY = """
         const latest = rawData[rawData.length - 1];
         const latestMA = maData.find(m => m.Date === latest.Date) || {};
 
-        const getTrend = (col) => {
-            const m5 = latestMA[col + '_5MA'];
-            const m10 = latestMA[col + '_10MA'];
-            const m20 = latestMA[col + '_20MA'];
-            if (!m5 || !m10 || !m20) return { icon: 'minus', color: 'text-slate-300' };
-            if (m5 > m10 && m10 > m20) return { icon: 'trending-up', color: 'text-emerald-500' };
-            if (m5 < m10 && m10 < m20) return { icon: 'trending-down', color: 'text-red-500' };
+        const getTrend = (v1, v2, v3) => {
+            if (v1 === undefined || v2 === undefined || v3 === undefined || v1 === '--' || v2 === '--' || v3 === '--') 
+                return { icon: 'minus', color: 'text-slate-300' };
+            if (v1 > v2 && v2 > v3) return { icon: 'trending-up', color: 'text-emerald-500' };
+            if (v1 < v2 && v2 < v3) return { icon: 'trending-down', color: 'text-red-500' };
             return { icon: 'minus', color: 'text-slate-300' };
         };
 
@@ -136,8 +134,8 @@ DASHBOARD_BODY = """
             sentimentGrid: [
                 { label: 'CNN F&G', col: 'CNN' },
                 { label: 'VIX 指數', col: 'VIX' },
-                { label: 'NAAIM 曝險', col: 'NAAIM' },
-                { label: 'AAII Spread', col: 'AAII B-B' },
+                { label: 'NAAIM 曝險', col: 'NAAIM', weekly: true },
+                { label: 'AAII Spread', col: 'AAII B-B', weekly: true },
                 { label: 'Crypto F&G', col: 'Crypto F&G' }
             ],
             macroGrid: [
@@ -153,12 +151,25 @@ DASHBOARD_BODY = """
             const grid = document.getElementById(id);
             if (!grid) return;
             items.forEach(m => {
-                const trend = getTrend(m.col);
                 const val = latest[m.col];
-                const m5 = latestMA[m.col + '_5MA'] || '--';
-                const m10 = latestMA[m.col + '_10MA'] || '--';
-                const m20 = latestMA[m.col + '_20MA'] || '--';
                 const sfx = m.suffix || '';
+                
+                let v1, v2, v3, labels;
+                if (m.weekly) {
+                    const idx = rawData.length - 1;
+                    // Stride by 5 days for weekly data
+                    v1 = rawData[idx - 5] ? rawData[idx - 5][m.col] : '--';
+                    v2 = rawData[idx - 10] ? rawData[idx - 10][m.col] : '--';
+                    v3 = rawData[idx - 15] ? rawData[idx - 15][m.col] : '--';
+                    labels = ['1W', '2W', '3W'];
+                } else {
+                    v1 = latestMA[m.col + '_5MA'] || '--';
+                    v2 = latestMA[m.col + '_10MA'] || '--';
+                    v3 = latestMA[m.col + '_20MA'] || '--';
+                    labels = ['5MA', '10MA', '20MA'];
+                }
+
+                const trend = getTrend(v1, v2, v3);
 
                 grid.innerHTML += `
                     <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300">
@@ -171,16 +182,16 @@ DASHBOARD_BODY = """
                         </div>
                         <div class="mt-2 pt-2 border-t border-slate-50 flex justify-between items-center text-[10px] font-bold text-slate-400">
                             <div class="flex flex-col">
-                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">5MA</span>
-                                <span class="text-slate-500 font-mono">${m5}${sfx}</span>
+                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">${labels[0]}</span>
+                                <span class="text-slate-500 font-mono">${v1}${sfx}</span>
                             </div>
                             <div class="flex flex-col">
-                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">10MA</span>
-                                <span class="text-slate-500 font-mono">${m10}${sfx}</span>
+                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">${labels[1]}</span>
+                                <span class="text-slate-500 font-mono">${v2}${sfx}</span>
                             </div>
                             <div class="flex flex-col">
-                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">20MA</span>
-                                <span class="text-slate-500 font-mono">${m20}${sfx}</span>
+                                <span class="text-[8px] uppercase tracking-tighter text-slate-300">${labels[2]}</span>
+                                <span class="text-slate-500 font-mono">${v3}${sfx}</span>
                             </div>
                         </div>
                     </div>

@@ -24,8 +24,9 @@ def calculate_all_ma():
     # Create DataFrame
     df = pd.DataFrame(history)
     
-    # Identify numeric columns (excluding Date)
-    numeric_cols = [col for col in df.columns if col != 'Date']
+    # Identify numeric columns (excluding Date and weekly data)
+    exclude_cols = ['Date', 'NAAIM', 'AAII B-B']
+    numeric_cols = [col for col in df.columns if col not in exclude_cols]
     
     # Ensure DataFrame is sorted by date
     def parse_date(d_str):
