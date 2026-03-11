@@ -68,14 +68,17 @@ BASE_FOOTER = """
 
 # --- DASHBOARD_BODY ---
 DASHBOARD_BODY = """
-        <div class="space-y-6">
+        <!-- Market Regime Score Section -->
+        <div id="regimeSection"></div>
+
+        <div id="dashboardGroups" class="space-y-8">
             <!-- Sentiment Section: Full Width Row -->
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
                     <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場情緒 Sentiment</h2>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="sentimentGrid"></div>
             </section>
 
             <!-- Breadth Section -->
@@ -185,6 +188,118 @@ DASHBOARD_BODY = """
             });
         };
 
+        const calculateRegimeScore = () => {
+            const getVal = (col) => latest[col] !== undefined && latest[col] !== null ? latest[col] : (rawData[rawData.length-2] ? rawData[rawData.length-2][col] : 50);
+            const getMA = (col, period) => latestMA[col + '_' + period + 'MA'] || 50;
+
+            // Normalize helper (clamp to 0-100)
+            const norm = (val, min, max, rev = false) => {
+                let p = (val - min) / (max - min) * 100;
+                if (rev) p = 100 - p;
+                return Math.max(0, Math.min(100, p));
+            };
+
+            // 1. Breadth (30%)
+            const b1 = norm(getVal('NYSE above 50MA'), 30, 75);
+            const b2 = norm(getVal('NASDAQ above 20MA'), 25, 70);
+            const breadthScore = (b1 + b2) / 2;
+
+            // 2. Credit & Risk (25%)
+            const c1 = norm(getVal('HY OAS'), 5.0, 2.5); // High OAS = Bad
+            const c2 = norm(getVal('VIX'), 35, 12);      // High VIX = Bad
+            const c3 = getMA('HYG/LQD Ratio', 5) > getMA('HYG/LQD Ratio', 20) ? 100 : 20;
+            const creditScore = (c1 + c2 + c3) / 3;
+
+            // 3. Flow & Liquidity (25%)
+            const f1 = norm(getVal('DIX'), 38, 48);
+            const f2 = norm(getVal('GEX'), -2, 8);
+            const flowScore = (f1 + f2) / 2;
+
+            // 4. Sentiment (15%) - Contrarian Logic
+            const s1 = norm(getVal('CNN'), 80, 20); // 20 = 100pts (Extrem Fear = Opportunity)
+            const s2 = norm(getVal('AAII B-B'), 30, -20);
+            const sentimentScore = (s1 + s2) / 2;
+
+            // 5. Intermarket (5%)
+            const m1 = getMA('XLY/XLP Ratio', 5) > getMA('XLY/XLP Ratio', 20) ? 100 : 20;
+            const macroScore = m1;
+
+            const total = (breadthScore * 0.30) + (creditScore * 0.25) + (flowScore * 0.25) + (sentimentScore * 0.15) + (macroScore * 0.05);
+            return {
+                total: Math.round(total),
+                breadth: Math.round(breadthScore),
+                credit: Math.round(creditScore),
+                flow: Math.round(flowScore),
+                sentiment: Math.round(sentimentScore),
+                macro: Math.round(macroScore)
+            };
+        };
+
+        const renderRegimeHeader = () => {
+            const score = calculateRegimeScore();
+            let label, color, bgColor, icon, insight;
+
+            if (score.total >= 75) { label = '積極做多'; color = 'text-emerald-600'; bgColor = 'bg-emerald-500'; icon = 'rocket'; insight = '市場環境極佳，各項指標均顯示強勁動能，可考慮積極參與。'; }
+            else if (score.total >= 60) { label = '偏多看待'; color = 'text-emerald-500'; bgColor = 'bg-emerald-400'; icon = 'trending-up'; insight = '市場處於上升趨勢，風險偏好回升，可維持較高倉位。'; }
+            else if (score.total >= 40) { label = '中性盤整'; color = 'text-amber-500'; bgColor = 'bg-amber-400'; icon = 'minus'; insight = '市場多空交戰，方向不明。建議保持中性倉位，等待趨勢確認。'; }
+            else if (score.total >= 25) { label = '保守警戒'; color = 'text-orange-500'; bgColor = 'bg-orange-400'; icon = 'alert-triangle'; insight = '環境轉弱，風險指標升溫。建議縮減倉位，保護本金。'; }
+            else { label = '極度危險'; color = 'text-red-600'; bgColor = 'bg-red-500'; icon = 'shield-alert'; insight = '市場處於極端負面環境，建議觀望或採取防禦型操作。'; }
+
+            // Sub-insights based on score divergence
+            if (score.flow > score.breadth + 30) insight = '🔥 偵測到「聰明錢底部吸納」模式：散戶恐慌且廣度疲軟，但暗池買盤與資金流向極其強勁。可能是波段底部。';
+            if (score.breadth > score.sentiment + 30) insight = '⚖️ 偵測到「隱性健康」模式：市場情緒低迷但內部結構 (廣度) 正悄悄改善。這通常是反彈前兆。';
+            if (score.sentiment > score.flow + 30) insight = '⚠️ 偵測到「誘多陷阱」模式：市場情緒樂觀但資金流向與暗池卻在撤退。需謹防假突破。';
+
+            const container = document.getElementById('regimeSection');
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-2xl ${bgColor} flex items-center justify-center text-white shadow-lg shadow-current/20">
+                                <span class="text-2xl font-black">${score.total}</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-xl font-black text-slate-800 tracking-tight">市場體制：${label}</h2>
+                                    <i data-lucide="${icon}" class="${color} w-5 h-5"></i>
+                                </div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Market Regime Score Index</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 max-w-md">
+                            <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1 px-1">
+                                <span>Risk 0</span>
+                                <span>Bull 100</span>
+                            </div>
+                            <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                                <div class="h-full rounded-full ${bgColor} transition-all duration-1000" style="width: ${score.total}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5 pt-4 border-t border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> 廣度: <span class="text-slate-800">${score.breadth}</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                <div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div> 信用: <span class="text-slate-800">${score.credit}</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div> 資金: <span class="text-slate-800">${score.flow}</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                <div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div> 情緒: <span class="text-slate-800">${score.sentiment}</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 md:text-right">
+                            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-4 py-2 rounded-xl inline-block border border-slate-200"> ${insight} </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        };
+
         const renderGrid = (id, items) => {
             const grid = document.getElementById(id);
             if (!grid) return;
@@ -210,10 +325,10 @@ DASHBOARD_BODY = """
                 
                 let v1, v2, v3, labels;
                 if (m.weekly) {
-                    v1 = rawData[targetIdx - 5] ? rawData[targetIdx - 5][m.col] : '--';
-                    v2 = rawData[targetIdx - 10] ? rawData[targetIdx - 10][m.col] : '--';
-                    v3 = rawData[targetIdx - 15] ? rawData[targetIdx - 15][m.col] : '--';
-                    labels = ['1W', '2W', '3W'];
+                    v1 = val;
+                    v2 = rawData[targetIdx - 5] ? rawData[targetIdx - 5][m.col] : '--';
+                    v3 = rawData[targetIdx - 10] ? rawData[targetIdx - 10][m.col] : '--';
+                    labels = ['CUR', '1W', '2W'];
                 } else {
                     const targetDate = rawData[targetIdx].Date;
                     const lookupMA = maData.find(ma => ma.Date === targetDate) || {};
@@ -266,6 +381,8 @@ DASHBOARD_BODY = """
         };
 
         Object.keys(categories).forEach(id => renderGrid(id, categories[id]));
+        renderRegimeHeader();
+        switchTab('sentiment');
     </script>
 """
 
