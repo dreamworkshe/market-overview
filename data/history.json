@@ -800,11 +800,19 @@
     "VIX": 24.93,
     "DIX": 47.91,
     "GEX": 2.83,
-    "Crypto F&G": 13,
+    "Crypto F&G": 15,
     "10Y-3M Spread": 0.541,
     "Copper/Gold Ratio": 0.0011,
     "HYG/LQD Ratio": 0.7272,
     "XLY/XLP Ratio": 1.335,
-    "KBE/SPY Ratio": 0.0876
+    "KBE/SPY Ratio": 0.0876,
+    "Total P/C Ratio": 0.94,
+    "Equity P/C Ratio": 0.57,
+    "NAAIM": 79.29,
+    "AAII B-B": -2.4,
+    "NYSE above 20MA": 27.87,
+    "NASDAQ above 20MA": 38.95,
+    "NYSE above 50MA": 41.27,
+    "NASDAQ above 50MA": 34.51
   }
 ]
