@@ -17,7 +17,7 @@ FRED_KEY = os.getenv("FRED_API_KEY")
 DATA_FILE = "data/history.json"
 GSHEET_ID = "18NLQo5n6Ni_NrMWuhIr9dUZFc57AKbxGVzK6M7V-FBg"
 
-def fetch_cnn_fg():
+def fetch_cnn_fg(target_dt=None):
     url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -26,10 +26,59 @@ def fetch_cnn_fg():
     try:
         response = requests.get(url, headers=headers, timeout=10)
         data = response.json()
-        return round(data['fear_and_greed']['score'], 2)
+        
+        def get_exact(comp):
+            if comp is None: return None
+            if target_dt is None:
+                return round(comp.get('score', 0), 2)
+            from datetime import timezone
+            target_date = target_dt.date()
+            for d in comp.get('data', []):
+                pt_date = datetime.fromtimestamp(d['x'] / 1000.0, timezone.utc).date()
+                if pt_date == target_date:
+                    return round(d['y'], 2)
+            return None
+            
+        return {
+            "score": get_exact(data['fear_and_greed']),
+            "net_new_highs": get_exact(data['stock_price_strength']),
+            "mc_breadth": get_exact(data['stock_price_breadth'])
+        }
     except Exception as e:
         print(f"Error CNN F&G: {e}")
-        return None
+        return {"score": None, "net_new_highs": None, "mc_breadth": None}
+
+def fetch_fed_liquidity(target_dt=None):
+    if not FRED_KEY: return None, None, None
+    try:
+        fred = Fred(api_key=FRED_KEY)
+        
+        def get_exact_val(series_id):
+            if target_dt:
+                date_str = target_dt.strftime('%Y-%m-%d')
+                data = fred.get_series(series_id, observation_start=date_str, observation_end=date_str)
+            else:
+                data = fred.get_series(series_id)
+            if not data.empty:
+                return data.iloc[-1]
+            return None
+            
+        assets = get_exact_val('WALCL')
+        rrp = get_exact_val('RRPONTSYD')
+        tga = get_exact_val('WTREGEN')
+        
+        assets_b = assets / 1000.0 if assets is not None else None
+        tga_b = tga / 1000.0 if tga is not None else None
+        
+        if assets_b is not None and rrp is not None and tga_b is not None:
+            liquidity = round(assets_b - rrp - tga_b, 2)
+        else:
+            liquidity = None
+            
+        return liquidity, (round(rrp, 2) if rrp is not None else None), (round(tga_b, 2) if tga is not None else None)
+    except Exception as e:
+        print(f"Error Fed Liquidity: {e}")
+        return None, None, None
 
 def fetch_vix(target_dt=None):
     try:
@@ -160,9 +209,8 @@ def fetch_hy_oas(target_dt=None):
         fred = Fred(api_key=FRED_KEY)
         series_id = 'BAMLH0A0HYM2'
         if target_dt:
-            start = (target_dt - timedelta(days=7)).strftime('%Y-%m-%d')
-            end = target_dt.strftime('%Y-%m-%d')
-            data = fred.get_series(series_id, observation_start=start, observation_end=end)
+            date_str = target_dt.strftime('%Y-%m-%d')
+            data = fred.get_series(series_id, observation_start=date_str, observation_end=date_str)
             if not data.empty:
                 return round(float(data.iloc[-1]), 2)
         else:
@@ -229,7 +277,7 @@ def fetch_sentiment_indicators(target_dt=None):
 
 def fetch_macro_data(target_dt=None):
     try:
-        tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY QQQ RSP IEF"
+        tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY QQQ RSP IEF DX-Y.NYB TLT"
         tickers = yf.Tickers(tickers_str)
         prices = {}
         
@@ -247,38 +295,54 @@ def fetch_macro_data(target_dt=None):
             if not hist.empty:
                 prices[t] = hist['Close'].iloc[-1]
             else:
-                return None, None, None, None, None, None, None, None
+                prices[t] = None
+                
+        def calc_ratio(n, d):
+            if prices.get(n) is not None and prices.get(d) is not None:
+                return round(prices[n] / prices[d], 4)
+            return None
         
-        spread = round(prices["^TNX"] - prices["^IRX"], 3)
-        cg_ratio = round(prices["HG=F"] / prices["GC=F"], 4)
-        hyg_lqd = round(prices["HYG"] / prices["LQD"], 4)
-        xly_xlp = round(prices["XLY"] / prices["XLP"], 4)
-        kbe_spy = round(prices["KBE"] / prices["SPY"], 4)
-        qqq_spy = round(prices["QQQ"] / prices["SPY"], 4)
-        rsp_spy = round(prices["RSP"] / prices["SPY"], 4)
-        hyg_ief = round(prices["HYG"] / prices["IEF"], 4)
+        spread = round(prices["^TNX"] - prices["^IRX"], 3) if prices.get("^TNX") is not None and prices.get("^IRX") is not None else None
+        cg_ratio = calc_ratio("HG=F", "GC=F")
+        hyg_lqd = calc_ratio("HYG", "LQD")
+        xly_xlp = calc_ratio("XLY", "XLP")
+        kbe_spy = calc_ratio("KBE", "SPY")
+        qqq_spy = calc_ratio("QQQ", "SPY")
+        rsp_spy = calc_ratio("RSP", "SPY")
+        hyg_ief = calc_ratio("HYG", "IEF")
+        dxy = round(prices["DX-Y.NYB"], 2) if prices.get("DX-Y.NYB") is not None else None
+        tlt = round(prices["TLT"], 2) if prices.get("TLT") is not None else None
         
-        return spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy, qqq_spy, rsp_spy, hyg_ief
+        return spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy, qqq_spy, rsp_spy, hyg_ief, dxy, tlt
     except Exception as e:
         print(f"Error fetching Macro data: {e}")
-        return None, None, None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None, None, None
 
 def run_fetch_for_date(target_dt):
     date_str = target_dt.strftime("%Y/%-m/%-d")
     print(f"\n>>> Processing Date: {date_str} <<<")
     
     # 1. Fetch Basic / API data
+    cnn_data = fetch_cnn_fg(target_dt)
     results = {
         "Date": date_str,
-        "CNN": fetch_cnn_fg(),
+        "CNN": cnn_data.get("score"),
+        "Net New Highs": cnn_data.get("net_new_highs"),
+        "McClellan Summation": cnn_data.get("mc_breadth"),
         "VIX": fetch_vix(target_dt),
         "HY OAS": fetch_hy_oas(target_dt)
     }
 
+    # Liquidity
+    liq, rrp, tga = fetch_fed_liquidity(target_dt)
+    results["Fed Liquidity"] = liq
+    results["RRP"] = rrp
+    results["TGA"] = tga
+
     # Add VIX3M and SKEW
     sent_ind = fetch_sentiment_indicators(target_dt)
     results.update(sent_ind)
-    if results["VIX"] is not None and results.get("VIX3M") is not None:
+    if results.get("VIX") is not None and results.get("VIX3M") is not None:
         results["VIX/VIX3M Ratio"] = round(results["VIX"] / results["VIX3M"], 4)
     else:
         results["VIX/VIX3M Ratio"] = None
@@ -299,15 +363,19 @@ def run_fetch_for_date(target_dt):
 
     # 5. Crypto & Macro
     results["Crypto F&G"] = fetch_crypto_fg()
-    spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy, qqq_spy, rsp_spy, hyg_ief = fetch_macro_data(target_dt)
-    results["10Y-3M Spread"] = spread
-    results["Copper/Gold Ratio"] = cg_ratio
-    results["HYG/LQD Ratio"] = hyg_lqd
-    results["XLY/XLP Ratio"] = xly_xlp
-    results["KBE/SPY Ratio"] = kbe_spy
-    results["QQQ/SPY Ratio"] = qqq_spy
-    results["RSP/SPY Ratio"] = rsp_spy
-    results["HYG/IEF Ratio"] = hyg_ief
+    macro_vals = fetch_macro_data(target_dt)
+    if all(v is not None for v in macro_vals):
+        spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy, qqq_spy, rsp_spy, hyg_ief, dxy, tlt = macro_vals
+        results["10Y-3M Spread"] = spread
+        results["Copper/Gold Ratio"] = cg_ratio
+        results["HYG/LQD Ratio"] = hyg_lqd
+        results["XLY/XLP Ratio"] = xly_xlp
+        results["KBE/SPY Ratio"] = kbe_spy
+        results["QQQ/SPY Ratio"] = qqq_spy
+        results["RSP/SPY Ratio"] = rsp_spy
+        results["HYG/IEF Ratio"] = hyg_ief
+        results["DXY"] = dxy
+        results["TLT"] = tlt
     
     return results
 
@@ -325,18 +393,21 @@ def main():
     from datetime import timezone
     ny_now = datetime.now(timezone.utc) - timedelta(hours=5)
     
+    # If NY time is before 6 PM (18:00), don't treat today as a completed trading day yet
+    if ny_now.hour < 18:
+        ny_now -= timedelta(days=1)
+    
     # We want to check the last 3 potential business days
     dates_to_check = []
     temp_dt = ny_now
     while len(dates_to_check) < 3:
-        # Check if weekday (0-4: Mon-Fri)
         if temp_dt.weekday() < 5:
             dates_to_check.append(temp_dt)
         temp_dt -= timedelta(days=1)
     
     today_dt = dates_to_check[0]
     dates_to_process = []
-    essential_keys = ["DIX", "NAAIM", "CNN", "VIX", "NYSE above 20MA", "GEX", "SPX"]
+    essential_keys = ["DIX", "NAAIM", "CNN", "VIX", "NYSE above 20MA", "GEX", "SPX", "Net New Highs", "McClellan Summation"]
 
     # Check which of these dates need processing
     for work_dt in dates_to_check:
