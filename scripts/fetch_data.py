@@ -7,7 +7,12 @@ import yfinance as yf
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
+from dotenv import load_dotenv
+from fredapi import Fred
 from calculate_ma import calculate_all_ma # Import MA calculation
+
+load_dotenv()
+FRED_KEY = os.getenv("FRED_API_KEY")
 
 DATA_FILE = "data/history.json"
 GSHEET_ID = "18NLQo5n6Ni_NrMWuhIr9dUZFc57AKbxGVzK6M7V-FBg"
@@ -147,9 +152,57 @@ def fetch_crypto_fg():
         print(f"Error fetching Crypto F&G: {e}")
         return None
 
+def fetch_hy_oas(target_dt=None):
+    if not FRED_KEY or FRED_KEY == "your_api_key_here":
+        print("FRED API Key not set.")
+        return None
+    try:
+        fred = Fred(api_key=FRED_KEY)
+        series_id = 'BAMLH0A0HYM2'
+        if target_dt:
+            start = (target_dt - timedelta(days=7)).strftime('%Y-%m-%d')
+            end = target_dt.strftime('%Y-%m-%d')
+            data = fred.get_series(series_id, observation_start=start, observation_end=end)
+            if not data.empty:
+                return round(float(data.iloc[-1]), 2)
+        else:
+            data = fred.get_series(series_id)
+            if not data.empty:
+                return round(float(data.iloc[-1]), 2)
+    except Exception as e:
+        print(f"Error FRED HY OAS: {e}")
+    return None
+
+def fetch_indices(target_dt=None):
+    try:
+        tickers_str = "^GSPC ^IXIC"
+        tickers = yf.Tickers(tickers_str)
+        results = {}
+        
+        start = end = None
+        if target_dt:
+            start = target_dt.strftime('%Y-%m-%d')
+            end = (target_dt + timedelta(days=1)).strftime('%Y-%m-%d')
+
+        for t in tickers_str.split():
+            if target_dt:
+                hist = tickers.tickers[t].history(start=start, end=end)
+            else:
+                hist = tickers.tickers[t].history(period="1d")
+                
+            if not hist.empty:
+                name = "SPX" if t == "^GSPC" else "NASDAQ"
+                results[name] = round(float(hist['Close'].iloc[-1]), 2)
+            else:
+                return {"SPX": None, "NASDAQ": None}
+        return results
+    except Exception as e:
+        print(f"Error fetching Indices: {e}")
+        return {"SPX": None, "NASDAQ": None}
+
 def fetch_macro_data(target_dt=None):
     try:
-        tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY"
+        tickers_str = "^TNX ^IRX GC=F HG=F HYG LQD XLY XLP KBE SPY QQQ RSP IEF"
         tickers = yf.Tickers(tickers_str)
         prices = {}
         
@@ -167,30 +220,32 @@ def fetch_macro_data(target_dt=None):
             if not hist.empty:
                 prices[t] = hist['Close'].iloc[-1]
             else:
-                # If doing historical fetch and one fails, we might just skip the whole macro set
-                return None, None, None, None, None
+                return None, None, None, None, None, None, None, None
         
         spread = round(prices["^TNX"] - prices["^IRX"], 3)
         cg_ratio = round(prices["HG=F"] / prices["GC=F"], 4)
         hyg_lqd = round(prices["HYG"] / prices["LQD"], 4)
         xly_xlp = round(prices["XLY"] / prices["XLP"], 4)
         kbe_spy = round(prices["KBE"] / prices["SPY"], 4)
+        qqq_spy = round(prices["QQQ"] / prices["SPY"], 4)
+        rsp_spy = round(prices["RSP"] / prices["SPY"], 4)
+        hyg_ief = round(prices["HYG"] / prices["IEF"], 4)
         
-        return spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy
+        return spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy, qqq_spy, rsp_spy, hyg_ief
     except Exception as e:
         print(f"Error fetching Macro data: {e}")
-        return None, None, None, None, None
+        return None, None, None, None, None, None, None, None
 
 def run_fetch_for_date(target_dt):
     date_str = target_dt.strftime("%Y/%-m/%-d")
     print(f"\n>>> Processing Date: {date_str} <<<")
     
     # 1. Fetch Basic / API data
-    # CNN and Crypto F&G are mostly "now" APIs, but we'll try for current date
     results = {
         "Date": date_str,
         "CNN": fetch_cnn_fg(),
-        "VIX": fetch_vix(target_dt)
+        "VIX": fetch_vix(target_dt),
+        "HY OAS": fetch_hy_oas(target_dt)
     }
     
     # 2. Fetch Expert Data from Google Sheet
@@ -203,14 +258,21 @@ def run_fetch_for_date(target_dt):
     results["DIX"] = dix_data["DIX"]
     results["GEX"] = dix_data["GEX"]
 
-    # 4. Crypto & Macro
+    # 4. Indices (Optional for data depth, but not cards)
+    indices = fetch_indices(target_dt)
+    results.update(indices)
+
+    # 5. Crypto & Macro
     results["Crypto F&G"] = fetch_crypto_fg()
-    spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy = fetch_macro_data(target_dt)
+    spread, cg_ratio, hyg_lqd, xly_xlp, kbe_spy, qqq_spy, rsp_spy, hyg_ief = fetch_macro_data(target_dt)
     results["10Y-3M Spread"] = spread
     results["Copper/Gold Ratio"] = cg_ratio
     results["HYG/LQD Ratio"] = hyg_lqd
     results["XLY/XLP Ratio"] = xly_xlp
     results["KBE/SPY Ratio"] = kbe_spy
+    results["QQQ/SPY Ratio"] = qqq_spy
+    results["RSP/SPY Ratio"] = rsp_spy
+    results["HYG/IEF Ratio"] = hyg_ief
     
     return results
 
@@ -224,37 +286,39 @@ def main():
         except Exception as e:
             print(f"Error loading {DATA_FILE}: {e}")
 
-    # Determine dates to process
+    # Determine dates to process: Check last 3 business days
     from datetime import timezone
     ny_now = datetime.now(timezone.utc) - timedelta(hours=5)
     
-    # Today's target (weekend adjustment)
-    today_dt = ny_now
-    if ny_now.weekday() == 5: # Saturday
-        today_dt = ny_now - timedelta(days=1)
-    elif ny_now.weekday() == 6: # Sunday
-        today_dt = ny_now - timedelta(days=2)
+    # We want to check the last 3 potential business days
+    dates_to_check = []
+    temp_dt = ny_now
+    while len(dates_to_check) < 3:
+        # Check if weekday (0-4: Mon-Fri)
+        if temp_dt.weekday() < 5:
+            dates_to_check.append(temp_dt)
+        temp_dt -= timedelta(days=1)
     
-    dates_to_process = [today_dt]
-    
-    # Check last 2 records for missing data
-    # Essential keys that should not be null on business days
-    essential_keys = ["DIX", "NAAIM", "CNN", "VIX", "NYSE above 20MA"]
-    
-    if len(history) >= 1:
-        # Check the last 3 entries in history (could be last 3 days)
-        for last_record in history[-3:]:
-            missing_count = sum(1 for k in essential_keys if last_record.get(k) is None)
-            if missing_count >= 2: # If more than 2 essential keys are missing, retry this date
-                try:
-                    rdt = datetime.strptime(last_record['Date'], "%Y/%-m/%-d")
-                    # Avoid adding today twice
-                    if rdt.date() != today_dt.date() and rdt not in [d.date() for d in dates_to_process if isinstance(d, datetime)]:
-                         # Only retry if it's a weekday
-                        if rdt.weekday() < 5:
-                            print(f"Found missing data for {last_record['Date']} ({missing_count} keys), adding to retry list.")
-                            dates_to_process.append(rdt)
-                except: pass
+    today_dt = dates_to_check[0]
+    dates_to_process = []
+    essential_keys = ["DIX", "NAAIM", "CNN", "VIX", "NYSE above 20MA", "GEX", "SPX"]
+
+    # Check which of these dates need processing
+    for work_dt in dates_to_check:
+        work_date_str = work_dt.strftime("%Y/%-m/%-d")
+        
+        # Find local record
+        record = next((r for r in history if r['Date'] == work_date_str), None)
+        
+        if record is None:
+            print(f"Missing record for {work_date_str}, adding to fetch list.")
+            dates_to_process.append(work_dt)
+        else:
+            # Check for missing essential data
+            missing_essential = [k for k in essential_keys if record.get(k) is None]
+            if missing_essential:
+                print(f"Record for {work_date_str} has missing keys: {missing_essential}. Retrying.")
+                dates_to_process.append(work_dt)
 
     # Sort dates to process (oldest first)
     dates_to_process.sort()

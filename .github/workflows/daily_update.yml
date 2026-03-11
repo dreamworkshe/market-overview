@@ -8,6 +8,8 @@ on:
     - cron: '30 3 * * 2-6'
     # 01:00 PM Taiwan Time (Tue-Sat) is 05:00 UTC (Tue-Sat)
     - cron: '0 5 * * 2-6'
+    # 03:00 PM Taiwan Time (Tue-Sat) is 07:00 UTC (Tue-Sat)
+    - cron: '0 7 * * 2-6'
   workflow_dispatch: # Enable manual trigger
 
 jobs:
@@ -32,6 +34,7 @@ jobs:
       - name: Run Data Fetcher
         env:
           GSHEET_CREDENTIALS: ${{ secrets.GSHEET_CREDENTIALS }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: |
           echo "$GSHEET_CREDENTIALS" > credentials.json
           python scripts/fetch_data.py
