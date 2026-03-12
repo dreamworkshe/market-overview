@@ -1374,11 +1374,11 @@
   },
   {
     "Date": "2026/3/10",
-    "CNN": 27.91,
+    "CNN": 26.05,
     "VIX": 24.93,
     "DIX": 47.91,
     "GEX": 2.83,
-    "Crypto F&G": 15,
+    "Crypto F&G": 18,
     "10Y-3M Spread": 0.541,
     "Copper/Gold Ratio": 0.0011,
     "HYG/LQD Ratio": 0.7272,
@@ -1406,11 +1406,12 @@
     "RRP": 0.28,
     "TGA": 832.05,
     "Net New Highs": 3.86,
-    "McClellan Summation": 1261.98
+    "McClellan Summation": 1261.98,
+    "HY OAS": 3.06
   },
   {
     "Date": "2026/3/11",
-    "CNN": null,
+    "CNN": 27.21,
     "Net New Highs": 3.33,
     "McClellan Summation": 1203.79,
     "VIX": 24.23,
