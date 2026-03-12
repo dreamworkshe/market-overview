@@ -40,7 +40,7 @@ def fetch_cnn_fg(target_dt=None):
             return None
             
         return {
-            "score": get_exact(data['fear_and_greed']),
+            "score": get_exact(data.get('fear_and_greed_historical') or data.get('fear_and_greed')),
             "net_new_highs": get_exact(data['stock_price_strength']),
             "mc_breadth": get_exact(data['stock_price_breadth'])
         }
@@ -407,7 +407,7 @@ def main():
     
     today_dt = dates_to_check[0]
     dates_to_process = []
-    essential_keys = ["DIX", "NAAIM", "CNN", "VIX", "NYSE above 20MA", "GEX", "SPX", "Net New Highs", "McClellan Summation"]
+    essential_keys = ["DIX", "NAAIM", "CNN", "VIX", "NYSE above 20MA", "GEX", "SPX", "Net New Highs", "McClellan Summation", "HY OAS"]
 
     # Check which of these dates need processing
     for work_dt in dates_to_check:

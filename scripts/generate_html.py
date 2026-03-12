@@ -32,7 +32,8 @@ BASE_HEAD = """
         .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 0, 0, 0.05); }
         .gradient-text { background: linear-gradient(135deg, #020617, #475569); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .card-hover:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); transition: all 0.2s ease; }
-        .active-tab { background: #0f172a; color: white !important; font-weight: 700; }
+        .active-tab { background: #0f172a !important; color: white !important; font-weight: 700; }
+        .active-tab:hover { background: white !important; color: #0f172a !important; }
         .stale-card { opacity: 0.65; background-color: #f1f5f9 !important; filter: grayscale(0.2); }
         .stale-tag { font-size: 8px; color: #94a3b8; border: 1px solid #e2e8f0; padding: 1px 4px; border-radius: 4px; }
     </style>
@@ -67,15 +68,13 @@ BASE_FOOTER = """
 """
 
 DASHBOARD_BODY = """
-        <div id="regimeSection"></div>
-
         <div id="dashboardGroups" class="space-y-8">
             <section>
                 <div class="flex items-center gap-2 mb-2 px-1">
                     <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場情緒 Sentiment</h2>
                 </div>
-                <div class="grid grid-cols-5 gap-3" id="sentimentGrid"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="sentimentGrid"></div>
             </section>
 
             <section>
@@ -83,15 +82,7 @@ DASHBOARD_BODY = """
                     <div class="w-1 h-3 bg-emerald-500 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">市場廣度 Breadth</h2>
                 </div>
-                <div class="grid grid-cols-5 gap-3" id="breadthGrid"></div>
-            </section>
-
-            <section>
-                <div class="flex items-center gap-2 mb-2 px-1">
-                    <div class="w-1 h-3 bg-blue-500 rounded-full"></div>
-                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">宏觀流動性 Liquidity</h2>
-                </div>
-                <div class="grid grid-cols-5 gap-3" id="liquidityGrid"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="breadthGrid"></div>
             </section>
 
             <section>
@@ -99,7 +90,7 @@ DASHBOARD_BODY = """
                     <div class="w-1 h-3 bg-amber-500 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">信用與風險 Credit & Risk</h2>
                 </div>
-                <div class="grid grid-cols-5 gap-3" id="creditGrid"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="creditGrid"></div>
             </section>
 
             <section>
@@ -107,11 +98,18 @@ DASHBOARD_BODY = """
                     <div class="w-1 h-3 bg-indigo-600 rounded-full"></div>
                     <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">跨市分析 Intermarket</h2>
                 </div>
-                <div class="grid grid-cols-5 gap-3" id="macroGrid"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="macroGrid"></div>
             </section>
 
-                <div class="grid grid-cols-5 gap-3" id="macroGrid"></div>
+            <section>
+                <div class="flex items-center gap-2 mb-2 px-1">
+                    <div class="w-1 h-3 bg-sky-500 rounded-full"></div>
+                    <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">宏觀流動性 Liquidity</h2>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="liquidityGrid"></div>
             </section>
+
+            <div id="regimeSection" class="pt-4"></div>
         </div>
 
     <script>
@@ -349,7 +347,7 @@ DASHBOARD_BODY = """
                 const sparkData = rawData.slice(-20).map(d => d[m.col]).filter(v => v !== undefined && v !== null);
                 grid.innerHTML += `
                     <div class="bg-white p-3 px-4 rounded-2xl card-hover border border-slate-200 shadow-sm transition-all duration-300 ${isStale ? 'stale-card' : ''}">
-                        <div class="flex items-center justify-between mb-1"><div class="flex items-center gap-2"><span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>${isStale ? '<span class="stale-tag">DELAYED</span>' : ''}</div><i data-lucide="${trend.icon}" class="${trend.color} w-3.5 h-3.5"></i></div>
+                        <div class="flex items-center justify-between mb-1"><div class="flex items-center gap-2"><span class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">${m.label}</span>${isStale ? '<span class="stale-tag">DELAYED</span>' : ''}</div><i data-lucide="${trend.icon}" class="text-slate-300 w-3.5 h-3.5"></i></div>
                         <div class="flex items-end justify-between gap-1 mb-2">
                             <div class="text-2xl font-black tracking-tighter text-slate-900">${formatVal(val, sfx)}</div>
                             <div class="w-16 h-8"><canvas id="${canvasId}"></canvas></div>
@@ -377,11 +375,11 @@ HISTORY_BODY = """
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
                 <button onclick="switchTab('sentiment')" id="tab-sentiment" class="px-5 py-2 rounded-xl text-xs font-bold transition-all active-tab shadow-sm">市場情緒</button>
-                <button onclick="switchTab('breadth')" id="tab-breadth" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">市場廣度</button>
-                <button onclick="switchTab('liquidity')" id="tab-liquidity" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">宏觀流動性</button>
-                <button onclick="switchTab('credit')" id="tab-credit" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">信用與風險</button>
-                <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">跨市分析</button>
-                <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white text-slate-500">全部紀錄</button>
+                <button onclick="switchTab('breadth')" id="tab-breadth" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white hover:text-slate-900 text-slate-500">市場廣度</button>
+                <button onclick="switchTab('liquidity')" id="tab-liquidity" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white hover:text-slate-900 text-slate-500">宏觀流動性</button>
+                <button onclick="switchTab('credit')" id="tab-credit" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white hover:text-slate-900 text-slate-500">信用與風險</button>
+                <button onclick="switchTab('macro')" id="tab-macro" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white hover:text-slate-900 text-slate-500">跨市分析</button>
+                <button onclick="switchTab('all')" id="tab-all" class="px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-white hover:text-slate-900 text-slate-500">全部紀錄</button>
             </div>
             <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-2xl shadow-sm">
                 <i data-lucide="keyboard" class="w-4 h-4 text-slate-400"></i>
