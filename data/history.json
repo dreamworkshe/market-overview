@@ -1500,7 +1500,7 @@
     "GEX": 0.1,
     "SPX": 6632.19,
     "NASDAQ": 22105.36,
-    "Crypto F&G": 15,
+    "Crypto F&G": 16,
     "10Y-3M Spread": 0.682,
     "Copper/Gold Ratio": 0.0011,
     "HYG/LQD Ratio": 0.7322,
@@ -1510,6 +1510,14 @@
     "RSP/SPY Ratio": 0.2922,
     "HYG/IEF Ratio": 0.8285,
     "DXY": 100.5,
-    "TLT": 86.54
+    "TLT": 86.54,
+    "Total P/C Ratio": 0.9,
+    "Equity P/C Ratio": 0.58,
+    "NAAIM": 66.99,
+    "AAII B-B": -14.5,
+    "NYSE above 20MA": 20.06,
+    "NASDAQ above 20MA": 30.52,
+    "NYSE above 50MA": 30.4,
+    "NASDAQ above 50MA": 28.66
   }
 ]
