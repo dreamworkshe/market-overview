@@ -1769,7 +1769,7 @@
     "GEX": -0.31,
     "SPX": 6477.16,
     "NASDAQ": 21408.08,
-    "Crypto F&G": 8,
+    "Crypto F&G": 11,
     "10Y-3M Spread": 0.796,
     "Copper/Gold Ratio": 0.0012,
     "HYG/LQD Ratio": 0.7316,
@@ -1798,7 +1798,7 @@
     "GEX": -7.24,
     "SPX": 6368.85,
     "NASDAQ": 20948.36,
-    "Crypto F&G": 8,
+    "Crypto F&G": 11,
     "10Y-3M Spread": 0.833,
     "Copper/Gold Ratio": 0.0012,
     "HYG/LQD Ratio": 0.7315,
@@ -1812,7 +1812,7 @@
   },
   {
     "Date": "2026/3/30",
-    "CNN": 8.67,
+    "CNN": 8.73,
     "Net New Highs": -1.57,
     "McClellan Summation": 673.39,
     "VIX": 30.61,
@@ -1827,7 +1827,7 @@
     "GEX": -1.08,
     "SPX": 6343.72,
     "NASDAQ": 20794.64,
-    "Crypto F&G": 8,
+    "Crypto F&G": 11,
     "10Y-3M Spread": 0.744,
     "Copper/Gold Ratio": 0.0012,
     "HYG/LQD Ratio": 0.7276,
@@ -1836,7 +1836,7 @@
     "QQQ/SPY Ratio": 0.8834,
     "RSP/SPY Ratio": 0.2976,
     "HYG/IEF Ratio": 0.8272,
-    "DXY": 100.49,
+    "DXY": 100.51,
     "TLT": 86.78
   }
 ]
