@@ -2030,7 +2030,7 @@
     "GEX": 5.35,
     "SPX": 6782.81,
     "NASDAQ": 22634.99,
-    "Crypto F&G": 16,
+    "Crypto F&G": 15,
     "10Y-3M Spread": 0.691,
     "Copper/Gold Ratio": 0.0012,
     "HYG/LQD Ratio": 0.7324,
@@ -2059,7 +2059,7 @@
     "GEX": 5.64,
     "SPX": 6824.66,
     "NASDAQ": 22822.42,
-    "Crypto F&G": 16,
+    "Crypto F&G": 15,
     "10Y-3M Spread": 0.705,
     "Copper/Gold Ratio": 0.0012,
     "HYG/LQD Ratio": 0.7332,
@@ -2088,7 +2088,7 @@
     "GEX": 5.11,
     "SPX": 6816.89,
     "NASDAQ": 22902.89,
-    "Crypto F&G": 16,
+    "Crypto F&G": 15,
     "10Y-3M Spread": 0.724,
     "Copper/Gold Ratio": 0.0012,
     "HYG/LQD Ratio": 0.7322,
@@ -2097,7 +2097,7 @@
     "QQQ/SPY Ratio": 0.8993,
     "RSP/SPY Ratio": 0.2894,
     "HYG/IEF Ratio": 0.8393,
-    "DXY": 98.7,
+    "DXY": 98.65,
     "TLT": 86.49
   }
 ]
