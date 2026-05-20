@@ -2844,7 +2844,7 @@
     "NASDAQ": 26090.73,
     "Crypto F&G": 27,
     "10Y-3M Spread": 1.055,
-    "Copper/Gold Ratio": NaN,
+    "Copper/Gold Ratio": 0.0014,
     "HYG/LQD Ratio": 0.7388,
     "XLY/XLP Ratio": 1.3541,
     "KBE/SPY Ratio": 0.0846,
@@ -2856,7 +2856,7 @@
   },
   {
     "Date": "2026/5/19",
-    "CNN": 60.43,
+    "CNN": 60.29,
     "Net New Highs": 2.43,
     "McClellan Summation": 980.14,
     "VIX": 18.06,
@@ -2880,7 +2880,7 @@
     "QQQ/SPY Ratio": 0.9561,
     "RSP/SPY Ratio": 0.2748,
     "HYG/IEF Ratio": 0.8522,
-    "DXY": 99.33,
+    "DXY": 99.3,
     "TLT": 83.02
   }
 ]
