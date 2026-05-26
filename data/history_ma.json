@@ -6684,9 +6684,9 @@
     "KBE/SPY Ratio_5MA": 0.085,
     "KBE/SPY Ratio_10MA": 0.085,
     "KBE/SPY Ratio_20MA": 0.087,
-    "Crypto F&G_5MA": 28.0,
-    "Crypto F&G_10MA": 31.5,
-    "Crypto F&G_20MA": 35.15,
+    "Crypto F&G_5MA": 29.2,
+    "Crypto F&G_10MA": 32.1,
+    "Crypto F&G_20MA": 35.45,
     "QQQ/SPY Ratio_5MA": 0.959,
     "QQQ/SPY Ratio_10MA": 0.961,
     "QQQ/SPY Ratio_20MA": 0.948,
@@ -6759,9 +6759,9 @@
     "KBE/SPY Ratio_5MA": 0.085,
     "KBE/SPY Ratio_10MA": 0.085,
     "KBE/SPY Ratio_20MA": 0.087,
-    "Crypto F&G_5MA": 28.2,
-    "Crypto F&G_10MA": 30.1,
-    "Crypto F&G_20MA": 35.25,
+    "Crypto F&G_5MA": 30.6,
+    "Crypto F&G_10MA": 31.3,
+    "Crypto F&G_20MA": 35.85,
     "QQQ/SPY Ratio_5MA": 0.96,
     "QQQ/SPY Ratio_10MA": 0.961,
     "QQQ/SPY Ratio_20MA": 0.95,
@@ -6807,5 +6807,14 @@
     "NASDAQ_5MA": 26173.774,
     "NASDAQ_10MA": 26249.39,
     "NASDAQ_20MA": 25750.547
+  },
+  {
+    "Date": "2026/5/25",
+    "VIX_5MA": 17.11,
+    "VIX_10MA": 17.492,
+    "VIX_20MA": 17.557,
+    "Crypto F&G_5MA": 31.6,
+    "Crypto F&G_10MA": 31.3,
+    "Crypto F&G_20MA": 36.1
   }
 ]
