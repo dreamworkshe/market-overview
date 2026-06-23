@@ -3503,10 +3503,10 @@
     "10Y-3M Spread": 0.793,
     "Copper/Gold Ratio": 0.0015,
     "HYG/LQD Ratio": 0.7336,
-    "XLY/XLP Ratio": 1.4065,
-    "KBE/SPY Ratio": 0.088,
-    "QQQ/SPY Ratio": 0.9918,
-    "RSP/SPY Ratio": 0.2812,
+    "XLY/XLP Ratio": 1.4134,
+    "KBE/SPY Ratio": 0.0875,
+    "QQQ/SPY Ratio": 0.9907,
+    "RSP/SPY Ratio": 0.2801,
     "HYG/IEF Ratio": 0.8479,
     "DXY": 100.85,
     "TLT": 86.75
@@ -3542,7 +3542,7 @@
   },
   {
     "Date": "2026/6/22",
-    "CNN": 34.74,
+    "CNN": 34.34,
     "Net New Highs": 1.91,
     "McClellan Summation": 912.69,
     "VIX": 17.28,
