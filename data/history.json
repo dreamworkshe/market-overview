@@ -4249,8 +4249,8 @@
     "VIX3M": 20.51,
     "SKEW": 147.28,
     "VIX/VIX3M Ratio": 0.9059,
-    "DIX": null,
-    "GEX": null,
+    "DIX": 43.29,
+    "GEX": 2.35,
     "SPX": 7411.98,
     "NASDAQ": 24975.82,
     "Crypto F&G": 27,
@@ -4262,7 +4262,7 @@
     "QQQ/SPY Ratio": 0.926,
     "RSP/SPY Ratio": 0.289,
     "HYG/IEF Ratio": 0.8517,
-    "DXY": 101.46,
+    "DXY": 101.47,
     "TLT": 83.25
   }
 ]
