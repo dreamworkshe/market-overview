@@ -5378,10 +5378,10 @@
     "10Y-3M Spread": 0.982,
     "Copper/Gold Ratio": 0.0015,
     "HYG/LQD Ratio": 0.7486,
-    "XLY/XLP Ratio": 1.3342,
-    "KBE/SPY Ratio": 0.0877,
-    "QQQ/SPY Ratio": 0.9424,
-    "RSP/SPY Ratio": 0.2804,
+    "XLY/XLP Ratio": 1.34,
+    "KBE/SPY Ratio": 0.0872,
+    "QQQ/SPY Ratio": 0.9415,
+    "RSP/SPY Ratio": 0.2794,
     "HYG/IEF Ratio": 0.8627,
     "DXY": 100.22,
     "TLT": 81.78
@@ -5407,17 +5407,17 @@
     "10Y-3M Spread": 1.02,
     "Copper/Gold Ratio": 0.0015,
     "HYG/LQD Ratio": 0.75,
-    "XLY/XLP Ratio": 1.3409,
-    "KBE/SPY Ratio": 0.0875,
-    "QQQ/SPY Ratio": 0.9472,
-    "RSP/SPY Ratio": 0.2787,
+    "XLY/XLP Ratio": 1.3468,
+    "KBE/SPY Ratio": 0.087,
+    "QQQ/SPY Ratio": 0.9462,
+    "RSP/SPY Ratio": 0.2777,
     "HYG/IEF Ratio": 0.8649,
     "DXY": 100.22,
     "TLT": 81.25
   },
   {
     "Date": "2026/9/21",
-    "CNN": 33.71,
+    "CNN": 33.66,
     "Net New Highs": -3.88,
     "McClellan Summation": 539.8,
     "VIX": 14.87,
@@ -5441,7 +5441,7 @@
     "QQQ/SPY Ratio": 0.9586,
     "RSP/SPY Ratio": 0.275,
     "HYG/IEF Ratio": 0.8632,
-    "DXY": 100.42,
+    "DXY": 100.43,
     "TLT": 81.8
   }
 ]
